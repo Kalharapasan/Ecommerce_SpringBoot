@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.Date;
 import java.util.Optional;
 
 @Service
@@ -36,6 +37,12 @@ public class UserService {
             return ResponseEntity.badRequest().body(MSG_CODE_2);
         }
 
+        // Validate role — now supports ADMIN, USER, SELLER
+        String role = userDto.getRole().toUpperCase();
+        if (!role.equals("ADMIN") && !role.equals("USER") && !role.equals("SELLER")) {
+            return ResponseEntity.badRequest().body("Invalid role. Allowed roles: ADMIN, USER, SELLER");
+        }
+
         String encPassword = securityConfig.hashPassword(userDto.getPassword());
 
         System.out.println("ENC PASSWORD : " + encPassword);
@@ -43,9 +50,13 @@ public class UserService {
         User user = new User();
         user.setEmail(userDto.getEmail());
         user.setUsername(userDto.getUsername());
-        user.setRole(userDto.getRole());
+        user.setRole(role);
         user.setPassword(encPassword);
         user.setFullName(userDto.getFullName());
+        // New fields with defaults
+        user.setStatus("ACTIVE");
+        user.setEmailVerified(false);
+        user.setCreatedDate(new Date());
 
         User savedUser = userRepo.save(user);
         if (savedUser.getUserId() != null) {
@@ -70,12 +81,30 @@ public class UserService {
         Optional<User> optUser = userRepo.findUserByUsername(loginDto.getUsername());
         if (optUser.isPresent()) {
             User user = optUser.get();
+
+            // Check if user account is active
+            if (user.getStatus() != null && !user.getStatus().equals("ACTIVE")) {
+                return ResponseEntity.badRequest().body("Account is " + user.getStatus().toLowerCase() + ". Please contact support.");
+            }
+
             Boolean flag = securityConfig.comparePassword(user.getPassword(), loginDto.getPassword());
             if (flag) {
+                // ─── Auto-migrate MD5 hash to BCrypt on successful login ───
+                if (securityConfig.isMd5Hash(user.getPassword())) {
+                    String bcryptHash = securityConfig.hashPassword(loginDto.getPassword());
+                    user.setPassword(bcryptHash);
+                    System.out.println("AUTO-MIGRATED password for user: " + user.getUsername() + " from MD5 to BCrypt");
+                }
+
+                // Update last login date
+                user.setLastLoginDate(new Date());
+                userRepo.save(user);
 
                 LoginResponseDto loginResponse = new LoginResponseDto();
                 String jwtToken = securityConfig.generateToken(user.getUsername(), user.getUserId(), user.getRole());
+                String refreshToken = securityConfig.generateRefreshToken(user.getUsername(), user.getUserId(), user.getRole());
                 loginResponse.setToken(jwtToken);
+                loginResponse.setRefreshToken(refreshToken);
 
                 response.setMessage("LOGIN SUCCESSFUL");
                 response.setData(loginResponse);
