@@ -7,19 +7,38 @@
       <div class="col-md-10">
         <div class="d-flex justify-content-between align-items-center position-relative">
           <div class="progress position-absolute top-50 start-0 translate-middle-y w-100" style="height: 2px; z-index: 1;">
-            <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+            <div 
+              class="progress-bar" 
+              role="progressbar" 
+              :style="{ width: progressPercent + '%' }" 
+              aria-valuenow="0" 
+              aria-valuemin="0" 
+              aria-valuemax="100"
+            ></div>
           </div>
           <div class="d-flex flex-column align-items-center position-relative" style="z-index: 2;">
-            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center font-weight-bold" style="width: 35px; height: 35px;">1</div>
-            <span class="small font-weight-bold mt-2 text-primary">Cart Review</span>
+            <div 
+              class="rounded-circle d-flex align-items-center justify-content-center font-weight-bold" 
+              :class="currentStep >= 1 ? 'bg-primary text-white' : 'bg-white border text-secondary shadow-sm'"
+              style="width: 35px; height: 35px; transition: all 0.3s;"
+            >1</div>
+            <span class="small font-weight-bold mt-2" :class="currentStep >= 1 ? 'text-primary' : 'text-secondary'">Cart Review</span>
           </div>
           <div class="d-flex flex-column align-items-center position-relative" style="z-index: 2;">
-            <div class="rounded-circle bg-white border text-secondary d-flex align-items-center justify-content-center font-weight-bold shadow-sm" style="width: 35px; height: 35px;">2</div>
-            <span class="small font-weight-bold mt-2 text-secondary">Delivery Info</span>
+            <div 
+              class="rounded-circle d-flex align-items-center justify-content-center font-weight-bold" 
+              :class="currentStep >= 2 ? 'bg-primary text-white' : 'bg-white border text-secondary shadow-sm'"
+              style="width: 35px; height: 35px; transition: all 0.3s;"
+            >2</div>
+            <span class="small font-weight-bold mt-2" :class="currentStep >= 2 ? 'text-primary' : 'text-secondary'">Delivery Info</span>
           </div>
           <div class="d-flex flex-column align-items-center position-relative" style="z-index: 2;">
-            <div class="rounded-circle bg-white border text-secondary d-flex align-items-center justify-content-center font-weight-bold shadow-sm" style="width: 35px; height: 35px;">3</div>
-            <span class="small font-weight-bold mt-2 text-secondary">Secure Payment</span>
+            <div 
+              class="rounded-circle d-flex align-items-center justify-content-center font-weight-bold" 
+              :class="currentStep >= 3 ? 'bg-primary text-white' : 'bg-white border text-secondary shadow-sm'"
+              style="width: 35px; height: 35px; transition: all 0.3s;"
+            >3</div>
+            <span class="small font-weight-bold mt-2" :class="currentStep >= 3 ? 'text-primary' : 'text-secondary'">Secure Payment</span>
           </div>
         </div>
       </div>
@@ -40,15 +59,15 @@
     <!-- Cart Layout -->
     <div v-else class="row">
       <!-- Empty Cart State -->
-      <div v-if="items.length === 0" class="col-12 text-center py-5 bg-white rounded shadow-sm">
+      <div v-if="items.length === 0" class="col-12 text-center py-5 bg-white rounded shadow-sm border">
         <h4 class="text-muted mb-3">Your cart is empty.</h4>
         <router-link to="/product" class="btn btn-primary">Start Shopping</router-link>
       </div>
 
       <!-- Line Items & Checkout Details -->
       <template v-else>
-        <!-- Table of Items -->
-        <div class="col-lg-8 mb-4">
+        <!-- STEP 1: CART REVIEW -->
+        <div v-if="currentStep === 1" class="col-lg-8 mb-4">
           <div class="card shadow-sm border-0">
             <div class="table-responsive">
               <table class="table table-hover mb-0">
@@ -75,6 +94,144 @@
           </div>
         </div>
 
+        <!-- STEP 2: DELIVERY INFO -->
+        <div v-else-if="currentStep === 2" class="col-lg-8 mb-4 text-start">
+          <div class="card shadow-sm border-0 p-4 bg-white rounded">
+            <h5 class="font-weight-bold mb-4">Delivery Information</h5>
+            <form @submit.prevent="currentStep = 3">
+              <div class="form-group mb-3">
+                <label for="addressStreet" class="form-label">Street Address</label>
+                <input 
+                  type="text" 
+                  id="addressStreet" 
+                  class="form-control" 
+                  v-model="delivery.street" 
+                  required 
+                  placeholder="e.g., 123 Galle Road"
+                />
+              </div>
+              <div class="row">
+                <div class="col-md-6 form-group mb-3">
+                  <label for="addressCity" class="form-label">City</label>
+                  <input 
+                    type="text" 
+                    id="addressCity" 
+                    class="form-control" 
+                    v-model="delivery.city" 
+                    required 
+                    placeholder="e.g., Colombo"
+                  />
+                </div>
+                <div class="col-md-6 form-group mb-3">
+                  <label for="addressPhone" class="form-label">Phone Number</label>
+                  <input 
+                    type="tel" 
+                    id="addressPhone" 
+                    class="form-control" 
+                    v-model="delivery.phone" 
+                    required 
+                    placeholder="e.g., 0771234567"
+                  />
+                </div>
+              </div>
+              <div class="d-flex justify-content-between mt-4">
+                <button type="button" class="btn btn-outline-secondary px-4" @click="currentStep = 1">Back</button>
+                <button type="submit" class="btn btn-primary px-4" :disabled="!isDeliveryValid">Proceed to Payment</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- STEP 3: SECURE PAYMENT -->
+        <div v-else-if="currentStep === 3" class="col-lg-8 mb-4 text-start">
+          <div class="card shadow-sm border-0 p-4 bg-white rounded">
+            <h5 class="font-weight-bold mb-4">Payment Method</h5>
+            
+            <div class="mb-4">
+              <!-- Cash on Delivery Option -->
+              <div 
+                class="form-check p-3 border rounded mb-3 d-flex align-items-center cursor-pointer" 
+                :class="{'border-primary bg-light': payment.method === 'CASH_ON_DELIVERY'}"
+                @click="payment.method = 'CASH_ON_DELIVERY'"
+                style="padding-left: 2.5rem !important;"
+              >
+                <input 
+                  class="form-check-input me-3" 
+                  type="radio" 
+                  name="payMethod" 
+                  id="payCod" 
+                  value="CASH_ON_DELIVERY" 
+                  v-model="payment.method"
+                  @click.stop
+                />
+                <label class="form-check-label w-100 cursor-pointer" for="payCod">
+                  <span class="d-block font-weight-bold">Cash on Delivery (COD)</span>
+                  <span class="small text-muted">Pay with cash when your package is delivered to your door.</span>
+                </label>
+              </div>
+              
+              <!-- Online Payment Option -->
+              <div 
+                class="form-check p-3 border rounded d-flex flex-column cursor-pointer" 
+                :class="{'border-primary bg-light': payment.method === 'ONLINE_PAYMENT'}"
+                @click="payment.method = 'ONLINE_PAYMENT'"
+                style="padding-left: 2.5rem !important;"
+              >
+                <div class="d-flex align-items-center w-100">
+                  <input 
+                    class="form-check-input me-3" 
+                    type="radio" 
+                    name="payMethod" 
+                    id="payOnline" 
+                    value="ONLINE_PAYMENT" 
+                    v-model="payment.method"
+                    @click.stop
+                  />
+                  <label class="form-check-label w-100 cursor-pointer" for="payOnline">
+                    <span class="d-block font-weight-bold">Online Payment (Credit / Debit Card)</span>
+                    <span class="small text-muted">Pay securely using your Visa, MasterCard, or Amex card.</span>
+                  </label>
+                </div>
+                
+                <!-- Mock Card Form -->
+                <div v-if="payment.method === 'ONLINE_PAYMENT'" class="mt-3 pt-3 border-top w-100" @click.stop>
+                  <div class="form-group mb-3">
+                    <label class="form-label small text-secondary font-weight-bold">Cardholder Name</label>
+                    <input type="text" class="form-control form-control-sm" v-model="payment.cardName" required placeholder="John Doe">
+                  </div>
+                  <div class="form-group mb-3">
+                    <label class="form-label small text-secondary font-weight-bold">Card Number</label>
+                    <input type="text" class="form-control form-control-sm" v-model="payment.cardNumber" required placeholder="4111 2222 3333 4444" maxlength="19">
+                  </div>
+                  <div class="row">
+                    <div class="col-6 form-group mb-3">
+                      <label class="form-label small text-secondary font-weight-bold">Expiry Date</label>
+                      <input type="text" class="form-control form-control-sm" v-model="payment.cardExpiry" required placeholder="MM/YY" maxlength="5">
+                    </div>
+                    <div class="col-6 form-group mb-3">
+                      <label class="form-label small text-secondary font-weight-bold">CVV</label>
+                      <input type="password" class="form-control form-control-sm" v-model="payment.cardCvv" required placeholder="123" maxlength="3">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-between mt-4">
+              <button type="button" class="btn btn-outline-secondary px-4" @click="currentStep = 2" :disabled="actionLoading">Back</button>
+              <button 
+                type="button" 
+                class="btn btn-success px-4 font-weight-bold" 
+                @click="handlePlaceOrder" 
+                :disabled="actionLoading || !isPaymentValid"
+              >
+                <span v-if="actionLoading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                Place Order
+              </button>
+            </div>
+          </div>
+        </div>
+
         <!-- Cost Breakdown Card & Promo Code Card -->
         <div class="col-lg-4">
           <div class="card shadow-sm border-0 p-4 bg-white rounded mb-4">
@@ -97,14 +254,36 @@
               <span class="h5 font-weight-bold text-primary mb-0">{{ formattedTotal }}</span>
             </div>
             
-            <button class="btn btn-primary btn-lg w-100 py-3 font-weight-bold" @click="handleCheckout" :disabled="actionLoading">
-              <span v-if="actionLoading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+            <!-- Dynamic Proceed Buttons -->
+            <button 
+              v-if="currentStep === 1" 
+              class="btn btn-primary btn-lg w-100 py-3 font-weight-bold" 
+              @click="currentStep = 2" 
+              :disabled="actionLoading"
+            >
               Proceed to Checkout
+            </button>
+            <button 
+              v-else-if="currentStep === 2" 
+              class="btn btn-primary btn-lg w-100 py-3 font-weight-bold" 
+              @click="currentStep = 3" 
+              :disabled="!isDeliveryValid"
+            >
+              Proceed to Payment
+            </button>
+            <button 
+              v-else 
+              class="btn btn-success btn-lg w-100 py-3 font-weight-bold" 
+              @click="handlePlaceOrder" 
+              :disabled="actionLoading || !isPaymentValid"
+            >
+              <span v-if="actionLoading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+              Place Order
             </button>
           </div>
 
-          <!-- Promo Code Card -->
-          <div class="card shadow-sm border-0 p-4 bg-white rounded">
+          <!-- Promo Code Card (Only on Step 1) -->
+          <div class="card shadow-sm border-0 p-4 bg-white rounded" v-if="currentStep === 1">
             <h6 class="font-weight-bold mb-3 text-start">Promo Code</h6>
             <div class="input-group mb-2">
               <input 
@@ -138,6 +317,7 @@ export default {
   components: { CartItemRow },
   data() {
     return {
+      currentStep: 1,
       items: [],
       totals: {
         amount: 0,
@@ -150,10 +330,31 @@ export default {
       promoCode: '',
       appliedDiscountPercent: 0,
       promoMessage: '',
-      promoError: false
+      promoError: false,
+      
+      // Delivery Information
+      delivery: {
+        street: '',
+        city: '',
+        phone: ''
+      },
+
+      // Payment Information
+      payment: {
+        method: 'CASH_ON_DELIVERY', // default
+        cardName: '',
+        cardNumber: '',
+        cardExpiry: '',
+        cardCvv: ''
+      }
     };
   },
   computed: {
+    progressPercent() {
+      if (this.currentStep === 1) return 0;
+      if (this.currentStep === 2) return 50;
+      return 100;
+    },
     formattedSubtotal() {
       return formatPrice(this.totals.amount);
     },
@@ -162,6 +363,24 @@ export default {
     },
     formattedTotal() {
       return formatPrice(this.totals.finalAmount);
+    },
+    isDeliveryValid() {
+      return (
+        this.delivery.street.trim() !== '' &&
+        this.delivery.city.trim() !== '' &&
+        this.delivery.phone.trim() !== ''
+      );
+    },
+    isPaymentValid() {
+      if (this.payment.method === 'CASH_ON_DELIVERY') {
+        return true;
+      }
+      return (
+        this.payment.cardName.trim() !== '' &&
+        this.payment.cardNumber.trim() !== '' &&
+        this.payment.cardExpiry.trim() !== '' &&
+        this.payment.cardCvv.trim() !== ''
+      );
     }
   },
   methods: {
@@ -256,18 +475,43 @@ export default {
         this.fetchCartData();
       }
     },
-    async handleCheckout() {
-      if (!confirm('Would you like to proceed with the checkout? This will finalize your order and clear your cart.')) {
+    async handlePlaceOrder() {
+      if (!this.isDeliveryValid) {
+        alert('Please complete the delivery details first.');
+        this.currentStep = 2;
         return;
       }
+      if (!this.isPaymentValid) {
+        alert('Please complete the payment details first.');
+        this.currentStep = 3;
+        return;
+      }
+
       this.actionLoading = true;
       try {
         const token = getToken();
-        const response = await api.delete(`/cart/clear/${token}`);
-        alert(response.data || 'Order Placed Successfully! Your cart has been cleared.');
+        const addressString = `${this.delivery.street}, ${this.delivery.city} (Phone: ${this.delivery.phone})`;
+        
+        const payload = {
+          token: token,
+          address: addressString,
+          paymentMethod: this.payment.method,
+          discountPercent: this.appliedDiscountPercent
+        };
+
+        const response = await api.post('/order/create', payload);
+        alert(response.data.message || 'Order Placed Successfully! Your cart has been cleared.');
+        
+        // Reset state
         this.items = [];
         this.resetTotals();
         updateCartCount(0);
+        this.currentStep = 1;
+        this.delivery = { street: '', city: '', phone: '' };
+        this.payment = { method: 'CASH_ON_DELIVERY', cardName: '', cardNumber: '', cardExpiry: '', cardCvv: '' };
+        
+        // Redirect to profile to see order history
+        this.$router.push({ name: 'Profile' });
       } catch (err) {
         alert('Checkout failed: ' + extractErrorMessage(err));
       } finally {
@@ -284,5 +528,11 @@ export default {
 <style scoped>
 .card {
   border-radius: 12px;
+}
+.cursor-pointer {
+  cursor: pointer;
+}
+.bg-light {
+  background-color: rgba(13, 110, 253, 0.05) !important;
 }
 </style>
