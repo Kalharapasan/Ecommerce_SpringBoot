@@ -750,18 +750,18 @@ export default {
 
 .stat-card {
   border-radius: var(--bf-radius-lg);
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--bf-border);
 }
 
 .stat-icon-badge {
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--bf-bg-tertiary);
   width: 50px;
   height: 50px;
   border-radius: var(--bf-radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--bf-border);
 }
 
 .brand-grid .col {
@@ -776,22 +776,22 @@ export default {
   font-family: var(--bf-font-mono);
   font-weight: 700;
   font-size: 0.875rem;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  background: var(--bf-bg-secondary);
+  border: 1.5px solid var(--bf-border) !important;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   transition: all var(--bf-transition-fast);
 }
 
 .brand-item-card:hover {
-  color: white !important;
+  color: var(--bf-primary) !important;
   border-color: var(--bf-primary) !important;
-  background: rgba(59, 130, 246, 0.08);
+  background: var(--bf-primary-light);
   box-shadow: 0 0 15px rgba(59, 130, 246, 0.15);
 }
 
 .testimonial-card {
-  border: 1px solid rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid var(--bf-border) !important;
   transition: all var(--bf-transition-base);
 }
 
@@ -842,31 +842,33 @@ export default {
 }
 
 .filter-chip {
+  flex-shrink: 0;
   padding: 8px 12px;
   font-size: 0.8125rem;
   border-radius: var(--bf-radius-md);
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  background: var(--bf-bg-secondary);
+  border: 1.5px solid var(--bf-border);
   color: var(--bf-text-secondary);
   cursor: pointer;
   transition: all var(--bf-transition-fast);
 }
 
 .filter-chip:hover {
-  color: white;
-  background: rgba(255, 255, 255, 0.06);
+  color: var(--bf-primary);
+  background: var(--bf-primary-light);
+  border-color: var(--bf-primary);
 }
 
 .filter-chip.active {
-  background: var(--bf-primary-light);
+  background: var(--bf-primary);
   border-color: var(--bf-primary);
   color: white;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .pagination-cyber .page-link {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--bf-bg-secondary);
+  border: 1px solid var(--bf-border);
   color: var(--bf-text-secondary);
   border-radius: var(--bf-radius-md);
   padding: 8px 16px;
@@ -881,20 +883,21 @@ export default {
 }
 
 .pagination-cyber .page-link:hover {
-  background: rgba(255, 255, 255, 0.08);
-  color: white;
+  background: var(--bf-primary-light);
+  color: var(--bf-primary);
+  border-color: var(--bf-primary);
 }
 
 .pagination-cyber .page-item.disabled .page-link {
   background: transparent;
-  border-color: rgba(255, 255, 255, 0.02);
+  border-color: var(--bf-border-light);
   color: var(--bf-text-muted);
   opacity: 0.5;
 }
 
 /* List card styles */
 .list-card {
-  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid var(--bf-border) !important;
   transition: all var(--bf-transition-base);
 }
 
