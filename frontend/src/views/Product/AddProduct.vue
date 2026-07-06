@@ -45,6 +45,18 @@
                   </div>
 
                   <div class="form-group mb-3">
+                    <label class="form-label d-block">Image Source</label>
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="radio" id="srcUrl" value="url" v-model="imageSource">
+                      <label class="form-check-label" for="srcUrl">URL</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="radio" id="srcUpload" value="upload" v-model="imageSource">
+                      <label class="form-check-label" for="srcUpload">Upload File</label>
+                    </div>
+                  </div>
+
+                  <div v-if="imageSource === 'url'" class="form-group mb-3">
                     <label for="imageUrl" class="form-label">Image URL</label>
                     <input 
                       type="text" 
@@ -56,6 +68,23 @@
                     />
                     <div v-if="touched.imageUrl && !imageUrl" class="text-danger mt-1 small">
                       Image URL is required.
+                    </div>
+                  </div>
+                  <div v-else class="form-group mb-3">
+                    <label for="imageFile" class="form-label">Upload Image</label>
+                    <input 
+                      type="file" 
+                      id="imageFile" 
+                      class="form-control" 
+                      @change="onFileChange"
+                      accept="image/*"
+                    />
+                    <div v-if="uploading" class="text-muted small mt-1">
+                      <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                      Uploading image...
+                    </div>
+                    <div v-if="touched.imageUrl && !imageUrl && !uploading" class="text-danger mt-1 small">
+                      Please upload an image file.
                     </div>
                   </div>
 
@@ -163,6 +192,8 @@ export default {
   name: 'AddProduct',
   data() {
     return {
+      imageSource: 'url',
+      uploading: false,
       productName: '',
       description: '',
       imageUrl: '',
@@ -211,6 +242,29 @@ export default {
         this.categories = response.data.data;
       } catch (err) {
         this.error = 'Failed to load categories: ' + extractErrorMessage(err);
+      }
+    },
+    async onFileChange(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      this.uploading = true;
+      this.error = null;
+      const formData = new FormData();
+      formData.append('file', file);
+
+      try {
+        const response = await api.post('/file/upload', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+        this.imageUrl = response.data.data;
+        this.touched.imageUrl = true;
+      } catch (err) {
+        this.error = 'Failed to upload image: ' + extractErrorMessage(err);
+      } finally {
+        this.uploading = false;
       }
     },
     async handleSubmit() {
