@@ -241,7 +241,78 @@
               </div>
             </div>
 
-            <!-- ─── TAB 5: SUPPORT MESSAGES ─── -->
+            <!-- ─── TAB 5: STORES / VENDORS ─── -->
+            <div v-if="activeTab === 'stores'">
+              <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                <div>
+                  <h4 class="font-weight-bold text-dark mb-1">Marketplace Stores & Vendors</h4>
+                  <p class="text-secondary small mb-0">Verify and manage multi-vendor storefront credentials</p>
+                </div>
+                <span class="bf-badge bf-badge-primary">{{ stores.length }} Storefronts</span>
+              </div>
+
+              <div class="table-responsive" v-if="stores.length > 0">
+                <table class="bf-table align-middle">
+                  <thead>
+                    <tr>
+                      <th>Store Profile</th>
+                      <th>Owner Account</th>
+                      <th>Rating & Reviews</th>
+                      <th>Followers</th>
+                      <th>Verification</th>
+                      <th class="text-end">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="store in stores" :key="store.storeId">
+                      <td>
+                        <div class="d-flex align-items-center gap-3">
+                          <div class="bf-product-mini-img-wrapper">
+                            <img :src="store.storeLogoUrl || 'https://placehold.co/100x100?text=Store'" class="bf-product-mini-img" alt="Logo" />
+                          </div>
+                          <div>
+                            <h6 class="mb-0 font-weight-bold text-dark">
+                              <router-link :to="'/store/' + store.storeId" class="text-decoration-none text-dark">
+                                {{ store.storeName }}
+                              </router-link>
+                            </h6>
+                            <small class="text-muted text-truncate d-inline-block" style="max-width: 250px;">{{ store.storeDescription }}</small>
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="font-weight-bold text-dark">{{ store.ownerName }}</div>
+                        <small class="text-muted">UID #{{ store.ownerId }}</small>
+                      </td>
+                      <td>
+                        <div class="text-warning font-weight-bold">{{ store.rating }} ★</div>
+                        <small class="text-muted">{{ store.reviewsCount }} reviews</small>
+                      </td>
+                      <td class="font-weight-bold text-dark">{{ store.followersCount }}</td>
+                      <td>
+                        <span class="bf-badge" :class="store.isVerified ? 'bf-badge-success' : 'bf-badge-warning'">
+                          {{ store.isVerified ? 'Verified' : 'Pending Review' }}
+                        </span>
+                      </td>
+                      <td class="text-end">
+                        <button
+                          class="bf-btn bf-btn-sm"
+                          :class="store.isVerified ? 'bf-btn-outline' : 'bf-btn-primary'"
+                          @click="toggleStoreVerify(store.storeId)"
+                        >
+                          {{ store.isVerified ? 'Revoke Status' : 'Grant Verified' }}
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div v-else class="text-center py-5 text-muted small">
+                No stores registered in the marketplace yet.
+              </div>
+            </div>
+
+            <!-- ─── TAB 6: SUPPORT MESSAGES ─── -->
             <div v-if="activeTab === 'messages'">
               <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
                 <div>
@@ -311,6 +382,7 @@
 import api, { extractErrorMessage, formatPrice } from '../../utils/api';
 import LoadingSkeleton from '../../components/Common/LoadingSkeleton.vue';
 import { showToast } from '../../components/Common/ToastNotification.vue';
+import { getToken } from '../../utils/auth';
 
 export default {
   name: 'AdminDashboard',
@@ -325,11 +397,13 @@ export default {
       products: [],
       categories: [],
       messages: [],
+      stores: [],
       tabItems: [
         { id: 'deliveries', label: 'Deliveries / Orders', icon: '📦', badgeCount: 0 },
         { id: 'users', label: 'Registered Users', icon: '👥', badgeCount: 0 },
         { id: 'products', label: 'Products', icon: '🔌', badgeCount: 0 },
         { id: 'categories', label: 'Categories', icon: '📂', badgeCount: 0 },
+        { id: 'stores', label: 'Stores', icon: '🏢', badgeCount: 0 },
         { id: 'messages', label: 'Support Messages', icon: '✉️', badgeCount: 0 }
       ]
     };
@@ -376,12 +450,13 @@ export default {
       this.loading = true;
       this.error = null;
       try {
-        const [ordersRes, usersRes, prodRes, catRes, msgRes] = await Promise.all([
+        const [ordersRes, usersRes, prodRes, catRes, msgRes, storeRes] = await Promise.all([
           api.get('/order/all'),
           api.get('/user/all'),
           api.get('/product'),
           api.get('/category'),
-          api.get('/message/all')
+          api.get('/message/all'),
+          api.get('/store/all')
         ]);
         this.orders = ordersRes.data.data || [];
         this.users = usersRes.data.data || [];
@@ -391,6 +466,7 @@ export default {
           ...m,
           replyInput: ''
         }));
+        this.stores = storeRes.data.data || [];
       } catch (err) {
         this.error = extractErrorMessage(err);
         showToast({
@@ -453,6 +529,30 @@ export default {
       } catch (err) {
         showToast({
           message: 'Failed to delete category: ' + extractErrorMessage(err),
+          type: 'error',
+          title: 'Operation Failed'
+        });
+      }
+    },
+    async toggleStoreVerify(storeId) {
+      const token = getToken();
+      if (!token) return;
+      try {
+        const response = await api.put(`/store/${storeId}/verify?token=${token}`);
+        showToast({
+          message: response.data.message,
+          type: 'success',
+          title: 'Store Verification Updated'
+        });
+        // Update local state
+        const updatedStore = response.data.data;
+        const index = this.stores.findIndex(s => s.storeId === storeId);
+        if (index !== -1) {
+          this.stores[index] = updatedStore;
+        }
+      } catch (err) {
+        showToast({
+          message: 'Failed to update store verification: ' + extractErrorMessage(err),
           type: 'error',
           title: 'Operation Failed'
         });

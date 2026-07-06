@@ -89,9 +89,11 @@
 
     <!-- ═══ Main Content ═══ -->
     <main class="bf-main-content">
-      <transition name="page-fade" mode="out-in">
-        <router-view :key="$route.fullPath" />
-      </transition>
+      <router-view v-slot="{ Component }">
+        <transition name="page-fade" mode="out-in">
+          <component :is="Component" :key="$route.fullPath" />
+        </transition>
+      </router-view>
     </main>
 
     <!-- ═══ Footer ═══ -->

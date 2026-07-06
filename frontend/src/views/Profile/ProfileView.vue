@@ -89,6 +89,13 @@
                     <button class="bf-btn bf-btn-outline w-100 mt-4" @click="toggleEdit">
                       Edit Account Info
                     </button>
+
+                    <!-- Become a Seller Section for regular USERs -->
+                    <div v-if="user && user.role === 'USER'" class="mt-4 p-3 bg-light border rounded text-center">
+                      <h6 class="font-weight-bold text-dark mb-2">💡 Start Earning</h6>
+                      <p class="small text-muted mb-3">Sell your high-quality PC hardware and components on the ByteForge marketplace.</p>
+                      <router-link to="/seller/store-setup" class="bf-btn bf-btn-primary bf-btn-sm w-100">Become a Seller</router-link>
+                    </div>
                   </div>
 
                   <!-- EDIT MODE -->

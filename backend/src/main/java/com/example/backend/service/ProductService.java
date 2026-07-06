@@ -5,6 +5,8 @@ import com.example.backend.model.Category;
 import com.example.backend.model.Product;
 import com.example.backend.repository.CategoryRepo;
 import com.example.backend.repository.ProductRepo;
+import com.example.backend.repository.StoreRepo;
+import com.example.backend.model.Store;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -28,10 +30,12 @@ public class ProductService {
 
     private final ProductRepo productRepo;
     private final CategoryRepo categoryRepo;
+    private final StoreRepo storeRepo;
 
-    public ProductService(ProductRepo productRepo, CategoryRepo categoryRepo) {
+    public ProductService(ProductRepo productRepo, CategoryRepo categoryRepo, StoreRepo storeRepo) {
         this.productRepo = productRepo;
         this.categoryRepo = categoryRepo;
+        this.storeRepo = storeRepo;
     }
 
     public ResponseEntity createProduct(ProductDto product) {
@@ -59,19 +63,15 @@ public class ProductService {
         data.setPrice(product.getPrice());
         data.setCategory(categoryRepo.findById(product.getCategoryId()).get());
         data.setStock(product.getStock() != null ? product.getStock() : 0);
+        if (product.getStoreId() != null) {
+            Optional<Store> store = storeRepo.findById(product.getStoreId());
+            store.ifPresent(data::setStore);
+        }
 
         Product savedProduct = productRepo.save(data);
         if (savedProduct.getProductId() != null) {
-            ProductDto productDto = new ProductDto();
-            productDto.setProductId(savedProduct.getProductId());
-            productDto.setProductName(savedProduct.getProductName());
-            productDto.setDescription(savedProduct.getDescription());
-            productDto.setImageUrl(savedProduct.getImageUrl());
-            productDto.setPrice(savedProduct.getPrice());
-            productDto.setCategoryId(savedProduct.getCategory().getCategoryId());
-            productDto.setStock(savedProduct.getStock());
             response.setMessage(MSG_CODE_4);
-            response.setData(productDto);
+            response.setData(convertToDto(savedProduct));
             return ResponseEntity.ok().body(response);
         } else {
             return ResponseEntity.badRequest().body(MSG_CODE_5);
@@ -81,8 +81,11 @@ public class ProductService {
     public ResponseEntity getProductList() {
         ResponseDto response = new ResponseDto();
         List<Product> productList = productRepo.findAll();
+        List<ProductDto> dtoList = productList.stream()
+                .map(this::convertToDto)
+                .collect(java.util.stream.Collectors.toList());
         response.setMessage(MSG_CODE_7);
-        response.setData(productList);
+        response.setData(dtoList);
         return ResponseEntity.ok().body(response);
     }
 
@@ -93,18 +96,8 @@ public class ProductService {
         }
         Optional<Product> optProduct = productRepo.findById(productId);
         if (optProduct.isPresent()) {
-
-            ProductDto productDto = new ProductDto();
-            productDto.setProductId(optProduct.get().getProductId());
-            productDto.setProductName(optProduct.get().getProductName());
-            productDto.setDescription(optProduct.get().getDescription());
-            productDto.setImageUrl(optProduct.get().getImageUrl());
-            productDto.setPrice(optProduct.get().getPrice());
-            productDto.setCategoryId(optProduct.get().getCategory().getCategoryId());
-            productDto.setStock(optProduct.get().getStock());
-
             response.setMessage(MSG_CODE_7);
-            response.setData(productDto);
+            response.setData(convertToDto(optProduct.get()));
             return ResponseEntity.ok().body(response);
         } else {
             return ResponseEntity.badRequest().body(MSG_CODE_6);
@@ -126,19 +119,16 @@ public class ProductService {
             data.setPrice(product.getPrice());
             data.setCategory(categoryRepo.findById(product.getCategoryId()).get());
             data.setStock(product.getStock() != null ? product.getStock() : 0);
+            if (product.getStoreId() != null) {
+                Optional<Store> store = storeRepo.findById(product.getStoreId());
+                store.ifPresent(data::setStore);
+            } else {
+                data.setStore(optProduct.get().getStore());
+            }
             Product updatedProduct = productRepo.save(data);
 
-            ProductDto productDto = new ProductDto();
-            productDto.setProductId(updatedProduct.getProductId());
-            productDto.setProductName(updatedProduct.getProductName());
-            productDto.setDescription(updatedProduct.getDescription());
-            productDto.setImageUrl(updatedProduct.getImageUrl());
-            productDto.setPrice(updatedProduct.getPrice());
-            productDto.setCategoryId(updatedProduct.getCategory().getCategoryId());
-            productDto.setStock(updatedProduct.getStock());
-
             response.setMessage(MSG_CODE_8);
-            response.setData(productDto);
+            response.setData(convertToDto(updatedProduct));
             return ResponseEntity.ok().body(response);
         } else {
             return ResponseEntity.badRequest().body(MSG_CODE_6);
@@ -161,5 +151,24 @@ public class ProductService {
         } else {
             return ResponseEntity.badRequest().body(MSG_CODE_6);
         }
+    }
+
+    public ProductDto convertToDto(Product product) {
+        if (product == null) return null;
+        ProductDto dto = new ProductDto();
+        dto.setProductId(product.getProductId());
+        dto.setProductName(product.getProductName());
+        dto.setDescription(product.getDescription());
+        dto.setImageUrl(product.getImageUrl());
+        dto.setPrice(product.getPrice());
+        if (product.getCategory() != null) {
+            dto.setCategoryId(product.getCategory().getCategoryId());
+        }
+        dto.setStock(product.getStock());
+        if (product.getStore() != null) {
+            dto.setStoreId(product.getStore().getStoreId());
+            dto.setStoreName(product.getStore().getStoreName());
+        }
+        return dto;
     }
 }

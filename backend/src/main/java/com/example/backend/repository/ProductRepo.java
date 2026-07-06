@@ -9,4 +9,6 @@ import java.util.Optional;
 @Repository
 public interface ProductRepo extends JpaRepository<Product,Integer> {
     Optional<Product> findByProductName(String productName);
+    java.util.List<Product> findByStoreStoreId(Integer storeId);
+    java.util.List<Product> findByStoreStoreIdAndProductNameContainingIgnoreCase(Integer storeId, String query);
 }

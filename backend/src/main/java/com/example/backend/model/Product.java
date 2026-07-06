@@ -36,6 +36,10 @@ public class Product {
     @JoinColumn(name = "CATEGORY_ID", nullable = false, referencedColumnName = "CATEGORY_ID")
     private Category category;
 
+    @ManyToOne
+    @JoinColumn(name = "STORE_ID", nullable = true, referencedColumnName = "STORE_ID")
+    private Store store;
+
     @Column(name = "STOCK")
     private Integer stock;
 

@@ -18,4 +18,6 @@ public class ProductDto {
     private @NotNull BigDecimal price;
     private Integer categoryId;
     private Integer stock;
+    private Integer storeId;
+    private String storeName;
 }
