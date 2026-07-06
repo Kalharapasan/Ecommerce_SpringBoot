@@ -1,108 +1,100 @@
 <template>
-  <div class="container my-5">
-    <div class="row justify-content-center">
-      <div class="col-md-10 col-lg-8">
-        <div class="card shadow-lg border-0 overflow-hidden" style="border-radius: 16px;">
-          <div class="row g-0">
-            <!-- Left Branding Panel -->
-            <div class="col-md-5 d-none d-md-flex flex-column justify-content-between p-4 p-lg-5 text-white text-start" style="background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%);">
-              <div>
-                <h4 class="font-weight-bold text-warning mb-3">ByteForge PC Store</h4>
-                <p class="opacity-75">Create an account to build high-performance gaming rigs, buy custom PC parts, and access exclusive desktop build components.</p>
-              </div>
-              <div class="small opacity-50">
-                © 2026 ByteForge PC Store. All rights reserved.
-              </div>
-            </div>
-
-            <!-- Right Form Panel -->
-            <div class="col-md-7 p-4 p-lg-5 bg-white">
-              <h3 class="text-center mb-4 font-weight-bold">Sign Up</h3>
-
-              <div v-if="error" class="alert alert-danger text-start" role="alert">
-                {{ error }}
+  <div class="bf-page bf-fade-in p-4 d-flex align-items-center justify-content-center" style="min-height: calc(100vh - 160px);">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-8">
+          <div class="bf-card bf-glass overflow-hidden shadow-xl" style="border-radius: var(--bf-radius-xl);">
+            <div class="row g-0">
+              <!-- Left Branding Panel -->
+              <div class="col-md-5 d-none d-md-flex flex-column justify-content-between p-4 p-lg-5 text-white text-start" style="background: var(--bf-gradient-hero);">
+                <div>
+                  <h4 class="font-weight-bold mb-3 d-flex align-items-center gap-2" style="color: var(--bf-accent)">
+                    ⚡ ByteForge PC
+                  </h4>
+                  <p class="opacity-75 small" style="line-height: 1.6;">Create an account to build high-performance gaming rigs, buy custom PC parts, or list products as a verified seller.</p>
+                </div>
+                <div class="small opacity-50">
+                  © 2026 ByteForge Store.
+                </div>
               </div>
 
-              <div v-if="success" class="alert alert-success text-start" role="alert">
-                {{ success }}
+              <!-- Right Form Panel -->
+              <div class="col-md-7 p-4 p-lg-5 text-start bg-white">
+                <h3 class="font-weight-bold text-dark mb-4">Sign Up</h3>
+
+                <form @submit.prevent="handleSignUp">
+                  <div class="mb-3">
+                    <label for="fullName" class="form-label font-weight-bold text-secondary">Full Name</label>
+                    <input
+                      type="text"
+                      id="fullName"
+                      class="bf-input"
+                      v-model="fullName"
+                      required
+                      placeholder="Enter your full name"
+                    />
+                  </div>
+
+                  <div class="mb-3">
+                    <label for="email" class="form-label font-weight-bold text-secondary">Email Address</label>
+                    <input
+                      type="email"
+                      id="email"
+                      class="bf-input"
+                      v-model="email"
+                      required
+                      placeholder="Enter your email address"
+                    />
+                  </div>
+
+                  <div class="mb-3">
+                    <label for="username" class="form-label font-weight-bold text-secondary">Username</label>
+                    <input
+                      type="text"
+                      id="username"
+                      class="bf-input"
+                      v-model="username"
+                      required
+                      placeholder="Choose a username"
+                    />
+                  </div>
+
+                  <div class="mb-3">
+                    <label for="password" class="form-label font-weight-bold text-secondary">Password</label>
+                    <input
+                      type="password"
+                      id="password"
+                      class="bf-input"
+                      v-model="password"
+                      required
+                      placeholder="Create a password"
+                    />
+                  </div>
+
+                  <div class="mb-4">
+                    <label for="role" class="form-label font-weight-bold text-secondary">Account Type</label>
+                    <select id="role" class="bf-input text-capitalize" v-model="role" required>
+                      <option value="USER">Buyer (Customer)</option>
+                      <option value="SELLER">Seller (Merchant)</option>
+                      <option value="ADMIN">Administrator</option>
+                    </select>
+                  </div>
+
+                  <button
+                    type="submit"
+                    class="bf-btn bf-btn-primary w-100 py-2.5 mb-3"
+                    :disabled="loading"
+                  >
+                    <span v-if="loading" class="bf-spinner me-2"></span>
+                    Sign Up
+                  </button>
+
+                  <div class="text-center">
+                    <span class="text-muted small">Already have an account? </span>
+                    <router-link to="/signIn" class="small font-weight-bold text-decoration-none">Sign In</router-link>
+                  </div>
+                </form>
               </div>
-
-              <form @submit.prevent="handleSignUp">
-                <div class="form-group mb-3 text-start">
-                  <label for="fullName" class="form-label">Full Name</label>
-                  <input
-                    type="text"
-                    id="fullName"
-                    class="form-control"
-                    v-model="fullName"
-                    required
-                    placeholder="Enter your full name"
-                  />
-                </div>
-
-                <div class="form-group mb-3 text-start">
-                  <label for="email" class="form-label">Email Address</label>
-                  <input
-                    type="email"
-                    id="email"
-                    class="form-control"
-                    v-model="email"
-                    required
-                    placeholder="Enter your email address"
-                  />
-                </div>
-
-                <div class="form-group mb-3 text-start">
-                  <label for="username" class="form-label">Username</label>
-                  <input
-                    type="text"
-                    id="username"
-                    class="form-control"
-                    v-model="username"
-                    required
-                    placeholder="Choose a username"
-                  />
-                </div>
-
-                <div class="form-group mb-3 text-start">
-                  <label for="password" class="form-label">Password</label>
-                  <input
-                    type="password"
-                    id="password"
-                    class="form-control"
-                    v-model="password"
-                    required
-                    placeholder="Create a password"
-                  />
-                </div>
-
-                <div class="form-group mb-4 text-start">
-                  <label for="role" class="form-label">Role</label>
-                  <select id="role" class="form-select" v-model="role" required>
-                    <option value="USER">USER</option>
-                    <option value="ADMIN">ADMIN</option>
-                  </select>
-                </div>
-
-                <button
-                  type="submit"
-                  class="btn btn-primary w-100 py-2 mb-3 font-weight-bold"
-                  :disabled="loading"
-                >
-                  <span
-                    v-if="loading"
-                    class="spinner-border spinner-border-sm me-2"
-                    role="status"
-                    aria-hidden="true"
-                  ></span>
-                  Sign Up
-                </button>
-
-                <div class="text-center">
-                  <span class="text-muted">Already have an account? </span>
-                  <router-link to="/signIn" class="text-decoration-none">Sign In</router-link>
-                </div>
-              </form>
             </div>
           </div>
         </div>
@@ -113,6 +105,7 @@
 
 <script>
 import api, { extractErrorMessage } from '../../utils/api';
+import { showToast } from '../../components/Common/ToastNotification.vue';
 
 export default {
   name: 'SignUp',
@@ -123,17 +116,13 @@ export default {
       username: '',
       password: '',
       role: 'USER',
-      loading: false,
-      error: null,
-      success: null
+      loading: false
     };
   },
   methods: {
     async handleSignUp() {
       this.loading = true;
-      this.error = null;
-      this.success = null;
-      
+
       const payload = {
         fullName: this.fullName,
         email: this.email,
@@ -144,12 +133,20 @@ export default {
 
       try {
         await api.post('/user/signUp', payload);
-        this.success = 'Registration successful! Redirecting to Sign In...';
+        showToast({
+          message: 'Your account was registered successfully!',
+          type: 'success',
+          title: 'Registration Successful'
+        });
         setTimeout(() => {
           this.$router.push({ name: 'SignIn' });
         }, 1500);
       } catch (err) {
-        this.error = extractErrorMessage(err);
+        showToast({
+          message: extractErrorMessage(err),
+          type: 'error',
+          title: 'Registration Failed'
+        });
       } finally {
         this.loading = false;
       }
@@ -157,6 +154,3 @@ export default {
   }
 };
 </script>
-
-<style scoped>
-</style>

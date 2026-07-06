@@ -1,225 +1,179 @@
 <template>
-  <div class="container my-4">
-    <!-- Split Banner Section (eBay Style Promo Grid) -->
-    <div class="row g-4 mb-4">
-      <!-- Main Dynamic Slideshow (Col 8) -->
-      <div class="col-lg-8">
-        <div class="card border-0 rounded-4 overflow-hidden h-100 shadow-sm text-white position-relative text-start p-4 p-md-5 d-flex flex-column justify-content-between" style="min-height: 380px; background: linear-gradient(135deg, rgba(30, 27, 75, 0.85) 0%, rgba(15, 23, 42, 0.95) 100%), url('https://images.unsplash.com/photo-1587202372775-e229f172b9d7?q=80&w=1200&auto=format&fit=crop') no-repeat center/cover;">
-          <!-- Dynamic Slides -->
-          <div 
-            v-if="slides && slides.length > 0"
-            class="h-100 d-flex flex-column justify-content-between z-index-2 position-relative"
-          >
-            <div>
-              <span class="badge bg-warning text-dark px-3 py-2 rounded-pill font-weight-bold mb-3 text-uppercase">
-                {{ slides[activeSlide].badge }}
-              </span>
-              <h1 class="display-5 font-weight-bold mb-2">{{ slides[activeSlide].title }}</h1>
-              <p class="lead mb-4 opacity-75">{{ slides[activeSlide].subtitle }}</p>
-            </div>
-            <div>
-              <button class="btn btn-warning btn-lg font-weight-bold px-4 py-2 text-dark shadow" @click="scrollToProducts">
+  <div class="bf-page bf-fade-in">
+    <!-- ═══ Hero Section with Dynamic Slideshow ═══ -->
+    <div class="container my-4">
+      <div class="row g-4 mb-5">
+        <!-- Main Hero Slideshow -->
+        <div class="col-lg-8">
+          <div class="bf-hero-main" :style="heroStyle">
+            <div v-if="slides && slides.length > 0" class="bf-hero-content">
+              <div>
+                <span class="bf-hero-badge">{{ slides[activeSlide].badge }}</span>
+                <h1 class="bf-hero-title">{{ slides[activeSlide].title }}</h1>
+                <p class="bf-hero-subtitle">{{ slides[activeSlide].subtitle }}</p>
+              </div>
+              <button class="bf-btn bf-btn-accent bf-btn-lg" @click="scrollToProducts">
                 Shop Now
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708"/></svg>
               </button>
             </div>
+
+            <!-- Slide Dots -->
+            <div class="bf-hero-dots">
+              <span
+                v-for="(slide, index) in slides"
+                :key="index"
+                class="bf-hero-dot"
+                :class="{ active: activeSlide === index }"
+                @click="activeSlide = index"
+              ></span>
+            </div>
+
+            <!-- Pattern Overlay -->
+            <div class="bf-hero-pattern"></div>
           </div>
-          
-          <!-- Slide indicator dots -->
-          <div class="position-absolute bottom-3 start-50 translate-middle-x z-index-2 d-flex gap-2 mb-3">
-            <span 
-              v-for="(slide, index) in slides" 
-              :key="index" 
-              class="slide-dot cursor-pointer" 
-              :class="{'active-dot bg-warning': activeSlide === index, 'bg-light opacity-50': activeSlide !== index}" 
-              @click="activeSlide = index"
-            ></span>
+        </div>
+
+        <!-- Side Promo Cards -->
+        <div class="col-lg-4 d-flex flex-column gap-3">
+          <div class="bf-promo-card bf-promo-dark" @click="selectCategoryByName('Desktop Systems')">
+            <span class="bf-promo-badge bf-badge bf-badge-primary">Featured Build</span>
+            <h5 class="bf-promo-title">Prebuilt Gaming PCs</h5>
+            <p class="bf-promo-desc">High-fps liquid-cooled rigs benchmarked and ready to play.</p>
+            <span class="bf-promo-link">Explore Systems →</span>
           </div>
 
-          <!-- Decorative background grid -->
-          <div class="hero-pattern position-absolute top-50 start-50 translate-middle w-100 h-100 opacity-10" style="background-image: radial-gradient(circle, #ffffff 1px, transparent 1px); background-size: 20px 20px;"></div>
+          <div class="bf-promo-card bf-promo-blue" @click="selectCategoryByName('Graphics Cards (GPUs)')">
+            <span class="bf-promo-badge bf-badge bf-badge-warning">Hardware Drop</span>
+            <h5 class="bf-promo-title">RTX 40-Series In Stock</h5>
+            <p class="bf-promo-desc">Unmatched ray-tracing and DLSS 3 support.</p>
+            <span class="bf-promo-link">Shop GPUs →</span>
+          </div>
         </div>
       </div>
 
-      <!-- Side Deal Banners (Col 4) -->
-      <div class="col-lg-4 d-flex flex-column gap-3">
-        <!-- Prebuilt Desktops Promo Card -->
-        <div class="card border-0 rounded-4 overflow-hidden flex-fill text-white p-4 shadow-sm text-start position-relative d-flex flex-column justify-content-center" style="background: linear-gradient(135deg, rgba(9, 9, 11, 0.8) 0%, rgba(39, 39, 42, 0.9) 100%), url('https://images.unsplash.com/photo-1593642632823-8f785ba67e45?q=80&w=600&auto=format&fit=crop') no-repeat center/cover; min-height: 180px;">
-          <div>
-            <span class="badge bg-primary text-white px-2 py-1 rounded font-weight-bold mb-2 small uppercase-badge">
-              Featured Build
-            </span>
-            <h5 class="font-weight-bold mb-1">Prebuilt Gaming PCs</h5>
-            <p class="small text-white-50 mb-3">High-fps liquid-cooled rigs benchmarked and ready to play.</p>
-          </div>
-          <button class="btn btn-outline-light btn-sm font-weight-bold align-self-start" @click="selectCategoryByName('Desktop Systems')">
-            Explore Systems
-          </button>
+      <!-- ═══ Shop By Category ═══ -->
+      <div class="bf-section bf-fade-in bf-fade-in-delay-1">
+        <div class="bf-section-header">
+          <h4 class="bf-section-title">Shop by Category</h4>
+          <p class="bf-section-desc">Browse our curated collection of PC components and peripherals</p>
         </div>
-
-        <!-- GPU Restock Promo Card -->
-        <div class="card border-0 rounded-4 overflow-hidden flex-fill text-white p-4 shadow-sm text-start position-relative d-flex flex-column justify-content-center" style="background: linear-gradient(135deg, rgba(12, 74, 110, 0.8) 0%, rgba(3, 105, 161, 0.9) 100%), url('https://images.unsplash.com/photo-1582994274092-23f4931bc151?q=80&w=600&auto=format&fit=crop') no-repeat center/cover; min-height: 180px;">
-          <div>
-            <span class="badge bg-warning text-dark px-2 py-1 rounded font-weight-bold mb-2 small uppercase-badge">
-              Hardware Drop
-            </span>
-            <h5 class="font-weight-bold mb-1">RTX 40-Series In Stock</h5>
-            <p class="small text-white-50 mb-3">Get unmatched ray-tracing output and DLSS 3 support.</p>
+        <div class="bf-category-scroll">
+          <!-- All Categories -->
+          <div class="bf-category-chip" :class="{ active: selectedCategoryId === 'all' }" @click="selectCategory('all')">
+            <div class="bf-category-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16"><path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5zm8 0A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5zm-8 8A1.5 1.5 0 0 1 2.5 9h3A1.5 1.5 0 0 1 7 10.5v3A1.5 1.5 0 0 1 5.5 15h-3A1.5 1.5 0 0 1 1 13.5zm8 0A1.5 1.5 0 0 1 10.5 9h3a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 13.5z"/></svg>
+            </div>
+            <span>All Gears</span>
           </div>
-          <button class="btn btn-outline-warning btn-sm font-weight-bold align-self-start text-warning" @click="selectCategoryByName('Graphics Cards (GPUs)')">
-            Shop GPUs
-          </button>
-        </div>
-      </div>
-    </div>
 
-    <!-- Shop By Category (eBay Style Circular Navigation) -->
-    <div class="mb-5 text-start bg-light p-4 rounded-4 shadow-sm">
-      <h4 class="font-weight-bold text-dark mb-4">Shop by Category</h4>
-      <!-- Horizontal scroll circle row -->
-      <div class="d-flex gap-4 overflow-auto pb-2 custom-horizontal-scroll">
-        <!-- "All Categories" circle -->
-        <div class="category-circle-item text-center cursor-pointer flex-shrink-0" @click="selectCategory('all')">
-          <div 
-            class="circle-image-wrapper mx-auto mb-2 shadow-sm rounded-circle d-flex align-items-center justify-content-center border bg-white" 
-            :class="{'active-circle border-primary border-3': selectedCategoryId === 'all'}" 
-            style="width: 80px; height: 80px;"
+          <!-- Dynamic Categories -->
+          <div
+            v-for="cat in categories"
+            :key="cat.categoryId"
+            class="bf-category-chip"
+            :class="{ active: selectedCategoryId === cat.categoryId }"
+            @click="selectCategory(cat.categoryId)"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-grid-fill text-primary" viewBox="0 0 16 16">
-              <path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5zm8 0A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5zm-8 8A1.5 1.5 0 0 1 2.5 9h-3A1.5 1.5 0 0 1 5.5 11v3A1.5 1.5 0 0 1 3.5 15h-3A1.5 1.5 0 0 1 1 13.5zm8 0A1.5 1.5 0 0 1 10.5 9h3a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-3a1.5 1.5 0 0 1-1.5-1.5z"/>
-            </svg>
+            <div class="bf-category-img">
+              <img :src="cat.imageUrl" :alt="cat.categoryName" />
+            </div>
+            <span>{{ cat.categoryName }}</span>
           </div>
-          <small class="font-weight-bold text-dark d-block">All Gears</small>
         </div>
+      </div>
 
-        <!-- Dynamic Category circles -->
-        <div 
-          v-for="cat in categories" 
-          :key="cat.categoryId" 
-          class="category-circle-item text-center cursor-pointer flex-shrink-0"
-          @click="selectCategory(cat.categoryId)"
+      <!-- ═══ Feature Highlights ═══ -->
+      <div class="row g-3 mb-5 bf-fade-in bf-fade-in-delay-2">
+        <div class="col-md-4">
+          <div class="bf-feature-card">
+            <div class="bf-feature-icon" style="background: var(--bf-primary-light); color: var(--bf-primary);">
+              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 16 16"><path d="M0 3.5A1.5 1.5 0 0 1 1.5 2h9A1.5 1.5 0 0 1 12 3.5V5h1.02a1.5 1.5 0 0 1 1.17.563l1.481 1.85a1.5 1.5 0 0 1 .329.938V10.5a1.5 1.5 0 0 1-1.5 1.5H14a2 2 0 1 1-4 0H5a2 2 0 1 1-3.998-.085A1.5 1.5 0 0 1 0 10.5z"/></svg>
+            </div>
+            <div>
+              <h6 class="bf-feature-title">Free Shipping</h6>
+              <p class="bf-feature-desc">On all orders over LKR 10,000</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="bf-feature-card">
+            <div class="bf-feature-icon" style="background: var(--bf-success-light); color: var(--bf-success);">
+              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 16 16"><path d="M5.338 1.59a6.1 6.1 0 0 0-2.837.856.48.48 0 0 0-.228.389v4.287c0 3.29 1.825 6.4 4.732 7.69a.48.48 0 0 0 .39 0c2.907-1.29 4.732-4.4 4.732-7.69V2.835a.48.48 0 0 0-.228-.389 6.1 6.1 0 0 0-2.837-.855 4.8 4.8 0 0 0-3.722 0"/></svg>
+            </div>
+            <div>
+              <h6 class="bf-feature-title">Secure Payments</h6>
+              <p class="bf-feature-desc">100% SSL protected payments</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="bf-feature-card">
+            <div class="bf-feature-icon" style="background: var(--bf-warning-light); color: var(--bf-warning);">
+              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 16 16"><path d="M8 1a5 5 0 0 0-5 5v1h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V6a6 6 0 1 1 12 0v5a1 1 0 0 1-1 1h-1a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1h1V6a5 5 0 0 0-5-5"/></svg>
+            </div>
+            <div>
+              <h6 class="bf-feature-title">24/7 Support</h6>
+              <p class="bf-feature-desc">Dedicated customer helpline</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ Search & Filter Toolbar ═══ -->
+      <div id="products-section" class="bf-toolbar bf-fade-in bf-fade-in-delay-3">
+        <div class="bf-toolbar-search">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/></svg>
+          <input
+            type="text"
+            class="bf-input"
+            placeholder="Search components or accessories..."
+            v-model="searchQuery"
+          />
+        </div>
+        <div class="bf-toolbar-sort">
+          <span class="bf-toolbar-label">Sort by:</span>
+          <select class="bf-input bf-toolbar-select" v-model="sortOrder">
+            <option value="default">Relevance</option>
+            <option value="name-asc">Name (A-Z)</option>
+            <option value="price-asc">Price (Low → High)</option>
+            <option value="price-desc">Price (High → Low)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- ═══ Loading Skeletons ═══ -->
+      <div v-if="loading" class="row g-4 mt-2">
+        <div v-for="n in 8" :key="n" class="col-xl-3 col-md-6">
+          <LoadingSkeleton type="card" />
+        </div>
+      </div>
+
+      <!-- ═══ Error State ═══ -->
+      <div v-else-if="error" class="bf-empty-state">
+        <div class="bf-empty-icon" style="color: var(--bf-danger);">⚠</div>
+        <h5>Something went wrong</h5>
+        <p>{{ error }}</p>
+        <button class="bf-btn bf-btn-primary" @click="fetchProducts">Try Again</button>
+      </div>
+
+      <!-- ═══ Empty State ═══ -->
+      <div v-else-if="processedProducts.length === 0" class="bf-empty-state">
+        <div class="bf-empty-icon">🔍</div>
+        <h5>No products match your criteria</h5>
+        <p>Try adjusting your search filters or browse another category.</p>
+      </div>
+
+      <!-- ═══ Products Grid ═══ -->
+      <div v-else class="row g-4 mt-2">
+        <div
+          v-for="(product, index) in processedProducts"
+          :key="product.productId"
+          class="col-xl-3 col-md-6 d-flex bf-fade-in"
+          :class="'bf-fade-in-delay-' + Math.min(index + 1, 6)"
         >
-          <div 
-            class="circle-image-wrapper mx-auto mb-2 shadow-sm rounded-circle border overflow-hidden" 
-            :class="{'active-circle border-primary border-3': selectedCategoryId === cat.categoryId}"
-            style="width: 80px; height: 80px;"
-          >
-            <img :src="cat.imageUrl" class="w-100 h-100" style="object-fit: cover;" alt="Category Thumbnail">
-          </div>
-          <small class="font-weight-bold text-dark d-block text-truncate" style="max-width: 90px;" :title="cat.categoryName">
-            {{ cat.categoryName }}
-          </small>
+          <ProductBox :product="product" />
         </div>
-      </div>
-    </div>
-
-    <!-- Highlight features row -->
-    <div class="row g-4 mb-5 text-start">
-      <div class="col-md-4">
-        <div class="card h-100 border-0 shadow-sm p-3 bg-white rounded d-flex flex-row align-items-center gap-3">
-          <div class="bg-light p-3 rounded-circle text-primary">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-truck" viewBox="0 0 16 16">
-              <path d="M0 3.5A1.5 1.5 0 0 1 1.5 2h9A1.5 1.5 0 0 1 12 3.5V5h1.02a1.5 1.5 0 0 1 1.17.563l1.481 1.85a1.5 1.5 0 0 1 .329.938V10.5a1.5 1.5 0 0 1-1.5 1.5H14a2 2 0 1 1-4 0H5a2 2 0 1 1-3.998-.085A1.5 1.5 0 0 1 0 10.5zm1.294 7.456A2 2 0 0 1 4.737 11H9.27a2 2 0 0 1 3.877-.274H14.5a.5.5 0 0 0 .5-.5V8.35a.5.5 0 0 0-.11-.312l-1.48-1.85A.5.5 0 0 0 13.02 6H12v4.5h-1.258a2 2 0 0 1-3.518.266zM4 11a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm9 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>
-            </svg>
-          </div>
-          <div>
-            <h6 class="font-weight-bold mb-0">Free Shipping</h6>
-            <small class="text-muted">On all orders over LKR 10,000</small>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card h-100 border-0 shadow-sm p-3 bg-white rounded d-flex flex-row align-items-center gap-3">
-          <div class="bg-light p-3 rounded-circle text-success">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-shield-check" viewBox="0 0 16 16">
-              <path d="M5.338 1.59a6.1 6.1 0 0 0-2.837.856.48.48 0 0 0-.228.389v4.287c0 3.29 1.825 6.4 4.732 7.69a.48.48 0 0 0 .39 0c2.907-1.29 4.732-4.4 4.732-7.69V2.835a.48.48 0 0 0-.228-.389 6.1 6.1 0 0 0-2.837-.855 4.8 4.8 0 0 0-3.722 0"/>
-              <path d="M10.854 5.854a.5.5 0 0 0-.708-.708L7.5 7.793 6.354 6.646a.5.5 0 1 0-.708.708l1.5 1.5a.5.5 0 0 0 .708 0z"/>
-            </svg>
-          </div>
-          <div>
-            <h6 class="font-weight-bold mb-0">Secure Payments</h6>
-            <small class="text-muted">100% SSL protected payments</small>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card h-100 border-0 shadow-sm p-3 bg-white rounded d-flex flex-row align-items-center gap-3">
-          <div class="bg-light p-3 rounded-circle text-warning">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-headset" viewBox="0 0 16 16">
-              <path d="M8 1a5 5 0 0 0-5 5v1h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V6a6 6 0 1 1 12 0v5a1 1 0 0 1-1 1h-1a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1h1V6a5 5 0 0 0-5-5"/>
-            </svg>
-          </div>
-          <div>
-            <h6 class="font-weight-bold mb-0">24/7 Support</h6>
-            <small class="text-muted">Dedicated customer helpline</small>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Filters & Search Toolbar -->
-    <div id="products-section" class="card p-3 shadow-sm border-0 mb-4 bg-white rounded">
-      <div class="row g-3 align-items-center">
-        <!-- Search bar -->
-        <div class="col-md-4 text-start">
-          <div class="input-group">
-            <span class="input-group-text bg-light border-end-0">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
-                <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
-              </svg>
-            </span>
-            <input 
-              type="text" 
-              class="form-control border-start-0 bg-light" 
-              placeholder="Search components or accessories..." 
-              v-model="searchQuery"
-            />
-          </div>
-        </div>
-
-        <!-- Spacer -->
-        <div class="col-md-5"></div>
-
-        <!-- Sorting dropdown -->
-        <div class="col-md-3 text-end">
-          <div class="d-flex align-items-center justify-content-end gap-2">
-            <span class="text-muted small text-nowrap">Sort by:</span>
-            <select class="form-select bg-light border" v-model="sortOrder" style="max-width: 180px;">
-              <option value="default">Relevance</option>
-              <option value="name-asc">Name (A-Z)</option>
-              <option value="price-asc">Price (Low to High)</option>
-              <option value="price-desc">Price (High to Low)</option>
-            </select>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Loading spinner -->
-    <div v-if="loading" class="text-center my-5">
-      <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Loading products...</span>
-      </div>
-    </div>
-
-    <!-- Error state -->
-    <div v-else-if="error" class="alert alert-danger text-start" role="alert">
-      {{ error }}
-    </div>
-
-    <!-- Empty State -->
-    <div v-else-if="processedProducts.length === 0" class="text-center my-5 py-5 bg-white rounded shadow-sm border border-light">
-      <h5 class="text-muted mb-2">No products match your criteria.</h5>
-      <p class="text-secondary small mb-0">Try adjusting your search filters or browse another category.</p>
-    </div>
-
-    <!-- Products Grid -->
-    <div v-else class="row">
-      <div 
-        v-for="product in processedProducts" 
-        :key="product.productId" 
-        class="col-xl-3 col-md-6 d-flex mb-4"
-      >
-        <ProductBox :product="product" />
       </div>
     </div>
   </div>
@@ -228,11 +182,12 @@
 <script>
 import api, { extractErrorMessage } from '../../utils/api';
 import ProductBox from '../../components/Product/ProductBox.vue';
+import LoadingSkeleton from '../../components/Common/LoadingSkeleton.vue';
 import { getCurrentUser } from '../../utils/auth';
 
 export default {
   name: 'ProductView',
-  components: { ProductBox },
+  components: { ProductBox, LoadingSkeleton },
   data() {
     return {
       products: [],
@@ -242,7 +197,7 @@ export default {
       sortOrder: 'default',
       loading: true,
       error: null,
-      
+
       // Dynamic Slider Configuration
       activeSlide: 0,
       slidesInterval: null,
@@ -270,14 +225,19 @@ export default {
       const user = getCurrentUser();
       return user && user.role === 'ADMIN';
     },
+    heroStyle() {
+      return {
+        background: `var(--bf-gradient-hero), url('https://images.unsplash.com/photo-1587202372775-e229f172b9d7?q=80&w=1200&auto=format&fit=crop') no-repeat center/cover`
+      };
+    },
     processedProducts() {
       let result = [...this.products];
 
       // 1. Filter by Search Query
       const query = this.searchQuery.trim().toLowerCase();
       if (query) {
-        result = result.filter(p => 
-          p.productName.toLowerCase().includes(query) || 
+        result = result.filter(p =>
+          p.productName.toLowerCase().includes(query) ||
           p.description.toLowerCase().includes(query)
         );
       }
@@ -343,7 +303,7 @@ export default {
   mounted() {
     this.fetchCategories();
     this.fetchProducts();
-    
+
     // Cycle promotional slides
     this.slidesInterval = setInterval(() => {
       this.activeSlide = (this.activeSlide + 1) % this.slides.length;
@@ -358,34 +318,334 @@ export default {
 </script>
 
 <style scoped>
-.custom-horizontal-scroll {
-  white-space: nowrap;
+/* ─── Hero Section ─────────────────────────────────────────── */
+.bf-hero-main {
+  border-radius: var(--bf-radius-xl);
+  padding: 48px 40px;
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+  color: white;
 }
-.category-circle-item:hover .circle-image-wrapper {
-  transform: scale(1.08);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+
+.bf-hero-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  gap: 24px;
 }
-.slide-dot {
+
+.bf-hero-badge {
+  display: inline-block;
+  background: rgba(245, 158, 11, 0.9);
+  color: #0f172a;
+  padding: 6px 16px;
+  border-radius: var(--bf-radius-full);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 16px;
+}
+
+.bf-hero-title {
+  font-size: clamp(1.75rem, 4vw, 3rem);
+  font-weight: 900;
+  line-height: 1.1;
+  margin: 0 0 12px 0;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+}
+
+.bf-hero-subtitle {
+  font-size: var(--bf-font-size-lg);
+  opacity: 0.7;
+  max-width: 500px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.bf-hero-dots {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 2;
+}
+
+.bf-hero-dot {
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  transition: all 0.2s ease;
-}
-.active-dot {
-  width: 25px;
-  border-radius: 6px;
-}
-.circle-image-wrapper {
-  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.4);
   cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  padding: 3px;
+  transition: all 0.3s ease;
 }
-.active-circle {
-  border-color: #0d6efd !important;
+
+.bf-hero-dot.active {
+  width: 28px;
+  border-radius: 5px;
+  background: var(--bf-accent);
 }
-.uppercase-badge {
-  font-size: 0.7rem;
-  letter-spacing: 1px;
+
+.bf-hero-pattern {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px);
+  background-size: 24px 24px;
+  z-index: 1;
+}
+
+/* ─── Promo Cards ──────────────────────────────────────────── */
+.bf-promo-card {
+  flex: 1;
+  padding: 28px 24px;
+  border-radius: var(--bf-radius-xl);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--bf-transition-base);
+  position: relative;
+  overflow: hidden;
+}
+
+.bf-promo-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--bf-shadow-xl);
+}
+
+.bf-promo-dark {
+  background: linear-gradient(135deg, rgba(9, 9, 11, 0.9) 0%, rgba(39, 39, 42, 0.95) 100%),
+    url('https://images.unsplash.com/photo-1593642632823-8f785ba67e45?q=80&w=600&auto=format&fit=crop') no-repeat center/cover;
+}
+
+.bf-promo-blue {
+  background: linear-gradient(135deg, rgba(12, 74, 110, 0.9) 0%, rgba(3, 105, 161, 0.95) 100%),
+    url('https://images.unsplash.com/photo-1582994274092-23f4931bc151?q=80&w=600&auto=format&fit=crop') no-repeat center/cover;
+}
+
+.bf-promo-badge { margin-bottom: 10px; align-self: flex-start; }
+.bf-promo-title { font-weight: 800; margin: 0 0 6px 0; font-size: var(--bf-font-size-lg); }
+.bf-promo-desc { font-size: var(--bf-font-size-xs); opacity: 0.6; margin: 0 0 12px 0; }
+.bf-promo-link {
+  font-size: var(--bf-font-size-sm);
+  font-weight: 600;
+  color: rgba(255,255,255,0.8);
+  transition: color 0.2s;
+}
+.bf-promo-card:hover .bf-promo-link { color: #fff; }
+
+/* ─── Section Styling ──────────────────────────────────────── */
+.bf-section {
+  background: var(--bf-bg-card);
+  border: 1px solid var(--bf-border);
+  border-radius: var(--bf-radius-xl);
+  padding: 28px;
+  margin-bottom: 32px;
+}
+
+.bf-section-header { margin-bottom: 20px; }
+.bf-section-title { font-weight: 800; margin: 0 0 4px 0; color: var(--bf-text-primary); }
+.bf-section-desc { margin: 0; font-size: var(--bf-font-size-sm); color: var(--bf-text-muted); }
+
+/* ─── Category Chips ───────────────────────────────────────── */
+.bf-category-scroll {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+}
+
+.bf-category-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all var(--bf-transition-base);
+}
+
+.bf-category-chip span {
+  font-size: var(--bf-font-size-xs);
+  font-weight: 600;
+  color: var(--bf-text-secondary);
+  max-width: 80px;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bf-category-chip.active span { color: var(--bf-primary); }
+
+.bf-category-icon,
+.bf-category-img {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  border: 2.5px solid var(--bf-border);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bf-bg-tertiary);
+  transition: all var(--bf-transition-base);
+}
+
+.bf-category-chip.active .bf-category-icon,
+.bf-category-chip.active .bf-category-img {
+  border-color: var(--bf-primary);
+  box-shadow: 0 0 0 3px var(--bf-primary-light);
+}
+
+.bf-category-chip:hover .bf-category-icon,
+.bf-category-chip:hover .bf-category-img {
+  transform: scale(1.08);
+  box-shadow: var(--bf-shadow-md);
+}
+
+.bf-category-icon { color: var(--bf-primary); }
+.bf-category-img img { width: 100%; height: 100%; object-fit: cover; }
+
+/* ─── Feature Cards ────────────────────────────────────────── */
+.bf-feature-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  background: var(--bf-bg-card);
+  border: 1px solid var(--bf-border);
+  border-radius: var(--bf-radius-lg);
+  transition: all var(--bf-transition-base);
+}
+
+.bf-feature-card:hover {
+  box-shadow: var(--bf-shadow-md);
+  transform: translateY(-2px);
+}
+
+.bf-feature-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--bf-radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.bf-feature-title {
+  font-weight: 700;
+  margin: 0 0 2px 0;
+  font-size: var(--bf-font-size-sm);
+  color: var(--bf-text-primary);
+}
+
+.bf-feature-desc {
+  margin: 0;
+  font-size: var(--bf-font-size-xs);
+  color: var(--bf-text-muted);
+}
+
+/* ─── Toolbar ──────────────────────────────────────────────── */
+.bf-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 20px;
+  background: var(--bf-bg-card);
+  border: 1px solid var(--bf-border);
+  border-radius: var(--bf-radius-lg);
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.bf-toolbar-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  max-width: 400px;
+  color: var(--bf-text-muted);
+}
+
+.bf-toolbar-search .bf-input {
+  border: none;
+  background: var(--bf-bg-tertiary);
+  padding: 10px 14px;
+}
+
+.bf-toolbar-sort {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bf-toolbar-label {
+  font-size: var(--bf-font-size-xs);
+  color: var(--bf-text-muted);
+  white-space: nowrap;
+}
+
+.bf-toolbar-select {
+  max-width: 180px;
+  padding: 8px 12px !important;
+  background: var(--bf-bg-tertiary) !important;
+  border: 1px solid var(--bf-border) !important;
+}
+
+/* ─── Empty State ──────────────────────────────────────────── */
+.bf-empty-state {
+  text-align: center;
+  padding: 64px 24px;
+  background: var(--bf-bg-card);
+  border: 1px solid var(--bf-border);
+  border-radius: var(--bf-radius-xl);
+  margin-top: 16px;
+}
+
+.bf-empty-icon {
+  font-size: 3rem;
+  margin-bottom: 16px;
+}
+
+.bf-empty-state h5 {
+  font-weight: 700;
+  color: var(--bf-text-primary);
+  margin-bottom: 8px;
+}
+
+.bf-empty-state p {
+  color: var(--bf-text-muted);
+  font-size: var(--bf-font-size-sm);
+  margin-bottom: 20px;
+}
+
+/* ─── Responsive ───────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .bf-hero-main {
+    padding: 32px 24px;
+    min-height: 300px;
+  }
+
+  .bf-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .bf-toolbar-search { max-width: none; }
+  .bf-toolbar-sort { justify-content: space-between; }
 }
 </style>

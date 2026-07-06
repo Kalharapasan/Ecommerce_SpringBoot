@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.Optional;
 
 @CrossOrigin
 @RestController
@@ -19,10 +20,12 @@ public class UserController {
 
     private final UserService userService;
     private final SecurityConfig securityConfig;
+    private final com.example.backend.service.RefreshTokenService refreshTokenService;
 
-    public UserController(UserService userService, SecurityConfig securityConfig) {
+    public UserController(UserService userService, SecurityConfig securityConfig, com.example.backend.service.RefreshTokenService refreshTokenService) {
         this.userService = userService;
         this.securityConfig = securityConfig;
+        this.refreshTokenService = refreshTokenService;
     }
 
     @PostMapping("/signUp")
@@ -58,25 +61,30 @@ public class UserController {
     public ResponseEntity<ResponseDto> refreshToken(@RequestParam String refreshToken) {
         ResponseDto response = new ResponseDto();
 
-        if (!securityConfig.verifyToken(refreshToken)) {
-            response.setMessage("Invalid or expired refresh token");
+        Optional<com.example.backend.model.RefreshToken> optToken = refreshTokenService.findByToken(refreshToken);
+        if (!optToken.isPresent()) {
+            response.setMessage("Invalid refresh token");
             return ResponseEntity.status(401).body(response);
         }
 
-        if (!securityConfig.isRefreshToken(refreshToken)) {
-            response.setMessage("Provided token is not a refresh token");
-            return ResponseEntity.badRequest().body(response);
+        try {
+            com.example.backend.model.RefreshToken token = optToken.get();
+            refreshTokenService.verifyExpiration(token);
+            com.example.backend.model.User user = token.getUser();
+
+            String newAccessToken = securityConfig.generateToken(user.getUsername(), user.getUserId(), user.getRole());
+            com.example.backend.model.RefreshToken rotatedToken = refreshTokenService.createRefreshToken(user.getUserId());
+
+            LoginResponseDto loginResponse = new LoginResponseDto();
+            loginResponse.setToken(newAccessToken);
+            loginResponse.setRefreshToken(rotatedToken.getToken());
+
+            response.setMessage("Token refreshed successfully");
+            response.setData(loginResponse);
+            return ResponseEntity.ok().body(response);
+        } catch (IllegalArgumentException e) {
+            response.setMessage(e.getMessage());
+            return ResponseEntity.status(401).body(response);
         }
-
-        JwtDataDto data = securityConfig.getJWTData(refreshToken);
-        String newAccessToken = securityConfig.generateToken(data.getUsername(), data.getUserId(), data.getRole());
-        String newRefreshToken = securityConfig.generateRefreshToken(data.getUsername(), data.getUserId(), data.getRole());
-
-        LoginResponseDto loginResponse = new LoginResponseDto();
-        loginResponse.setToken(newAccessToken);
-
-        response.setMessage("Token refreshed successfully");
-        response.setData(loginResponse);
-        return ResponseEntity.ok().body(response);
     }
 }

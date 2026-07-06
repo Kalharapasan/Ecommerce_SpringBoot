@@ -2,23 +2,24 @@
   <tr class="align-middle">
     <td>
       <div class="d-flex align-items-center gap-3">
-        <img 
-          :src="currentImageUrl" 
-          @error="handleImageError" 
-          alt="Product Thumbnail" 
-          class="img-thumbnail img-fluid rounded" 
-          style="width: 80px; height: 80px; object-fit: cover;"
-        />
+        <div class="bf-cart-thumbnail-wrapper">
+          <img 
+            :src="currentImageUrl" 
+            @error="handleImageError" 
+            alt="Product Thumbnail" 
+            class="bf-cart-thumbnail"
+          />
+        </div>
         <div class="text-start">
-          <h6 class="mb-0 font-weight-bold">{{ item.product.productName }}</h6>
+          <h6 class="mb-0 font-weight-bold text-dark">{{ item.product.productName }}</h6>
           <small class="text-muted">Unit Price: {{ formattedUnitPrice }}</small>
         </div>
       </div>
     </td>
     <td>
-      <div class="input-group quantity-stepper">
+      <div class="bf-qty-stepper bf-qty-stepper-sm">
         <button 
-          class="btn btn-sm btn-outline-secondary" 
+          class="bf-btn bf-btn-ghost bf-btn-icon" 
           type="button" 
           @click="decrement"
           :disabled="item.count <= 1 || loading"
@@ -27,14 +28,14 @@
         </button>
         <input 
           type="number" 
-          class="form-control form-control-sm text-center" 
+          class="bf-qty-input" 
           v-model.number="count"
           min="1"
           @change="validateAndEmit"
           :disabled="loading"
         />
         <button 
-          class="btn btn-sm btn-outline-secondary" 
+          class="bf-btn bf-btn-ghost bf-btn-icon" 
           type="button" 
           @click="increment"
           :disabled="loading"
@@ -44,11 +45,11 @@
       </div>
     </td>
     <td class="text-start">
-      <span class="font-weight-bold text-dark">{{ formattedSubtotal }}</span>
+      <span class="font-weight-bold text-primary">{{ formattedSubtotal }}</span>
     </td>
     <td>
       <button 
-        class="btn btn-sm btn-danger d-flex align-items-center justify-content-center gap-1" 
+        class="bf-btn bf-btn-ghost bf-btn-danger bf-btn-sm" 
         @click="remove"
         :disabled="loading"
       >
@@ -129,16 +130,53 @@ export default {
 </script>
 
 <style scoped>
-.quantity-stepper {
-  width: 100px;
+.bf-cart-thumbnail-wrapper {
+  width: 72px;
+  height: 72px;
+  border-radius: var(--bf-radius-md);
+  overflow: hidden;
+  border: 1px solid var(--bf-border);
+  background: var(--bf-bg-tertiary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
-/* Hide default arrows on number inputs */
-input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button {
+
+.bf-cart-thumbnail {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.bf-qty-stepper-sm {
+  border: 1px solid var(--bf-border);
+  border-radius: var(--bf-radius-md);
+  overflow: hidden;
+  background: var(--bf-bg-secondary);
+}
+
+.bf-qty-stepper-sm .bf-btn-icon {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  font-size: var(--bf-font-size-xs);
+}
+
+.bf-qty-input {
+  width: 38px;
+  border: none;
+  text-align: center;
+  font-weight: 700;
+  color: var(--bf-text-primary);
+  background: transparent;
+  outline: none;
+  font-size: var(--bf-font-size-xs);
+}
+
+.bf-qty-input::-webkit-outer-spin-button,
+.bf-qty-input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
-}
-input[type=number] {
-  -moz-appearance: textfield;
 }
 </style>

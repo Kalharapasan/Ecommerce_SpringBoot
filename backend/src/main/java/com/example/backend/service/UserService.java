@@ -22,10 +22,12 @@ public class UserService {
     private static final String MSG_CODE_4 = "USER REGISTRATION SUCCESSFUL";
     private final UserRepo userRepo;
     private final SecurityConfig securityConfig;
+    private final RefreshTokenService refreshTokenService;
 
-    public UserService(UserRepo userRepo, SecurityConfig securityConfig) {
+    public UserService(UserRepo userRepo, SecurityConfig securityConfig, RefreshTokenService refreshTokenService) {
         this.userRepo = userRepo;
         this.securityConfig = securityConfig;
+        this.refreshTokenService = refreshTokenService;
     }
 
     public ResponseEntity signUp(UserDto userDto) throws NoSuchAlgorithmException {
@@ -102,9 +104,9 @@ public class UserService {
 
                 LoginResponseDto loginResponse = new LoginResponseDto();
                 String jwtToken = securityConfig.generateToken(user.getUsername(), user.getUserId(), user.getRole());
-                String refreshToken = securityConfig.generateRefreshToken(user.getUsername(), user.getUserId(), user.getRole());
+                com.example.backend.model.RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getUserId());
                 loginResponse.setToken(jwtToken);
-                loginResponse.setRefreshToken(refreshToken);
+                loginResponse.setRefreshToken(refreshToken.getToken());
 
                 response.setMessage("LOGIN SUCCESSFUL");
                 response.setData(loginResponse);

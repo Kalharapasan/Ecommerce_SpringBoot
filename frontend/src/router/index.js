@@ -84,6 +84,29 @@ const routes = [
     path: '/profile',
     name: 'Profile',
     component: ProfileView
+  },
+  {
+    path: '/seller/dashboard',
+    name: 'SellerDashboard',
+    component: () => import('../views/Seller/SellerDashboard.vue'),
+    meta: { requiresSeller: true }
+  },
+  {
+    path: '/seller/store-setup',
+    name: 'SellerStoreSetup',
+    component: () => import('../views/Seller/SellerStoreSetup.vue'),
+    meta: { requiresSeller: true }
+  },
+  {
+    path: '/seller/products',
+    name: 'SellerProducts',
+    component: () => import('../views/Seller/SellerProducts.vue'),
+    meta: { requiresSeller: true }
+  },
+  {
+    path: '/store/:id',
+    name: 'StorePage',
+    component: () => import('../views/Store/StorePage.vue')
   }
 ]
 
@@ -98,6 +121,14 @@ router.beforeEach((to, from, next) => {
   // Guard admin routes from non-admins
   if (to.matched.some(record => record.meta.requiresAdmin)) {
     if (!user || user.role !== 'ADMIN') {
+      next({ name: 'Home' });
+      return;
+    }
+  }
+
+  // Guard seller routes from non-sellers (admins are allowed)
+  if (to.matched.some(record => record.meta.requiresSeller)) {
+    if (!user || (user.role !== 'SELLER' && user.role !== 'ADMIN')) {
       next({ name: 'Home' });
       return;
     }
