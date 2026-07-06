@@ -4,7 +4,7 @@
       <div class="row mb-4">
         <div class="col-12 text-start">
           <span class="bf-badge bf-badge-primary mb-2">Customer Profile</span>
-          <h2 class="text-white font-weight-bold mb-1">My Account & Overview</h2>
+          <h2 class="font-weight-bold mb-1">My Account & Overview</h2>
           <p class="text-muted small">Manage account information, check order statuses, and create support queries.</p>
         </div>
       </div>
@@ -12,10 +12,10 @@
       <div class="row g-4">
         <!-- Profile Details Column -->
         <div class="col-lg-4">
-          <div class="bf-card bf-glass position-relative h-100 border-light text-white">
+          <div class="bf-card bf-glass position-relative h-100">
             <!-- Header -->
-            <div class="p-4 text-center bg-dark border-light-bottom position-relative" style="border-top-left-radius: var(--bf-radius-lg); border-top-right-radius: var(--bf-radius-lg);">
-              <h5 class="mb-0 font-weight-bold text-white">Member Information</h5>
+            <div class="p-4 text-center border-light-bottom position-relative" style="border-top-left-radius: var(--bf-radius-lg); border-top-right-radius: var(--bf-radius-lg);">
+              <h5 class="mb-0 font-weight-bold">Member Information</h5>
               <span class="bf-badge bf-badge-primary text-uppercase mt-2">
                 {{ user ? user.role : 'Guest' }}
               </span>
@@ -60,7 +60,7 @@
                 <div v-if="uploading" class="bf-spinner mb-3 mx-auto"></div>
 
                 <!-- User Header -->
-                <h5 class="font-weight-bold text-white mb-1">{{ user.fullName || 'Anonymous' }}</h5>
+                <h5 class="font-weight-bold mb-1">{{ user.fullName || 'Anonymous' }}</h5>
                 <p class="text-muted small mb-4">@{{ user.username }}</p>
 
                 <hr class="my-4 opacity-25" />
@@ -71,19 +71,19 @@
                   <div v-if="!editMode">
                     <div class="mb-3">
                       <span class="text-muted d-block small">Full Name</span>
-                      <strong class="text-white">{{ user.fullName || 'N/A' }}</strong>
+                      <strong>{{ user.fullName || 'N/A' }}</strong>
                     </div>
                     <div class="mb-3">
                       <span class="text-muted d-block small">Email Address</span>
-                      <strong class="text-white text-break">{{ user.email }}</strong>
+                      <strong class="text-break">{{ user.email }}</strong>
                     </div>
                     <div class="mb-3">
                       <span class="text-muted d-block small">Phone Connection</span>
-                      <strong class="text-white">{{ user.phoneNumber || 'Not provided' }}</strong>
+                      <strong>{{ user.phoneNumber || 'Not provided' }}</strong>
                     </div>
                     <div class="mb-3">
                       <span class="text-muted d-block small">Shipping Address</span>
-                      <strong class="text-white">{{ user.address || 'No shipping address set' }}</strong>
+                      <strong>{{ user.address || 'No shipping address set' }}</strong>
                     </div>
 
                     <button class="bf-btn bf-btn-outline w-100 mt-4" @click="toggleEdit">
@@ -91,34 +91,33 @@
                     </button>
 
                     <!-- Become a Seller Section for regular USERs -->
-                    <div v-if="user && user.role === 'USER'" class="mt-4 p-3 bg-dark border-light rounded text-center">
-                      <h6 class="font-weight-bold text-white mb-2">💡 Start Earning</h6>
+                    <div v-if="user && user.role === 'USER'" class="mt-4 p-3 rounded border text-center">
+                      <h6 class="font-weight-bold mb-2">💡 Start Earning</h6>
                       <p class="small text-muted mb-3">Sell your high-quality PC hardware and components on the ByteForge marketplace.</p>
                       <router-link to="/seller/store-setup" class="bf-btn bf-btn-primary bf-btn-sm w-100">Become a Seller</router-link>
                     </div>
                   </div>
 
-                  <!-- EDIT MODE -->
                   <div v-else>
                     <form @submit.prevent="saveProfile">
                       <div class="mb-3">
                         <label class="form-label small text-muted font-weight-bold">Full Name</label>
-                        <input type="text" class="bf-input text-white bg-dark border-light" v-model="editForm.fullName" required />
+                        <input type="text" class="bf-input" v-model="editForm.fullName" required />
                       </div>
 
                       <div class="mb-3">
                         <label class="form-label small text-muted font-weight-bold">Email Address</label>
-                        <input type="email" class="bf-input text-white bg-dark border-light" v-model="editForm.email" required />
+                        <input type="email" class="bf-input" v-model="editForm.email" required />
                       </div>
 
                       <div class="mb-3">
                         <label class="form-label small text-muted font-weight-bold">Phone Number</label>
-                        <input type="text" class="bf-input text-white bg-dark border-light" v-model="editForm.phoneNumber" placeholder="e.g. +94 77 123 4567" />
+                        <input type="text" class="bf-input" v-model="editForm.phoneNumber" placeholder="e.g. +94 77 123 4567" />
                       </div>
 
                       <div class="mb-3">
                         <label class="form-label small text-muted font-weight-bold">Shipping Address</label>
-                        <textarea class="bf-input text-white bg-dark border-light" rows="3" v-model="editForm.address" placeholder="Enter your full delivery address..."></textarea>
+                        <textarea class="bf-input" rows="3" v-model="editForm.address" placeholder="Enter your full delivery address..."></textarea>
                       </div>
 
                       <div class="d-flex gap-2 mt-4">
@@ -141,9 +140,9 @@
         <!-- Orders & Support Columns -->
         <div class="col-lg-8 d-flex flex-column gap-4">
           <!-- Order History Card -->
-          <div class="bf-card border-light text-white">
-            <div class="p-4 bg-dark border-light-bottom d-flex justify-content-between align-items-center" style="border-top-left-radius: var(--bf-radius-lg); border-top-right-radius: var(--bf-radius-lg);">
-              <h5 class="mb-0 font-weight-bold text-white">Order History</h5>
+          <div class="bf-card">
+            <div class="p-4 border-light-bottom d-flex justify-content-between align-items-center" style="border-top-left-radius: var(--bf-radius-lg); border-top-right-radius: var(--bf-radius-lg);">
+              <h5 class="mb-0 font-weight-bold">Order History</h5>
               <span class="bf-badge bf-badge-primary" v-if="!ordersLoading && !ordersError">
                 {{ orders.length }} Order(s)
               </span>
@@ -164,15 +163,15 @@
               </div>
 
               <div v-else class="d-flex flex-column gap-3">
-                <div v-for="order in orders" :key="order.orderId" class="bf-card bg-dark border-light overflow-hidden">
+                <div v-for="order in orders" :key="order.orderId" class="bf-card overflow-hidden">
                   <div class="p-3 bg-secondary-dark border-light-bottom d-flex flex-wrap justify-content-between align-items-center gap-3">
                     <div class="text-start">
                       <span class="text-muted d-block small">ORDER PLACED</span>
-                      <strong class="small text-white">{{ formatDate(order.createdDate) }}</strong>
+                      <strong class="small">{{ formatDate(order.createdDate) }}</strong>
                     </div>
                     <div class="text-start">
                       <span class="text-muted d-block small">SHIP TO</span>
-                      <strong class="small text-white text-truncate d-inline-block" style="max-width: 180px;" :title="order.address">
+                      <strong class="small text-truncate d-inline-block" style="max-width: 180px;" :title="order.address">
                         {{ order.address }}
                       </strong>
                     </div>
@@ -194,16 +193,16 @@
                     >
                       <img
                         :src="item.product.imageUrl"
-                        class="img-thumbnail bg-dark border-secondary me-3"
+                        class="img-thumbnail me-3"
                         style="width: 50px; height: 50px; object-fit: contain;"
                         alt="Product Image"
                       />
                       <div class="text-start flex-grow-1">
-                        <h6 class="mb-1 font-weight-bold small text-white">{{ item.product.productName }}</h6>
+                        <h6 class="mb-1 font-weight-bold small">{{ item.product.productName }}</h6>
                         <small class="text-muted">Quantity: {{ item.quantity }}</small>
                       </div>
                       <div class="text-end">
-                        <strong class="text-white small">{{ formatPrice(item.price * item.quantity) }}</strong>
+                        <strong class="small">{{ formatPrice(item.price * item.quantity) }}</strong>
                       </div>
                     </div>
                   </div>
@@ -213,9 +212,9 @@
           </div>
 
           <!-- Support Tickets -->
-          <div class="bf-card border-light text-white">
-            <div class="p-4 bg-dark border-light-bottom d-flex justify-content-between align-items-center" style="border-top-left-radius: var(--bf-radius-lg); border-top-right-radius: var(--bf-radius-lg);">
-              <h5 class="mb-0 font-weight-bold text-white">Support Resolution Desk</h5>
+          <div class="bf-card text-white">
+            <div class="p-4 border-light-bottom d-flex justify-content-between align-items-center" style="border-top-left-radius: var(--bf-radius-lg); border-top-right-radius: var(--bf-radius-lg);">
+              <h5 class="mb-0 font-weight-bold">Support Resolution Desk</h5>
               <button class="bf-btn bf-btn-accent bf-btn-sm px-3" @click="showTicketForm = !showTicketForm">
                 {{ showTicketForm ? 'Close Window' : 'File Complaint' }}
               </button>
@@ -224,16 +223,16 @@
             <div class="p-4 text-start">
               <!-- Report form -->
               <transition name="page-fade">
-                <div v-if="showTicketForm" class="bf-card bg-dark border-light p-3 mb-4 text-white">
-                  <h5 class="font-weight-bold text-white mb-3">File Support Request</h5>
+                <div v-if="showTicketForm" class="bf-card p-3 mb-4">
+                  <h5 class="font-weight-bold mb-3">File Support Request</h5>
                   <form @submit.prevent="sendTicket">
                     <div class="mb-3">
                       <label class="form-label small font-weight-bold text-muted">Subject</label>
-                      <input type="text" class="bf-input text-white bg-dark border-light" v-model="ticketSubject" placeholder="e.g. Delivery status delay / Defective item" required />
+                      <input type="text" class="bf-input" v-model="ticketSubject" placeholder="e.g. Delivery status delay / Defective item" required />
                     </div>
                     <div class="mb-3">
                       <label class="form-label small font-weight-bold text-muted">Details</label>
-                      <textarea class="bf-input text-white bg-dark border-light" rows="4" v-model="ticketContent" placeholder="Describe your problem or question in detail..." required></textarea>
+                      <textarea class="bf-input" rows="4" v-model="ticketContent" placeholder="Describe your problem or question in detail..." required></textarea>
                     </div>
                     <button type="submit" class="bf-btn bf-btn-primary bf-btn-sm" :disabled="sendingTicket">
                       <span v-if="sendingTicket" class="spinner-border spinner-border-sm me-1"></span>
@@ -257,13 +256,13 @@
               </div>
 
               <div v-else style="max-height: 350px; overflow-y: auto;" class="d-flex flex-column gap-3">
-                <div v-for="msg in messages" :key="msg.messageId" class="bf-card bg-dark border-light p-3">
+                <div v-for="msg in messages" :key="msg.messageId" class="bf-card p-3">
                   <div class="d-flex justify-content-between align-items-center py-2 flex-wrap gap-2 border-light-bottom mb-2">
                     <div class="d-flex align-items-center gap-2">
                       <span class="bf-badge" :class="msg.status === 'OPEN' ? 'bf-badge-warning' : 'bf-badge-success'">
                         {{ msg.status }}
                       </span>
-                      <strong class="text-white small">{{ msg.subject }}</strong>
+                      <strong class="small">{{ msg.subject }}</strong>
                     </div>
                     <small class="text-muted">{{ formatDate(msg.createdDate) }}</small>
                   </div>
@@ -272,7 +271,7 @@
 
                   <div v-if="msg.status === 'REPLIED'" class="bg-secondary-dark p-3 rounded border-start border-success border-3 text-start mt-2">
                     <small class="font-weight-bold text-success d-block mb-1">Response from Support:</small>
-                    <p class="small mb-0 text-white">{{ msg.reply }}</p>
+                    <p class="small mb-0">{{ msg.reply }}</p>
                   </div>
                 </div>
               </div>

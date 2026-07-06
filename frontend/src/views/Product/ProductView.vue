@@ -17,7 +17,7 @@
                     <span class="pulse-dot"></span>
                     {{ slides[activeSlide].badge }}
                   </span>
-                  <h1 class="bf-hero-title-main text-white mb-3">
+                  <h1 class="bf-hero-title-main mb-3">
                     {{ slides[activeSlide].title }}
                   </h1>
                   <p class="bf-hero-subtitle-main text-muted mb-4 fs-5">
@@ -64,9 +64,9 @@
           <div class="col-md-3" v-for="(stat, idx) in homeStats" :key="idx">
             <div class="bf-card bf-glass stat-card p-4">
               <div class="d-flex align-items-center gap-3">
-                <span class="stat-icon-badge text-white fs-3">{{ stat.icon }}</span>
+                <span class="stat-icon-badge fs-3">{{ stat.icon }}</span>
                 <div>
-                  <h4 class="mb-0 font-weight-bold text-white">{{ stat.value }}</h4>
+                  <h4 class="mb-0 font-weight-bold">{{ stat.value }}</h4>
                   <small class="text-muted text-uppercase tracking-wider font-weight-bold">{{ stat.label }}</small>
                 </div>
               </div>
@@ -77,7 +77,7 @@
         <!-- Brand Showcase -->
         <div class="bf-section-bg p-5 mb-5 text-center">
           <span class="bf-badge bf-badge-primary mb-3">OFFICIAL VENDORS & BRANDS</span>
-          <h3 class="text-white font-weight-bold mb-4">Ultimate Hardware Ecosystem</h3>
+          <h3 class="font-weight-bold mb-4">Ultimate Hardware Ecosystem</h3>
           <div class="row row-cols-2 row-cols-md-5 g-4 justify-content-center align-items-center brand-grid">
             <div class="col" v-for="brand in brandList" :key="brand">
               <div class="brand-item-card p-3 rounded border text-muted">
@@ -89,7 +89,7 @@
 
         <!-- Featured Collections Header -->
         <div id="featured-section" class="text-start mb-4">
-          <h4 class="text-white font-weight-bold mb-2">Featured Rig Gear</h4>
+          <h4 class="font-weight-bold mb-2">Featured Rig Gear</h4>
           <p class="text-muted">Uncompromising engineering built to exceed performance benchmarks.</p>
         </div>
 
@@ -112,8 +112,8 @@
               <p class="text-secondary small italic-text">"{{ t.quote }}"</p>
               <div class="d-flex align-items-center gap-3 mt-3 pt-3 border-top">
                 <div class="testimonial-avatar">{{ t.author.charAt(0) }}</div>
-                <div>
-                  <h6 class="mb-0 text-white font-weight-bold">{{ t.author }}</h6>
+                 <div>
+                  <h6 class="mb-0 font-weight-bold">{{ t.author }}</h6>
                   <small class="text-muted">{{ t.role }}</small>
                 </div>
               </div>
@@ -127,7 +127,7 @@
           <h4 class="font-weight-bold mb-2">Join the Forge Elite Network</h4>
           <p class="text-secondary small mb-4">Get hot restock alerts, flash sales releases, and custom PC hardware guides first.</p>
           <div class="d-flex gap-2 max-width-sm mx-auto justify-content-center flex-wrap">
-            <input type="email" class="bf-input py-2 px-3 text-white bg-dark border-light" placeholder="Enter your email address" style="max-width: 320px;" />
+            <input type="email" class="bf-input py-2 px-3" placeholder="Enter your email address" style="max-width: 320px;" />
             <button class="bf-btn bf-btn-primary" @click="handleSubscribe">Subscribe</button>
           </div>
         </div>
@@ -149,17 +149,17 @@
           <!-- Grid/List layout toggle -->
           <div class="col-md-6 d-flex justify-content-md-end gap-2 align-items-center mt-3 mt-md-0">
             <span class="text-muted small">Layout:</span>
-            <div class="btn-group border rounded p-1 bg-dark">
+            <div class="btn-group border rounded p-1 bg-dark-toggle">
               <button 
-                class="btn btn-sm btn-dark text-white p-2" 
-                :class="{ active: viewMode === 'grid' }"
+                class="bf-btn bf-btn-ghost bf-btn-sm px-3" 
+                :class="{ 'bf-btn-primary': viewMode === 'grid' }"
                 @click="viewMode = 'grid'"
               >
                 Grid
               </button>
               <button 
-                class="btn btn-sm btn-dark text-white p-2" 
-                :class="{ active: viewMode === 'list' }"
+                class="bf-btn bf-btn-ghost bf-btn-sm px-3" 
+                :class="{ 'bf-btn-primary': viewMode === 'list' }"
                 @click="viewMode = 'list'"
               >
                 List
@@ -180,7 +180,7 @@
                 <div class="position-relative">
                   <input 
                     type="text" 
-                    class="bf-input py-2 text-white bg-dark border-light" 
+                    class="bf-input py-2" 
                     v-model="searchQuery" 
                     placeholder="Enter keywords..."
                   />
@@ -235,7 +235,7 @@
               <!-- Brand Filter Options -->
               <div class="mb-4">
                 <label class="form-label text-muted small font-weight-bold uppercase">Manufacturers / Brand</label>
-                <select class="bf-input py-2 text-white bg-dark border-light" v-model="selectedBrand">
+                <select class="bf-input py-2" v-model="selectedBrand">
                   <option value="all">All Manufacturers</option>
                   <option v-for="b in brandList" :key="b" :value="b">{{ b }}</option>
                 </select>
@@ -272,7 +272,7 @@
               </span>
               <div class="d-flex align-items-center gap-2">
                 <span class="text-muted small">Sort:</span>
-                <select class="bf-input py-1 px-2 bg-dark text-white border-light text-sm" v-model="sortOrder">
+                <select class="bf-input py-1 px-2 text-sm" v-model="sortOrder">
                   <option value="default">Relevance</option>
                   <option value="name-asc">Name (A-Z)</option>
                   <option value="price-asc">Price (Low → High)</option>
@@ -329,7 +329,7 @@
                     <span class="bf-badge bf-badge-primary text-uppercase mb-1 small" v-if="product.category">
                       {{ product.category.categoryName }}
                     </span>
-                    <h5 class="text-white font-weight-bold mb-2">{{ product.productName }}</h5>
+                    <h5 class="font-weight-bold mb-2">{{ product.productName }}</h5>
                     <p class="text-secondary small mb-0 text-truncate-2">{{ product.description }}</p>
                   </div>
                   <div class="text-md-end d-flex flex-column gap-2 flex-shrink-0 align-items-end justify-content-between min-width-card">
@@ -814,8 +814,8 @@ export default {
 }
 
 .bf-newsletter-banner {
-  background: var(--bf-gradient-card);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--bf-gradient-dark);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .newsletter-glow {

@@ -51,12 +51,12 @@
             <!-- Quick features list under image -->
             <div class="row g-2 mt-2">
               <div class="col-6">
-                <div class="p-3 bg-dark border rounded text-center text-muted small">
+                <div class="p-3 rounded border text-center text-muted small">
                   🛡️ 1-Year Local Warranty
                 </div>
               </div>
               <div class="col-6">
-                <div class="p-3 bg-dark border rounded text-center text-muted small">
+                <div class="p-3 rounded border text-center text-muted small">
                   ⚡ Tested Benchmarks
                 </div>
               </div>
@@ -65,7 +65,7 @@
 
           <!-- Right Column: Specs Selection -->
           <div class="col-lg-6">
-            <div class="bf-card p-4 p-md-5 h-100 d-flex flex-column justify-content-between text-white border-light">
+            <div class="bf-card bf-glass p-4 p-md-5 h-100 d-flex flex-column justify-content-between">
               <div>
                 <!-- Category badge & Seller reference -->
                 <div class="d-flex flex-wrap gap-2 mb-3 align-items-center justify-content-between">
@@ -86,7 +86,7 @@
                   </router-link>
                 </div>
 
-                <h1 class="text-white font-weight-bold mb-3 fs-3">{{ product.productName }}</h1>
+                <h1 class="font-weight-bold mb-3 fs-3">{{ product.productName }}</h1>
 
                 <!-- Reviews overview -->
                 <div class="d-flex align-items-center gap-2 mb-4">
@@ -97,7 +97,7 @@
                 </div>
 
                 <!-- Price Rates -->
-                <div class="price-box-details p-3 rounded bg-dark border-light mb-4">
+                <div class="price-box-details p-3 rounded border mb-4">
                   <span class="text-muted d-block small mb-1">Standard Market Rate</span>
                   <span class="bf-price-amount fs-2 font-weight-bold text-primary">{{ formattedPrice }}</span>
                 </div>
@@ -106,14 +106,14 @@
                 <div class="mb-4">
                   <div class="d-flex gap-3 border-bottom pb-2 mb-3">
                     <button 
-                      class="btn btn-sm text-white p-0 border-0 font-weight-bold" 
+                      class="btn btn-sm text-secondary p-0 border-0 font-weight-bold" 
                       :class="{ 'text-primary': activeTab === 'desc' }"
                       @click="activeTab = 'desc'"
                     >
                       Overview
                     </button>
                     <button 
-                      class="btn btn-sm text-white p-0 border-0 font-weight-bold" 
+                      class="btn btn-sm text-secondary p-0 border-0 font-weight-bold" 
                       :class="{ 'text-primary': activeTab === 'specs' }"
                       @click="activeTab = 'specs'"
                     >
@@ -126,23 +126,23 @@
                       {{ product.description }}
                     </div>
                     <div v-else>
-                      <table class="table table-dark table-sm table-borderless mb-0 text-start">
+                      <table class="table table-sm table-borderless mb-0 text-start">
                         <tbody>
                           <tr>
                             <td class="text-muted" style="width: 140px;">Module Type:</td>
-                            <td class="text-white">{{ categoryName || 'PC Hardware' }}</td>
+                            <td class="text-secondary font-weight-bold">{{ categoryName || 'PC Hardware' }}</td>
                           </tr>
                           <tr>
                             <td class="text-muted">Part Condition:</td>
-                            <td class="text-white">{{ product.condition || 'Brand New' }}</td>
+                            <td class="text-secondary font-weight-bold">{{ product.condition || 'Brand New' }}</td>
                           </tr>
                           <tr>
                             <td class="text-muted">Stock Quantity:</td>
-                            <td class="text-white">{{ product.stock || 'Not Specified' }} units</td>
+                            <td class="text-secondary font-weight-bold">{{ product.stock || 'Not Specified' }} units</td>
                           </tr>
                           <tr>
                             <td class="text-muted">Vendor Registry:</td>
-                            <td class="text-white">{{ product.storeName || 'ByteForge Partner' }}</td>
+                            <td class="text-secondary font-weight-bold">{{ product.storeName || 'ByteForge Partner' }}</td>
                           </tr>
                         </tbody>
                       </table>
