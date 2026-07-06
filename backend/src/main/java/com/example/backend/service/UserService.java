@@ -101,8 +101,11 @@ public class UserService {
             userDto.setEmail(user.getEmail());
             userDto.setFullName(user.getFullName());
             userDto.setRole(user.getRole());
-            userDto.setPassword(user.getPassword());
-            userDto.setUsername(user.getUsername());;
+            userDto.setPassword(null); // omit password
+            userDto.setUsername(user.getUsername());
+            userDto.setProfileImageUrl(user.getProfileImageUrl());
+            userDto.setPhoneNumber(user.getPhoneNumber());
+            userDto.setAddress(user.getAddress());
 
             response.setMessage("USER FOUND");
             response.setData(userDto);
@@ -119,5 +122,40 @@ public class UserService {
         response.setMessage("All users retrieved successfully");
         response.setData(users);
         return ResponseEntity.ok().body(response);
+    }
+
+    public ResponseEntity updateProfile(UserDto userDto) {
+        ResponseDto response = new ResponseDto();
+        if (userDto.getUserId() == null) {
+            return ResponseEntity.badRequest().body("User ID is required");
+        }
+        Optional<User> optUser = userRepo.findById(userDto.getUserId());
+        if (optUser.isPresent()) {
+            User user = optUser.get();
+            user.setFullName(userDto.getFullName());
+            user.setEmail(userDto.getEmail());
+            user.setPhoneNumber(userDto.getPhoneNumber());
+            user.setAddress(userDto.getAddress());
+            if (userDto.getProfileImageUrl() != null) {
+                user.setProfileImageUrl(userDto.getProfileImageUrl());
+            }
+            userRepo.save(user);
+
+            UserDto updatedDto = new UserDto();
+            updatedDto.setUserId(user.getUserId());
+            updatedDto.setFullName(user.getFullName());
+            updatedDto.setEmail(user.getEmail());
+            updatedDto.setUsername(user.getUsername());
+            updatedDto.setRole(user.getRole());
+            updatedDto.setProfileImageUrl(user.getProfileImageUrl());
+            updatedDto.setPhoneNumber(user.getPhoneNumber());
+            updatedDto.setAddress(user.getAddress());
+
+            response.setMessage("Profile updated successfully");
+            response.setData(updatedDto);
+            return ResponseEntity.ok().body(response);
+        } else {
+            return ResponseEntity.badRequest().body("User not found");
+        }
     }
 }

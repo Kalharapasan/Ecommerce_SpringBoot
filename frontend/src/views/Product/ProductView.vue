@@ -1,26 +1,115 @@
 <template>
   <div class="container my-4">
-    <!-- Header Title -->
-    <div class="row mb-4 align-items-center">
-      <div class="col-md-6 text-start">
-        <h3>Our Products</h3>
+    <!-- Split Banner Section (eBay Style Promo Grid) -->
+    <div class="row g-4 mb-4">
+      <!-- Main Dynamic Slideshow (Col 8) -->
+      <div class="col-lg-8">
+        <div class="card border-0 rounded-4 overflow-hidden h-100 shadow-sm text-white position-relative text-start p-4 p-md-5 d-flex flex-column justify-content-between" style="min-height: 380px; background: linear-gradient(135deg, rgba(30, 27, 75, 0.85) 0%, rgba(15, 23, 42, 0.95) 100%), url('https://images.unsplash.com/photo-1587202372775-e229f172b9d7?q=80&w=1200&auto=format&fit=crop') no-repeat center/cover;">
+          <!-- Dynamic Slides -->
+          <div 
+            v-if="slides && slides.length > 0"
+            class="h-100 d-flex flex-column justify-content-between z-index-2 position-relative"
+          >
+            <div>
+              <span class="badge bg-warning text-dark px-3 py-2 rounded-pill font-weight-bold mb-3 text-uppercase">
+                {{ slides[activeSlide].badge }}
+              </span>
+              <h1 class="display-5 font-weight-bold mb-2">{{ slides[activeSlide].title }}</h1>
+              <p class="lead mb-4 opacity-75">{{ slides[activeSlide].subtitle }}</p>
+            </div>
+            <div>
+              <button class="btn btn-warning btn-lg font-weight-bold px-4 py-2 text-dark shadow" @click="scrollToProducts">
+                Shop Now
+              </button>
+            </div>
+          </div>
+          
+          <!-- Slide indicator dots -->
+          <div class="position-absolute bottom-3 start-50 translate-middle-x z-index-2 d-flex gap-2 mb-3">
+            <span 
+              v-for="(slide, index) in slides" 
+              :key="index" 
+              class="slide-dot cursor-pointer" 
+              :class="{'active-dot bg-warning': activeSlide === index, 'bg-light opacity-50': activeSlide !== index}" 
+              @click="activeSlide = index"
+            ></span>
+          </div>
+
+          <!-- Decorative background grid -->
+          <div class="hero-pattern position-absolute top-50 start-50 translate-middle w-100 h-100 opacity-10" style="background-image: radial-gradient(circle, #ffffff 1px, transparent 1px); background-size: 20px 20px;"></div>
+        </div>
       </div>
-      <div class="col-md-6 text-md-end mt-2 mt-md-0" v-if="isAdmin">
-        <router-link :to="{ name: 'AddProduct' }">
-          <button class="btn btn-primary">Add Product</button>
-        </router-link>
+
+      <!-- Side Deal Banners (Col 4) -->
+      <div class="col-lg-4 d-flex flex-column gap-3">
+        <!-- Prebuilt Desktops Promo Card -->
+        <div class="card border-0 rounded-4 overflow-hidden flex-fill text-white p-4 shadow-sm text-start position-relative d-flex flex-column justify-content-center" style="background: linear-gradient(135deg, rgba(9, 9, 11, 0.8) 0%, rgba(39, 39, 42, 0.9) 100%), url('https://images.unsplash.com/photo-1593642632823-8f785ba67e45?q=80&w=600&auto=format&fit=crop') no-repeat center/cover; min-height: 180px;">
+          <div>
+            <span class="badge bg-primary text-white px-2 py-1 rounded font-weight-bold mb-2 small uppercase-badge">
+              Featured Build
+            </span>
+            <h5 class="font-weight-bold mb-1">Prebuilt Gaming PCs</h5>
+            <p class="small text-white-50 mb-3">High-fps liquid-cooled rigs benchmarked and ready to play.</p>
+          </div>
+          <button class="btn btn-outline-light btn-sm font-weight-bold align-self-start" @click="selectCategoryByName('Desktop Systems')">
+            Explore Systems
+          </button>
+        </div>
+
+        <!-- GPU Restock Promo Card -->
+        <div class="card border-0 rounded-4 overflow-hidden flex-fill text-white p-4 shadow-sm text-start position-relative d-flex flex-column justify-content-center" style="background: linear-gradient(135deg, rgba(12, 74, 110, 0.8) 0%, rgba(3, 105, 161, 0.9) 100%), url('https://images.unsplash.com/photo-1582994274092-23f4931bc151?q=80&w=600&auto=format&fit=crop') no-repeat center/cover; min-height: 180px;">
+          <div>
+            <span class="badge bg-warning text-dark px-2 py-1 rounded font-weight-bold mb-2 small uppercase-badge">
+              Hardware Drop
+            </span>
+            <h5 class="font-weight-bold mb-1">RTX 40-Series In Stock</h5>
+            <p class="small text-white-50 mb-3">Get unmatched ray-tracing output and DLSS 3 support.</p>
+          </div>
+          <button class="btn btn-outline-warning btn-sm font-weight-bold align-self-start text-warning" @click="selectCategoryByName('Graphics Cards (GPUs)')">
+            Shop GPUs
+          </button>
+        </div>
       </div>
     </div>
 
-    <!-- Hero Banner Section -->
-    <div class="hero-section rounded-4 text-white p-5 mb-4 position-relative overflow-hidden shadow-lg border border-dark" style="background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%);">
-      <div class="position-relative z-index-2 text-start">
-        <span class="badge bg-primary text-white px-3 py-2 rounded-pill font-weight-bold mb-3">GAMING GEAR & CUSTOM PC BUILDER</span>
-        <h1 class="display-4 font-weight-bold mb-2">ByteForge PC Store</h1>
-        <p class="lead mb-4 opacity-75">Build your dream setup with high-end GPUs, desktop hardware, custom cases, and peripherals. Use coupon <strong class="text-warning">SAVE50</strong> at checkout!</p>
-        <button class="btn btn-warning btn-lg font-weight-bold px-4 py-2 text-dark shadow-sm" @click="scrollToProducts">Shop Now</button>
+    <!-- Shop By Category (eBay Style Circular Navigation) -->
+    <div class="mb-5 text-start bg-light p-4 rounded-4 shadow-sm">
+      <h4 class="font-weight-bold text-dark mb-4">Shop by Category</h4>
+      <!-- Horizontal scroll circle row -->
+      <div class="d-flex gap-4 overflow-auto pb-2 custom-horizontal-scroll">
+        <!-- "All Categories" circle -->
+        <div class="category-circle-item text-center cursor-pointer flex-shrink-0" @click="selectCategory('all')">
+          <div 
+            class="circle-image-wrapper mx-auto mb-2 shadow-sm rounded-circle d-flex align-items-center justify-content-center border bg-white" 
+            :class="{'active-circle border-primary border-3': selectedCategoryId === 'all'}" 
+            style="width: 80px; height: 80px;"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-grid-fill text-primary" viewBox="0 0 16 16">
+              <path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5zm8 0A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5zm-8 8A1.5 1.5 0 0 1 2.5 9h-3A1.5 1.5 0 0 1 5.5 11v3A1.5 1.5 0 0 1 3.5 15h-3A1.5 1.5 0 0 1 1 13.5zm8 0A1.5 1.5 0 0 1 10.5 9h3a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-3a1.5 1.5 0 0 1-1.5-1.5z"/>
+            </svg>
+          </div>
+          <small class="font-weight-bold text-dark d-block">All Gears</small>
+        </div>
+
+        <!-- Dynamic Category circles -->
+        <div 
+          v-for="cat in categories" 
+          :key="cat.categoryId" 
+          class="category-circle-item text-center cursor-pointer flex-shrink-0"
+          @click="selectCategory(cat.categoryId)"
+        >
+          <div 
+            class="circle-image-wrapper mx-auto mb-2 shadow-sm rounded-circle border overflow-hidden" 
+            :class="{'active-circle border-primary border-3': selectedCategoryId === cat.categoryId}"
+            style="width: 80px; height: 80px;"
+          >
+            <img :src="cat.imageUrl" class="w-100 h-100" style="object-fit: cover;" alt="Category Thumbnail">
+          </div>
+          <small class="font-weight-bold text-dark d-block text-truncate" style="max-width: 90px;" :title="cat.categoryName">
+            {{ cat.categoryName }}
+          </small>
+        </div>
       </div>
-      <div class="hero-pattern position-absolute top-50 start-50 translate-middle w-100 h-100 opacity-10" style="background-image: radial-gradient(circle, #ffffff 1px, transparent 1px); background-size: 20px 20px;"></div>
     </div>
 
     <!-- Highlight features row -->
@@ -81,50 +170,31 @@
             <input 
               type="text" 
               class="form-control border-start-0 bg-light" 
-              placeholder="Search products..." 
+              placeholder="Search components or accessories..." 
               v-model="searchQuery"
             />
           </div>
         </div>
 
-        <!-- Category selector -->
-        <div class="col-md-4 d-flex align-items-center gap-2 text-start">
-          <label for="categoryFilter" class="form-label mb-0 text-nowrap text-secondary small font-weight-bold">Category:</label>
-          <select 
-            id="categoryFilter" 
-            class="form-select" 
-            v-model="selectedCategoryId" 
-            @change="handleCategoryChange"
-          >
-            <option value="all">All Products</option>
-            <option 
-              v-for="cat in categories" 
-              :key="cat.categoryId" 
-              :value="cat.categoryId"
-            >
-              {{ cat.categoryName }}
-            </option>
-          </select>
-        </div>
+        <!-- Spacer -->
+        <div class="col-md-5"></div>
 
-        <!-- Sorting selector -->
-        <div class="col-md-4 d-flex align-items-center gap-2 text-start">
-          <label for="sortOrder" class="form-label mb-0 text-nowrap text-secondary small font-weight-bold">Sort By:</label>
-          <select 
-            id="sortOrder" 
-            class="form-select" 
-            v-model="sortOrder"
-          >
-            <option value="default">Default</option>
-            <option value="name-asc">Name (A-Z)</option>
-            <option value="price-asc">Price (Low to High)</option>
-            <option value="price-desc">Price (High to Low)</option>
-          </select>
+        <!-- Sorting dropdown -->
+        <div class="col-md-3 text-end">
+          <div class="d-flex align-items-center justify-content-end gap-2">
+            <span class="text-muted small text-nowrap">Sort by:</span>
+            <select class="form-select bg-light border" v-model="sortOrder" style="max-width: 180px;">
+              <option value="default">Relevance</option>
+              <option value="name-asc">Name (A-Z)</option>
+              <option value="price-asc">Price (Low to High)</option>
+              <option value="price-desc">Price (High to Low)</option>
+            </select>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- Loading Spinner -->
+    <!-- Loading spinner -->
     <div v-if="loading" class="text-center my-5">
       <div class="spinner-border text-primary" role="status">
         <span class="visually-hidden">Loading products...</span>
@@ -171,7 +241,28 @@ export default {
       searchQuery: '',
       sortOrder: 'default',
       loading: true,
-      error: null
+      error: null,
+      
+      // Dynamic Slider Configuration
+      activeSlide: 0,
+      slidesInterval: null,
+      slides: [
+        {
+          badge: 'Next-Gen Computing',
+          title: 'Unleash Peak Performance',
+          subtitle: 'Build your dream custom rig with newly restocked Ryzen 7 7800X3D processors and DDR5 modules.'
+        },
+        {
+          badge: 'Exclusive Tech Sale',
+          title: 'Level Up Your Setup',
+          subtitle: 'Save up to 40% on mechanical gaming keyboards, high-precision optical mice, and headsets.'
+        },
+        {
+          badge: 'Apex Graphics Power',
+          title: 'RTX 4090 Flagship GPUs',
+          subtitle: 'Experience ray-tracing and AI-driven frame rendering with Nvidia RTX and Radeon graphics.'
+        }
+      ]
     };
   },
   computed: {
@@ -210,6 +301,19 @@ export default {
         el.scrollIntoView({ behavior: 'smooth' });
       }
     },
+    selectCategory(id) {
+      this.selectedCategoryId = id;
+      this.fetchProducts();
+      this.scrollToProducts();
+    },
+    selectCategoryByName(name) {
+      const category = this.categories.find(c => c.categoryName.toLowerCase().includes(name.toLowerCase()));
+      if (category) {
+        this.selectCategory(category.categoryId);
+      } else {
+        this.scrollToProducts();
+      }
+    },
     async fetchCategories() {
       try {
         const response = await api.get('/category');
@@ -234,20 +338,54 @@ export default {
       } finally {
         this.loading = false;
       }
-    },
-    handleCategoryChange() {
-      this.fetchProducts();
     }
   },
   mounted() {
     this.fetchCategories();
     this.fetchProducts();
+    
+    // Cycle promotional slides
+    this.slidesInterval = setInterval(() => {
+      this.activeSlide = (this.activeSlide + 1) % this.slides.length;
+    }, 5000);
+  },
+  beforeUnmount() {
+    if (this.slidesInterval) {
+      clearInterval(this.slidesInterval);
+    }
   }
 };
 </script>
 
 <style scoped>
-.hero-section {
-  background-size: cover;
+.custom-horizontal-scroll {
+  white-space: nowrap;
+}
+.category-circle-item:hover .circle-image-wrapper {
+  transform: scale(1.08);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+.slide-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+.active-dot {
+  width: 25px;
+  border-radius: 6px;
+}
+.circle-image-wrapper {
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 3px;
+}
+.active-circle {
+  border-color: #0d6efd !important;
+}
+.uppercase-badge {
+  font-size: 0.7rem;
+  letter-spacing: 1px;
 }
 </style>

@@ -77,7 +77,7 @@ export default {
     return {
       count: this.item.count,
       currentImageUrl: this.item.product.imageUrl,
-      fallbackUrl: 'https://via.placeholder.com/80x80?text=No+Img'
+      fallbackUrl: 'https://placehold.co/80x80?text=No+Img'
     };
   },
   watch: {

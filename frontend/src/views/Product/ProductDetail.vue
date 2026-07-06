@@ -150,7 +150,7 @@ export default {
       error: null,
       addingToCart: false,
       currentImageUrl: '',
-      fallbackUrl: 'https://via.placeholder.com/500x400?text=No+Image+Available'
+      fallbackUrl: 'https://placehold.co/500x400?text=No+Image+Available'
     };
   },
   computed: {

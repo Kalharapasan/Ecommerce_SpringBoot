@@ -3,57 +3,123 @@
     <div class="row">
       <!-- Profile Details Column -->
       <div class="col-lg-4 mb-4">
-        <div class="card shadow-sm border-0 h-100">
-          <div class="card-header bg-dark text-white p-4">
-            <h4 class="mb-0">User Profile</h4>
+        <div class="card shadow-sm border-0 h-100 position-relative">
+          <!-- Banner Header -->
+          <div class="card-header bg-dark text-white p-4 text-center position-relative">
+            <h4 class="mb-0 font-weight-bold">My Account</h4>
+            <span class="badge bg-secondary position-absolute top-0 start-0 m-3 text-uppercase">
+              {{ user ? user.role : '' }}
+            </span>
           </div>
-          <div class="card-body p-4">
-            <div v-if="loading" class="text-center py-4">
+
+          <div class="card-body p-4 text-center">
+            <div v-if="loading" class="py-5">
               <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Loading...</span>
+                <span class="visually-hidden">Loading profile...</span>
               </div>
             </div>
-            
+
             <div v-else-if="error" class="alert alert-danger" role="alert">
               {{ error }}
             </div>
 
             <div v-else-if="user">
-              <div class="row mb-3 pb-3 border-bottom text-start">
-                <div class="col-sm-4 text-muted">Full Name</div>
-                <div class="col-sm-8 font-weight-bold">
-                  {{ user.fullName || 'N/A' }}
+              <!-- Avatar Container -->
+              <div class="avatar-container mb-4 position-relative mx-auto">
+                <img 
+                  :src="user.profileImageUrl || defaultAvatar" 
+                  class="rounded-circle border shadow-sm avatar-image"
+                  alt="Profile Avatar"
+                  @error="handleAvatarError"
+                />
+                <!-- Upload overlay -->
+                <div class="avatar-upload-overlay rounded-circle d-flex align-items-center justify-content-center cursor-pointer" @click="triggerFileInput">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-camera text-white" viewBox="0 0 16 16">
+                    <path d="M15 12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h1.172a3 3 0 0 0 2.12-.879l.83-.828A1 1 0 0 1 6.827 3h2.344a1 1 0 0 1 .702.292l.83.828A3 3 0 0 0 12.828 5H14a1 1 0 0 1 1 1zM2 4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-1.172a2 2 0 0 1-1.414-.586l-.828-.828A2 2 0 0 0 9.172 2H6.828a2 2 0 0 0-1.414.586l-.828.828A2 2 0 0 1 3.172 4z"/>
+                    <path d="M8 11a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5m0 1a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM3 6.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0"/>
+                  </svg>
                 </div>
-              </div>
-              
-              <div class="row mb-3 pb-3 border-bottom text-start">
-                <div class="col-sm-4 text-muted">Username</div>
-                <div class="col-sm-8"><strong>{{ user.username }}</strong></div>
-              </div>
-
-              <div class="row mb-3 pb-3 border-bottom text-start">
-                <div class="col-sm-4 text-muted">Email Address</div>
-                <div class="col-sm-8">{{ user.email }}</div>
+                <!-- Hidden file input -->
+                <input 
+                  type="file" 
+                  ref="fileInput" 
+                  class="d-none" 
+                  accept="image/*" 
+                  @change="handleAvatarUpload"
+                />
               </div>
 
-              <div class="row mb-3 text-start">
-                <div class="col-sm-4 text-muted">Account Role</div>
-                <div class="col-sm-8">
-                  <span class="badge bg-secondary text-uppercase">{{ user.role }}</span>
+              <!-- Upload Progress / Info -->
+              <div v-if="uploading" class="spinner-border spinner-border-sm text-primary mb-3" role="status">
+                <span class="visually-hidden">Uploading image...</span>
+              </div>
+
+              <!-- User Header -->
+              <h5 class="font-weight-bold mb-1">{{ user.fullName || 'Anonymous User' }}</h5>
+              <p class="text-muted small mb-4">@{{ user.username }}</p>
+
+              <hr />
+
+              <!-- User Details Panel (Read-only / Edit-mode) -->
+              <div class="text-start">
+                <!-- VIEW MODE -->
+                <div v-if="!editMode">
+                  <div class="row mb-3">
+                    <div class="col-4 text-muted small">Full Name</div>
+                    <div class="col-8 font-weight-bold">{{ user.fullName || 'N/A' }}</div>
+                  </div>
+                  <div class="row mb-3">
+                    <div class="col-4 text-muted small">Email</div>
+                    <div class="col-8 text-break">{{ user.email }}</div>
+                  </div>
+                  <div class="row mb-3">
+                    <div class="col-4 text-muted small">Phone</div>
+                    <div class="col-8">{{ user.phoneNumber || 'Not provided' }}</div>
+                  </div>
+                  <div class="row mb-3">
+                    <div class="col-4 text-muted small">Address</div>
+                    <div class="col-8">{{ user.address || 'No shipping address set' }}</div>
+                  </div>
+
+                  <button class="btn btn-outline-primary btn-sm w-100 mt-3 font-weight-bold" @click="toggleEdit">
+                    Edit Account Info
+                  </button>
                 </div>
-              </div>
 
-              <!-- Cart Summary Stats -->
-              <div class="mt-4 pt-4 border-top text-center bg-light rounded p-3">
-                <h6 class="text-secondary font-weight-bold mb-2">Shopping Activity</h6>
-                <p class="mb-0 text-muted">
-                  Your shopping cart currently holds 
-                  <strong class="text-primary h5 mx-1 mb-0 align-middle">{{ cartCount }}</strong> 
-                  item(s).
-                </p>
-                <router-link to="/cart" class="btn btn-outline-primary btn-sm mt-3" v-if="cartCount > 0">
-                  Go to Cart
-                </router-link>
+                <!-- EDIT MODE -->
+                <div v-else>
+                  <form @submit.prevent="saveProfile">
+                    <div class="mb-3">
+                      <label class="form-label small text-muted font-weight-bold mb-1">Full Name</label>
+                      <input type="text" class="form-control form-control-sm" v-model="editForm.fullName" required />
+                    </div>
+
+                    <div class="mb-3">
+                      <label class="form-label small text-muted font-weight-bold mb-1">Email Address</label>
+                      <input type="email" class="form-control form-control-sm" v-model="editForm.email" required />
+                    </div>
+
+                    <div class="mb-3">
+                      <label class="form-label small text-muted font-weight-bold mb-1">Phone Number</label>
+                      <input type="text" class="form-control form-control-sm" v-model="editForm.phoneNumber" placeholder="e.g. +94 77 123 4567" />
+                    </div>
+
+                    <div class="mb-3">
+                      <label class="form-label small text-muted font-weight-bold mb-1">Shipping Address</label>
+                      <textarea class="form-control form-control-sm" rows="3" v-model="editForm.address" placeholder="Enter your full delivery address..."></textarea>
+                    </div>
+
+                    <div class="d-flex gap-2 mt-4">
+                      <button type="submit" class="btn btn-success btn-sm flex-grow-1 font-weight-bold" :disabled="saving">
+                        <span v-if="saving" class="spinner-border spinner-border-sm me-1"></span>
+                        Save Changes
+                      </button>
+                      <button type="button" class="btn btn-outline-secondary btn-sm" @click="toggleEdit" :disabled="saving">
+                        Cancel
+                      </button>
+                    </div>
+                  </form>
+                </div>
               </div>
             </div>
           </div>
@@ -143,7 +209,7 @@
 
 <script>
 import api, { extractErrorMessage, formatPrice } from '../../utils/api';
-import { getCurrentUser, authState, getToken } from '../../utils/auth';
+import { getCurrentUser, getToken } from '../../utils/auth';
 
 export default {
   name: 'ProfileView',
@@ -153,16 +219,25 @@ export default {
       loading: true,
       error: null,
       
+      // Inline Editing Form
+      editMode: false,
+      saving: false,
+      editForm: {
+        fullName: '',
+        email: '',
+        phoneNumber: '',
+        address: ''
+      },
+
+      // Avatar Image Upload
+      uploading: false,
+      defaultAvatar: 'https://placehold.co/150x150?text=Upload+Photo',
+
       // Orders History
       orders: [],
       ordersLoading: true,
       ordersError: null
     };
-  },
-  computed: {
-    cartCount() {
-      return authState.cartCount;
-    }
   },
   methods: {
     formatDate(dateStr) {
@@ -183,6 +258,78 @@ export default {
     },
     formatPrice(val) {
       return formatPrice(val);
+    },
+    handleAvatarError(e) {
+      e.target.src = this.defaultAvatar;
+    },
+    triggerFileInput() {
+      this.$refs.fileInput.click();
+    },
+    async handleAvatarUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      this.uploading = true;
+      try {
+        // 1. Upload the image using our file controller
+        const uploadRes = await api.post('/file/upload', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+        const localImageUrl = uploadRes.data;
+
+        // 2. Instantly persist to user profile database record
+        const updateRes = await api.put('/user/profile/update', {
+          userId: this.user.userId,
+          fullName: this.user.fullName,
+          email: this.user.email,
+          phoneNumber: this.user.phoneNumber,
+          address: this.user.address,
+          profileImageUrl: localImageUrl
+        });
+
+        this.user = updateRes.data.data;
+        alert('Profile picture updated successfully!');
+      } catch (err) {
+        alert('Failed to upload picture: ' + extractErrorMessage(err));
+      } finally {
+        this.uploading = false;
+      }
+    },
+    toggleEdit() {
+      if (!this.editMode) {
+        // Initialize form fields with current user state
+        this.editForm.fullName = this.user.fullName || '';
+        this.editForm.email = this.user.email || '';
+        this.editForm.phoneNumber = this.user.phoneNumber || '';
+        this.editForm.address = this.user.address || '';
+      }
+      this.editMode = !this.editMode;
+    },
+    async saveProfile() {
+      this.saving = true;
+      try {
+        const updatePayload = {
+          userId: this.user.userId,
+          fullName: this.editForm.fullName,
+          email: this.editForm.email,
+          phoneNumber: this.editForm.phoneNumber,
+          address: this.editForm.address,
+          profileImageUrl: this.user.profileImageUrl
+        };
+        const response = await api.put('/user/profile/update', updatePayload);
+        this.user = response.data.data;
+        this.editMode = false;
+        alert('Profile saved successfully.');
+      } catch (err) {
+        alert('Failed to save profile: ' + extractErrorMessage(err));
+      } finally {
+        this.saving = false;
+      }
     },
     async fetchOrderHistory() {
       const token = getToken();
@@ -230,5 +377,30 @@ export default {
 }
 .last-border-0:last-child {
   border-bottom: 0 !important;
+}
+
+/* Avatar upload aesthetics */
+.avatar-container {
+  width: 130px;
+  height: 130px;
+}
+.avatar-image {
+  width: 130px;
+  height: 130px;
+  object-fit: cover;
+  background-color: #f8f9fa;
+}
+.avatar-upload-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+.avatar-container:hover .avatar-upload-overlay {
+  opacity: 1;
 }
 </style>

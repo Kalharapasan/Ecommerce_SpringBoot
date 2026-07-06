@@ -34,6 +34,15 @@ public class User {
     @Column(name = "USER_ROLE")
     private String role;
 
+    @Column(name = "PROFILE_IMAGE_URL")
+    private String profileImageUrl;
+
+    @Column(name = "PHONE_NUMBER")
+    private String phoneNumber;
+
+    @Column(name = "ADDRESS")
+    private String address;
+
 //    @OneToMany(mappedBy = "user")
 //    private List<Cart> cart;
 

@@ -45,7 +45,7 @@ export default {
   data() {
     return {
       currentImageUrl: this.product.imageUrl,
-      fallbackUrl: 'https://via.placeholder.com/300x200?text=No+Image+Available'
+      fallbackUrl: 'https://placehold.co/300x200?text=No+Image+Available'
     };
   },
   watch: {
