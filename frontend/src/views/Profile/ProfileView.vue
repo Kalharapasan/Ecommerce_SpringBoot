@@ -1,21 +1,21 @@
 <template>
-  <div class="bf-page bf-fade-in p-4">
+  <div class="bf-page bf-fade-in p-4 text-start">
     <div class="container">
       <div class="row mb-4">
         <div class="col-12 text-start">
           <span class="bf-badge bf-badge-primary mb-2">Customer Profile</span>
-          <h2 class="bf-section-title">My Account & Overview</h2>
-          <p class="bf-section-desc">Manage account information, check order statuses, and create support queries.</p>
+          <h2 class="text-white font-weight-bold mb-1">My Account & Overview</h2>
+          <p class="text-muted small">Manage account information, check order statuses, and create support queries.</p>
         </div>
       </div>
 
       <div class="row g-4">
         <!-- Profile Details Column -->
         <div class="col-lg-4">
-          <div class="bf-card bf-glass position-relative h-100">
+          <div class="bf-card bf-glass position-relative h-100 border-light text-white">
             <!-- Header -->
-            <div class="p-4 text-center bg-dark text-white position-relative" style="border-top-left-radius: var(--bf-radius-lg); border-top-right-radius: var(--bf-radius-lg);">
-              <h5 class="mb-0 font-weight-bold">Member Information</h5>
+            <div class="p-4 text-center bg-dark border-light-bottom position-relative" style="border-top-left-radius: var(--bf-radius-lg); border-top-right-radius: var(--bf-radius-lg);">
+              <h5 class="mb-0 font-weight-bold text-white">Member Information</h5>
               <span class="bf-badge bf-badge-primary text-uppercase mt-2">
                 {{ user ? user.role : 'Guest' }}
               </span>
@@ -32,10 +32,10 @@
 
               <div v-else-if="user" class="bf-fade-in">
                 <!-- Avatar Container -->
-                <div class="avatar-container mb-4 position-relative mx-auto">
+                <div class="avatar-container mb-4 position-relative mx-auto border-light rounded-circle">
                   <img
                     :src="user.profileImageUrl || defaultAvatar"
-                    class="rounded-circle border shadow-sm avatar-image"
+                    class="rounded-circle border border-secondary shadow-sm avatar-image"
                     alt="Profile Avatar"
                     @error="handleAvatarError"
                   />
@@ -60,10 +60,10 @@
                 <div v-if="uploading" class="bf-spinner mb-3 mx-auto"></div>
 
                 <!-- User Header -->
-                <h5 class="font-weight-bold text-dark mb-1">{{ user.fullName || 'Anonymous' }}</h5>
+                <h5 class="font-weight-bold text-white mb-1">{{ user.fullName || 'Anonymous' }}</h5>
                 <p class="text-muted small mb-4">@{{ user.username }}</p>
 
-                <hr class="my-4" />
+                <hr class="my-4 opacity-25" />
 
                 <!-- Details Panel -->
                 <div class="text-start">
@@ -71,19 +71,19 @@
                   <div v-if="!editMode">
                     <div class="mb-3">
                       <span class="text-muted d-block small">Full Name</span>
-                      <strong class="text-dark">{{ user.fullName || 'N/A' }}</strong>
+                      <strong class="text-white">{{ user.fullName || 'N/A' }}</strong>
                     </div>
                     <div class="mb-3">
                       <span class="text-muted d-block small">Email Address</span>
-                      <strong class="text-dark text-break">{{ user.email }}</strong>
+                      <strong class="text-white text-break">{{ user.email }}</strong>
                     </div>
                     <div class="mb-3">
                       <span class="text-muted d-block small">Phone Connection</span>
-                      <strong class="text-dark">{{ user.phoneNumber || 'Not provided' }}</strong>
+                      <strong class="text-white">{{ user.phoneNumber || 'Not provided' }}</strong>
                     </div>
                     <div class="mb-3">
                       <span class="text-muted d-block small">Shipping Address</span>
-                      <strong class="text-dark">{{ user.address || 'No shipping address set' }}</strong>
+                      <strong class="text-white">{{ user.address || 'No shipping address set' }}</strong>
                     </div>
 
                     <button class="bf-btn bf-btn-outline w-100 mt-4" @click="toggleEdit">
@@ -91,8 +91,8 @@
                     </button>
 
                     <!-- Become a Seller Section for regular USERs -->
-                    <div v-if="user && user.role === 'USER'" class="mt-4 p-3 bg-light border rounded text-center">
-                      <h6 class="font-weight-bold text-dark mb-2">💡 Start Earning</h6>
+                    <div v-if="user && user.role === 'USER'" class="mt-4 p-3 bg-dark border-light rounded text-center">
+                      <h6 class="font-weight-bold text-white mb-2">💡 Start Earning</h6>
                       <p class="small text-muted mb-3">Sell your high-quality PC hardware and components on the ByteForge marketplace.</p>
                       <router-link to="/seller/store-setup" class="bf-btn bf-btn-primary bf-btn-sm w-100">Become a Seller</router-link>
                     </div>
@@ -103,30 +103,30 @@
                     <form @submit.prevent="saveProfile">
                       <div class="mb-3">
                         <label class="form-label small text-muted font-weight-bold">Full Name</label>
-                        <input type="text" class="bf-input" v-model="editForm.fullName" required />
+                        <input type="text" class="bf-input text-white bg-dark border-light" v-model="editForm.fullName" required />
                       </div>
 
                       <div class="mb-3">
                         <label class="form-label small text-muted font-weight-bold">Email Address</label>
-                        <input type="email" class="bf-input" v-model="editForm.email" required />
+                        <input type="email" class="bf-input text-white bg-dark border-light" v-model="editForm.email" required />
                       </div>
 
                       <div class="mb-3">
                         <label class="form-label small text-muted font-weight-bold">Phone Number</label>
-                        <input type="text" class="bf-input" v-model="editForm.phoneNumber" placeholder="e.g. +94 77 123 4567" />
+                        <input type="text" class="bf-input text-white bg-dark border-light" v-model="editForm.phoneNumber" placeholder="e.g. +94 77 123 4567" />
                       </div>
 
                       <div class="mb-3">
                         <label class="form-label small text-muted font-weight-bold">Shipping Address</label>
-                        <textarea class="bf-input" rows="3" v-model="editForm.address" placeholder="Enter your full delivery address..."></textarea>
+                        <textarea class="bf-input text-white bg-dark border-light" rows="3" v-model="editForm.address" placeholder="Enter your full delivery address..."></textarea>
                       </div>
 
                       <div class="d-flex gap-2 mt-4">
                         <button type="submit" class="bf-btn bf-btn-primary flex-grow-1" :disabled="saving">
-                          <span v-if="saving" class="bf-spinner me-1"></span>
+                          <span v-if="saving" class="spinner-border spinner-border-sm me-1"></span>
                           Save Changes
                         </button>
-                        <button type="button" class="bf-btn bf-btn-ghost" @click="toggleEdit" :disabled="saving">
+                        <button type="button" class="bf-btn bf-btn-ghost text-muted" @click="toggleEdit" :disabled="saving">
                           Cancel
                         </button>
                       </div>
@@ -141,17 +141,17 @@
         <!-- Orders & Support Columns -->
         <div class="col-lg-8 d-flex flex-column gap-4">
           <!-- Order History Card -->
-          <div class="bf-card">
-            <div class="p-4 bg-dark text-white d-flex justify-content-between align-items-center" style="border-top-left-radius: var(--bf-radius-lg); border-top-right-radius: var(--bf-radius-lg);">
-              <h5 class="mb-0 font-weight-bold">Order History</h5>
+          <div class="bf-card border-light text-white">
+            <div class="p-4 bg-dark border-light-bottom d-flex justify-content-between align-items-center" style="border-top-left-radius: var(--bf-radius-lg); border-top-right-radius: var(--bf-radius-lg);">
+              <h5 class="mb-0 font-weight-bold text-white">Order History</h5>
               <span class="bf-badge bf-badge-primary" v-if="!ordersLoading && !ordersError">
                 {{ orders.length }} Order(s)
               </span>
             </div>
 
             <div class="p-4" style="max-height: 400px; overflow-y: auto;">
-              <div v-if="ordersLoading" class="py-5">
-                <LoadingSkeleton type="table" :lines="2" />
+              <div v-if="ordersLoading" class="py-5 text-center">
+                <span class="spinner-border spinner-border-sm text-primary"></span>
               </div>
 
               <div v-else-if="ordersError" class="bf-empty-state py-3">
@@ -160,19 +160,19 @@
 
               <div v-else-if="orders.length === 0" class="text-center py-4">
                 <p class="text-secondary small mb-3">You haven't placed any marketplace orders yet.</p>
-                <router-link to="/product" class="bf-btn bf-btn-primary bf-btn-sm">Shop Parts Now</router-link>
+                <router-link to="/product" class="bf-btn bf-btn-primary bf-btn-sm px-3">Shop Parts Now</router-link>
               </div>
 
               <div v-else class="d-flex flex-column gap-3">
-                <div v-for="order in orders" :key="order.orderId" class="bf-card overflow-hidden">
-                  <div class="p-3 bg-light border-bottom d-flex flex-wrap justify-content-between align-items-center gap-3">
+                <div v-for="order in orders" :key="order.orderId" class="bf-card bg-dark border-light overflow-hidden">
+                  <div class="p-3 bg-secondary-dark border-light-bottom d-flex flex-wrap justify-content-between align-items-center gap-3">
                     <div class="text-start">
                       <span class="text-muted d-block small">ORDER PLACED</span>
-                      <strong class="small text-dark">{{ formatDate(order.createdDate) }}</strong>
+                      <strong class="small text-white">{{ formatDate(order.createdDate) }}</strong>
                     </div>
                     <div class="text-start">
                       <span class="text-muted d-block small">SHIP TO</span>
-                      <strong class="small text-dark text-truncate d-inline-block" style="max-width: 180px;" :title="order.address">
+                      <strong class="small text-white text-truncate d-inline-block" style="max-width: 180px;" :title="order.address">
                         {{ order.address }}
                       </strong>
                     </div>
@@ -190,20 +190,20 @@
                     <div
                       v-for="item in order.orderItems"
                       :key="item.orderItemId"
-                      class="d-flex align-items-center p-3 border-bottom last-border-0"
+                      class="d-flex align-items-center p-3 border-light-bottom last-border-0"
                     >
                       <img
                         :src="item.product.imageUrl"
-                        class="img-thumbnail me-3"
+                        class="img-thumbnail bg-dark border-secondary me-3"
                         style="width: 50px; height: 50px; object-fit: contain;"
                         alt="Product Image"
                       />
                       <div class="text-start flex-grow-1">
-                        <h6 class="mb-1 font-weight-bold small text-dark">{{ item.product.productName }}</h6>
+                        <h6 class="mb-1 font-weight-bold small text-white">{{ item.product.productName }}</h6>
                         <small class="text-muted">Quantity: {{ item.quantity }}</small>
                       </div>
                       <div class="text-end">
-                        <strong class="text-dark small">{{ formatPrice(item.price * item.quantity) }}</strong>
+                        <strong class="text-white small">{{ formatPrice(item.price * item.quantity) }}</strong>
                       </div>
                     </div>
                   </div>
@@ -213,10 +213,10 @@
           </div>
 
           <!-- Support Tickets -->
-          <div class="bf-card">
-            <div class="p-4 bg-dark text-white d-flex justify-content-between align-items-center" style="border-top-left-radius: var(--bf-radius-lg); border-top-right-radius: var(--bf-radius-lg);">
-              <h5 class="mb-0 font-weight-bold">Support Resolution Desk</h5>
-              <button class="bf-btn bf-btn-accent bf-btn-sm" @click="showTicketForm = !showTicketForm">
+          <div class="bf-card border-light text-white">
+            <div class="p-4 bg-dark border-light-bottom d-flex justify-content-between align-items-center" style="border-top-left-radius: var(--bf-radius-lg); border-top-right-radius: var(--bf-radius-lg);">
+              <h5 class="mb-0 font-weight-bold text-white">Support Resolution Desk</h5>
+              <button class="bf-btn bf-btn-accent bf-btn-sm px-3" @click="showTicketForm = !showTicketForm">
                 {{ showTicketForm ? 'Close Window' : 'File Complaint' }}
               </button>
             </div>
@@ -224,19 +224,19 @@
             <div class="p-4 text-start">
               <!-- Report form -->
               <transition name="page-fade">
-                <div v-if="showTicketForm" class="bf-card bf-glass p-3 mb-4">
-                  <h5 class="font-weight-bold text-dark mb-3">File Support Request</h5>
+                <div v-if="showTicketForm" class="bf-card bg-dark border-light p-3 mb-4 text-white">
+                  <h5 class="font-weight-bold text-white mb-3">File Support Request</h5>
                   <form @submit.prevent="sendTicket">
                     <div class="mb-3">
-                      <label class="form-label small font-weight-bold text-secondary">Subject</label>
-                      <input type="text" class="bf-input" v-model="ticketSubject" placeholder="e.g. Delivery status delay / Defective item" required />
+                      <label class="form-label small font-weight-bold text-muted">Subject</label>
+                      <input type="text" class="bf-input text-white bg-dark border-light" v-model="ticketSubject" placeholder="e.g. Delivery status delay / Defective item" required />
                     </div>
                     <div class="mb-3">
-                      <label class="form-label small font-weight-bold text-secondary">Details</label>
-                      <textarea class="bf-input" rows="4" v-model="ticketContent" placeholder="Describe your problem or question in detail..." required></textarea>
+                      <label class="form-label small font-weight-bold text-muted">Details</label>
+                      <textarea class="bf-input text-white bg-dark border-light" rows="4" v-model="ticketContent" placeholder="Describe your problem or question in detail..." required></textarea>
                     </div>
                     <button type="submit" class="bf-btn bf-btn-primary bf-btn-sm" :disabled="sendingTicket">
-                      <span v-if="sendingTicket" class="bf-spinner me-1"></span>
+                      <span v-if="sendingTicket" class="spinner-border spinner-border-sm me-1"></span>
                       Submit Ticket
                     </button>
                   </form>
@@ -244,8 +244,8 @@
               </transition>
 
               <!-- Ticket logs -->
-              <div v-if="messagesLoading" class="py-4">
-                <LoadingSkeleton type="text" />
+              <div v-if="messagesLoading" class="py-4 text-center">
+                <span class="spinner-border spinner-border-sm text-primary"></span>
               </div>
 
               <div v-else-if="messagesError" class="alert alert-danger py-2">
@@ -257,22 +257,22 @@
               </div>
 
               <div v-else style="max-height: 350px; overflow-y: auto;" class="d-flex flex-column gap-3">
-                <div v-for="msg in messages" :key="msg.messageId" class="bf-card p-3 border">
-                  <div class="d-flex justify-content-between align-items-center py-2 flex-wrap gap-2 border-bottom mb-2">
+                <div v-for="msg in messages" :key="msg.messageId" class="bf-card bg-dark border-light p-3">
+                  <div class="d-flex justify-content-between align-items-center py-2 flex-wrap gap-2 border-light-bottom mb-2">
                     <div class="d-flex align-items-center gap-2">
                       <span class="bf-badge" :class="msg.status === 'OPEN' ? 'bf-badge-warning' : 'bf-badge-success'">
                         {{ msg.status }}
                       </span>
-                      <strong class="text-dark small">{{ msg.subject }}</strong>
+                      <strong class="text-white small">{{ msg.subject }}</strong>
                     </div>
                     <small class="text-muted">{{ formatDate(msg.createdDate) }}</small>
                   </div>
                   
                   <p class="small text-secondary mb-2"><strong>My Request:</strong> {{ msg.content }}</p>
 
-                  <div v-if="msg.status === 'REPLIED'" class="bg-light p-3 rounded border-start border-success border-3 text-start mt-2">
+                  <div v-if="msg.status === 'REPLIED'" class="bg-secondary-dark p-3 rounded border-start border-success border-3 text-start mt-2">
                     <small class="font-weight-bold text-success d-block mb-1">Response from Support:</small>
-                    <p class="small mb-0 text-dark">{{ msg.reply }}</p>
+                    <p class="small mb-0 text-white">{{ msg.reply }}</p>
                   </div>
                 </div>
               </div>
@@ -525,13 +525,14 @@ export default {
 .avatar-container {
   width: 120px;
   height: 120px;
+  overflow: hidden;
 }
 
 .avatar-image {
   width: 120px;
   height: 120px;
   object-fit: cover;
-  background-color: var(--bf-bg-tertiary);
+  background-color: var(--bf-bg-secondary);
 }
 
 .avatar-upload-overlay {
@@ -548,6 +549,14 @@ export default {
 
 .avatar-container:hover .avatar-upload-overlay {
   opacity: 1;
+}
+
+.bg-secondary-dark {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.border-light-bottom {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .last-border-0:last-child {

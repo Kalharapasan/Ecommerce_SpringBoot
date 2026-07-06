@@ -1,5 +1,5 @@
 <template>
-  <tr class="align-middle">
+  <tr class="align-middle border-light-row">
     <td>
       <div class="d-flex align-items-center gap-3">
         <div class="bf-cart-thumbnail-wrapper">
@@ -11,15 +11,15 @@
           />
         </div>
         <div class="text-start">
-          <h6 class="mb-0 font-weight-bold text-dark">{{ item.product.productName }}</h6>
+          <h6 class="mb-0 font-weight-bold text-white">{{ item.product.productName }}</h6>
           <small class="text-muted">Unit Price: {{ formattedUnitPrice }}</small>
         </div>
       </div>
     </td>
     <td>
-      <div class="bf-qty-stepper bf-qty-stepper-sm">
+      <div class="bf-qty-stepper-cyber">
         <button 
-          class="bf-btn bf-btn-ghost bf-btn-icon" 
+          class="qty-control-btn" 
           type="button" 
           @click="decrement"
           :disabled="item.count <= 1 || loading"
@@ -28,14 +28,14 @@
         </button>
         <input 
           type="number" 
-          class="bf-qty-input" 
+          class="qty-display-box" 
           v-model.number="count"
           min="1"
           @change="validateAndEmit"
           :disabled="loading"
         />
         <button 
-          class="bf-btn bf-btn-ghost bf-btn-icon" 
+          class="qty-control-btn" 
           type="button" 
           @click="increment"
           :disabled="loading"
@@ -49,7 +49,7 @@
     </td>
     <td>
       <button 
-        class="bf-btn bf-btn-ghost bf-btn-danger bf-btn-sm" 
+        class="bf-btn bf-btn-ghost bf-btn-danger bf-btn-sm px-3" 
         @click="remove"
         :disabled="loading"
       >
@@ -130,13 +130,17 @@ export default {
 </script>
 
 <style scoped>
+.border-light-row {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
 .bf-cart-thumbnail-wrapper {
   width: 72px;
   height: 72px;
   border-radius: var(--bf-radius-md);
   overflow: hidden;
-  border: 1px solid var(--bf-border);
-  background: var(--bf-bg-tertiary);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--bf-bg-secondary);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -149,33 +153,47 @@ export default {
   object-fit: contain;
 }
 
-.bf-qty-stepper-sm {
-  border: 1px solid var(--bf-border);
+.bf-qty-stepper-cyber {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: var(--bf-radius-md);
   overflow: hidden;
-  background: var(--bf-bg-secondary);
+  background: rgba(255, 255, 255, 0.02);
 }
 
-.bf-qty-stepper-sm .bf-btn-icon {
-  width: 28px;
-  height: 28px;
-  padding: 0;
-  font-size: var(--bf-font-size-xs);
-}
-
-.bf-qty-input {
-  width: 38px;
+.qty-control-btn {
+  background: transparent;
   border: none;
+  color: white;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-weight: 700;
+  transition: all var(--bf-transition-fast);
+}
+
+.qty-control-btn:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.qty-display-box {
+  width: 40px;
+  border: none;
+  background: transparent;
+  color: white;
   text-align: center;
   font-weight: 700;
-  color: var(--bf-text-primary);
-  background: transparent;
-  outline: none;
   font-size: var(--bf-font-size-xs);
+  outline: none;
+  -moz-appearance: textfield;
 }
 
-.bf-qty-input::-webkit-outer-spin-button,
-.bf-qty-input::-webkit-inner-spin-button {
+.qty-display-box::-webkit-outer-spin-button,
+.qty-display-box::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }

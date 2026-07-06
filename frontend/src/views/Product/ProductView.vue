@@ -1,181 +1,375 @@
 <template>
-  <div class="bf-page bf-fade-in">
-    <!-- ═══ Hero Section with Dynamic Slideshow ═══ -->
-    <div class="container my-4">
-      <div class="row g-4 mb-5">
-        <!-- Main Hero Slideshow -->
-        <div class="col-lg-8">
-          <div class="bf-hero-main" :style="heroStyle">
-            <div v-if="slides && slides.length > 0" class="bf-hero-content">
-              <div>
-                <span class="bf-hero-badge">{{ slides[activeSlide].badge }}</span>
-                <h1 class="bf-hero-title">{{ slides[activeSlide].title }}</h1>
-                <p class="bf-hero-subtitle">{{ slides[activeSlide].subtitle }}</p>
-              </div>
-              <button class="bf-btn bf-btn-accent bf-btn-lg" @click="scrollToProducts">
-                Shop Now
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708"/></svg>
-              </button>
-            </div>
+  <div class="bf-page bf-fade-in position-relative">
+    
+    <!-- ═══ LAYOUT A: HOMEPAGE (/) ═══ -->
+    <div v-if="isHomeRoute" class="bf-home-layout">
+      <!-- Particle Background Canvas -->
+      <canvas ref="particleCanvas" class="bf-particle-canvas"></canvas>
 
-            <!-- Slide Dots -->
-            <div class="bf-hero-dots">
+      <!-- Hero Header Section -->
+      <div class="container py-5">
+        <div class="row g-4 align-items-center mb-5 hero-row">
+          <div class="col-lg-7 text-start position-relative" style="z-index: 2;">
+            <div v-if="slides && slides.length > 0" class="bf-hero-content-slider">
+              <transition name="page-fade" mode="out-in">
+                <div :key="activeSlide" class="bf-slide-content">
+                  <span class="bf-hero-badge-tag bf-badge bf-badge-primary mb-3">
+                    <span class="pulse-dot"></span>
+                    {{ slides[activeSlide].badge }}
+                  </span>
+                  <h1 class="bf-hero-title-main text-white mb-3">
+                    {{ slides[activeSlide].title }}
+                  </h1>
+                  <p class="bf-hero-subtitle-main text-muted mb-4 fs-5">
+                    {{ slides[activeSlide].subtitle }}
+                  </p>
+                </div>
+              </transition>
+              <div class="d-flex gap-3">
+                <router-link to="/product" class="bf-btn bf-btn-primary bf-btn-lg px-4 shadow-glow">
+                  Explore Components
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708"/></svg>
+                </router-link>
+                <button class="bf-btn bf-btn-outline bf-btn-lg px-4" @click="scrollToFeatured">
+                  Quick Specs
+                </button>
+              </div>
+            </div>
+            
+            <!-- Slides navigation dots -->
+            <div class="bf-slides-dots mt-4">
               <span
-                v-for="(slide, index) in slides"
-                :key="index"
-                class="bf-hero-dot"
-                :class="{ active: activeSlide === index }"
-                @click="activeSlide = index"
+                v-for="(slide, idx) in slides"
+                :key="idx"
+                class="bf-slide-dot"
+                :class="{ active: activeSlide === idx }"
+                @click="activeSlide = idx"
               ></span>
             </div>
+          </div>
 
-            <!-- Pattern Overlay -->
-            <div class="bf-hero-pattern"></div>
+          <!-- Banner Tech Graphic -->
+          <div class="col-lg-5 position-relative text-center">
+            <div class="hero-graphic-glow"></div>
+            <img 
+              src="https://images.unsplash.com/photo-1587202372775-e229f172b9d7?q=80&w=800&auto=format&fit=crop" 
+              class="img-fluid hero-tech-img rounded-4 shadow-xl border-light" 
+              alt="Premium PC Rig"
+            />
           </div>
         </div>
 
-        <!-- Side Promo Cards -->
-        <div class="col-lg-4 d-flex flex-column gap-3">
-          <div class="bf-promo-card bf-promo-dark" @click="selectCategoryByName('Desktop Systems')">
-            <span class="bf-promo-badge bf-badge bf-badge-primary">Featured Build</span>
-            <h5 class="bf-promo-title">Prebuilt Gaming PCs</h5>
-            <p class="bf-promo-desc">High-fps liquid-cooled rigs benchmarked and ready to play.</p>
-            <span class="bf-promo-link">Explore Systems →</span>
-          </div>
-
-          <div class="bf-promo-card bf-promo-blue" @click="selectCategoryByName('Graphics Cards (GPUs)')">
-            <span class="bf-promo-badge bf-badge bf-badge-warning">Hardware Drop</span>
-            <h5 class="bf-promo-title">RTX 40-Series In Stock</h5>
-            <p class="bf-promo-desc">Unmatched ray-tracing and DLSS 3 support.</p>
-            <span class="bf-promo-link">Shop GPUs →</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- ═══ Shop By Category ═══ -->
-      <div class="bf-section bf-fade-in bf-fade-in-delay-1">
-        <div class="bf-section-header">
-          <h4 class="bf-section-title">Shop by Category</h4>
-          <p class="bf-section-desc">Browse our curated collection of PC components and peripherals</p>
-        </div>
-        <div class="bf-category-scroll">
-          <!-- All Categories -->
-          <div class="bf-category-chip" :class="{ active: selectedCategoryId === 'all' }" @click="selectCategory('all')">
-            <div class="bf-category-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16"><path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5zm8 0A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5zm-8 8A1.5 1.5 0 0 1 2.5 9h3A1.5 1.5 0 0 1 7 10.5v3A1.5 1.5 0 0 1 5.5 15h-3A1.5 1.5 0 0 1 1 13.5zm8 0A1.5 1.5 0 0 1 10.5 9h3a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 13.5z"/></svg>
-            </div>
-            <span>All Gears</span>
-          </div>
-
-          <!-- Dynamic Categories -->
-          <div
-            v-for="cat in categories"
-            :key="cat.categoryId"
-            class="bf-category-chip"
-            :class="{ active: selectedCategoryId === cat.categoryId }"
-            @click="selectCategory(cat.categoryId)"
-          >
-            <div class="bf-category-img">
-              <img :src="cat.imageUrl" :alt="cat.categoryName" />
-            </div>
-            <span>{{ cat.categoryName }}</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- ═══ Feature Highlights ═══ -->
-      <div class="row g-3 mb-5 bf-fade-in bf-fade-in-delay-2">
-        <div class="col-md-4">
-          <div class="bf-feature-card">
-            <div class="bf-feature-icon" style="background: var(--bf-primary-light); color: var(--bf-primary);">
-              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 16 16"><path d="M0 3.5A1.5 1.5 0 0 1 1.5 2h9A1.5 1.5 0 0 1 12 3.5V5h1.02a1.5 1.5 0 0 1 1.17.563l1.481 1.85a1.5 1.5 0 0 1 .329.938V10.5a1.5 1.5 0 0 1-1.5 1.5H14a2 2 0 1 1-4 0H5a2 2 0 1 1-3.998-.085A1.5 1.5 0 0 1 0 10.5z"/></svg>
-            </div>
-            <div>
-              <h6 class="bf-feature-title">Free Shipping</h6>
-              <p class="bf-feature-desc">On all orders over LKR 10,000</p>
+        <!-- Animated Statistics Counter Row -->
+        <div class="row g-4 mb-5 text-start">
+          <div class="col-md-3" v-for="(stat, idx) in homeStats" :key="idx">
+            <div class="bf-card bf-glass stat-card p-4">
+              <div class="d-flex align-items-center gap-3">
+                <span class="stat-icon-badge text-white fs-3">{{ stat.icon }}</span>
+                <div>
+                  <h4 class="mb-0 font-weight-bold text-white">{{ stat.value }}</h4>
+                  <small class="text-muted text-uppercase tracking-wider font-weight-bold">{{ stat.label }}</small>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-        <div class="col-md-4">
-          <div class="bf-feature-card">
-            <div class="bf-feature-icon" style="background: var(--bf-success-light); color: var(--bf-success);">
-              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 16 16"><path d="M5.338 1.59a6.1 6.1 0 0 0-2.837.856.48.48 0 0 0-.228.389v4.287c0 3.29 1.825 6.4 4.732 7.69a.48.48 0 0 0 .39 0c2.907-1.29 4.732-4.4 4.732-7.69V2.835a.48.48 0 0 0-.228-.389 6.1 6.1 0 0 0-2.837-.855 4.8 4.8 0 0 0-3.722 0"/></svg>
-            </div>
-            <div>
-              <h6 class="bf-feature-title">Secure Payments</h6>
-              <p class="bf-feature-desc">100% SSL protected payments</p>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div class="bf-feature-card">
-            <div class="bf-feature-icon" style="background: var(--bf-warning-light); color: var(--bf-warning);">
-              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 16 16"><path d="M8 1a5 5 0 0 0-5 5v1h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V6a6 6 0 1 1 12 0v5a1 1 0 0 1-1 1h-1a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1h1V6a5 5 0 0 0-5-5"/></svg>
-            </div>
-            <div>
-              <h6 class="bf-feature-title">24/7 Support</h6>
-              <p class="bf-feature-desc">Dedicated customer helpline</p>
+
+        <!-- Brand Showcase -->
+        <div class="bf-section-bg p-5 mb-5 text-center">
+          <span class="bf-badge bf-badge-primary mb-3">OFFICIAL VENDORS & BRANDS</span>
+          <h3 class="text-white font-weight-bold mb-4">Ultimate Hardware Ecosystem</h3>
+          <div class="row row-cols-2 row-cols-md-5 g-4 justify-content-center align-items-center brand-grid">
+            <div class="col" v-for="brand in brandList" :key="brand">
+              <div class="brand-item-card p-3 rounded border text-muted">
+                {{ brand }}
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- ═══ Search & Filter Toolbar ═══ -->
-      <div id="products-section" class="bf-toolbar bf-fade-in bf-fade-in-delay-3">
-        <div class="bf-toolbar-search">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/></svg>
-          <input
-            type="text"
-            class="bf-input"
-            placeholder="Search components or accessories..."
-            v-model="searchQuery"
-          />
+        <!-- Featured Collections Header -->
+        <div id="featured-section" class="text-start mb-4">
+          <h4 class="text-white font-weight-bold mb-2">Featured Rig Gear</h4>
+          <p class="text-muted">Uncompromising engineering built to exceed performance benchmarks.</p>
         </div>
-        <div class="bf-toolbar-sort">
-          <span class="bf-toolbar-label">Sort by:</span>
-          <select class="bf-input bf-toolbar-select" v-model="sortOrder">
-            <option value="default">Relevance</option>
-            <option value="name-asc">Name (A-Z)</option>
-            <option value="price-asc">Price (Low → High)</option>
-            <option value="price-desc">Price (High → Low)</option>
-          </select>
+
+        <!-- Products Grid for Home Page -->
+        <div v-if="loading" class="row g-4">
+          <div v-for="n in 4" :key="n" class="col-xl-3 col-md-6">
+            <LoadingSkeleton type="card" />
+          </div>
         </div>
-      </div>
-
-      <!-- ═══ Loading Skeletons ═══ -->
-      <div v-if="loading" class="row g-4 mt-2">
-        <div v-for="n in 8" :key="n" class="col-xl-3 col-md-6">
-          <LoadingSkeleton type="card" />
+        <div v-else class="row g-4 mb-5">
+          <div v-for="product in homeFeaturedProducts" :key="product.productId" class="col-xl-3 col-md-6 d-flex">
+            <ProductBox :product="product" />
+          </div>
         </div>
-      </div>
 
-      <!-- ═══ Error State ═══ -->
-      <div v-else-if="error" class="bf-empty-state">
-        <div class="bf-empty-icon" style="color: var(--bf-danger);">⚠</div>
-        <h5>Something went wrong</h5>
-        <p>{{ error }}</p>
-        <button class="bf-btn bf-btn-primary" @click="fetchProducts">Try Again</button>
-      </div>
-
-      <!-- ═══ Empty State ═══ -->
-      <div v-else-if="processedProducts.length === 0" class="bf-empty-state">
-        <div class="bf-empty-icon">🔍</div>
-        <h5>No products match your criteria</h5>
-        <p>Try adjusting your search filters or browse another category.</p>
-      </div>
-
-      <!-- ═══ Products Grid ═══ -->
-      <div v-else class="row g-4 mt-2">
-        <div
-          v-for="(product, index) in processedProducts"
-          :key="product.productId"
-          class="col-xl-3 col-md-6 d-flex bf-fade-in"
-          :class="'bf-fade-in-delay-' + Math.min(index + 1, 6)"
-        >
-          <ProductBox :product="product" />
+        <!-- Customer Testimonials -->
+        <div class="row g-4 mb-5 text-start">
+          <div class="col-md-4" v-for="(t, index) in testimonials" :key="index">
+            <div class="bf-card bf-glass p-4 h-100 d-flex flex-column justify-content-between testimonial-card">
+              <p class="text-secondary small italic-text">"{{ t.quote }}"</p>
+              <div class="d-flex align-items-center gap-3 mt-3 pt-3 border-top">
+                <div class="testimonial-avatar">{{ t.author.charAt(0) }}</div>
+                <div>
+                  <h6 class="mb-0 text-white font-weight-bold">{{ t.author }}</h6>
+                  <small class="text-muted">{{ t.role }}</small>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
+
+        <!-- Newsletter section -->
+        <div class="bf-newsletter-banner p-5 text-center text-white rounded-4 border position-relative overflow-hidden mb-5">
+          <div class="newsletter-glow"></div>
+          <h4 class="font-weight-bold mb-2">Join the Forge Elite Network</h4>
+          <p class="text-secondary small mb-4">Get hot restock alerts, flash sales releases, and custom PC hardware guides first.</p>
+          <div class="d-flex gap-2 max-width-sm mx-auto justify-content-center flex-wrap">
+            <input type="email" class="bf-input py-2 px-3 text-white bg-dark border-light" placeholder="Enter your email address" style="max-width: 320px;" />
+            <button class="bf-btn bf-btn-primary" @click="handleSubscribe">Subscribe</button>
+          </div>
+        </div>
+
       </div>
     </div>
+
+    <!-- ═══ LAYOUT B: CATALOG / CATEGORY PAGE (/product) ═══ -->
+    <div v-else class="bf-catalog-layout py-4">
+      <div class="container">
+        
+        <!-- Toolbar Header -->
+        <div class="row mb-4 align-items-center">
+          <div class="col-md-6 text-start">
+            <span class="bf-badge bf-badge-primary mb-2">Hardware Inventory</span>
+            <h2 class="text-white font-weight-bold mb-1">Advanced Catalog Explorer</h2>
+            <p class="text-muted small">Filters components dynamically by price, manufacturer, and stock availability.</p>
+          </div>
+          <!-- Grid/List layout toggle -->
+          <div class="col-md-6 d-flex justify-content-md-end gap-2 align-items-center mt-3 mt-md-0">
+            <span class="text-muted small">Layout:</span>
+            <div class="btn-group border rounded p-1 bg-dark">
+              <button 
+                class="btn btn-sm btn-dark text-white p-2" 
+                :class="{ active: viewMode === 'grid' }"
+                @click="viewMode = 'grid'"
+              >
+                Grid
+              </button>
+              <button 
+                class="btn btn-sm btn-dark text-white p-2" 
+                :class="{ active: viewMode === 'list' }"
+                @click="viewMode = 'list'"
+              >
+                List
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="row g-4">
+          <!-- Left Sidebar Filters -->
+          <div class="col-lg-3 text-start">
+            <div class="bf-card bf-glass p-4 sticky-sidebar">
+              <h5 class="text-white font-weight-bold mb-4 border-bottom pb-2">Filter Hardware</h5>
+              
+              <!-- Search Filter Input -->
+              <div class="mb-4">
+                <label class="form-label text-muted small font-weight-bold uppercase">Search</label>
+                <div class="position-relative">
+                  <input 
+                    type="text" 
+                    class="bf-input py-2 text-white bg-dark border-light" 
+                    v-model="searchQuery" 
+                    placeholder="Enter keywords..."
+                  />
+                  <span class="position-absolute top-50 end-0 translate-middle-y pe-3 text-muted">🔍</span>
+                </div>
+              </div>
+
+              <!-- Categories Select Panel -->
+              <div class="mb-4">
+                <label class="form-label text-muted small font-weight-bold uppercase">Component Type</label>
+                <div class="d-flex flex-column gap-2 max-height-chips">
+                  <div 
+                    class="filter-chip"
+                    :class="{ active: selectedCategoryId === 'all' }"
+                    @click="selectedCategoryId = 'all'"
+                  >
+                    All Categories
+                  </div>
+                  <div 
+                    v-for="cat in categories" 
+                    :key="cat.categoryId"
+                    class="filter-chip text-truncate"
+                    :class="{ active: selectedCategoryId === cat.categoryId }"
+                    @click="selectedCategoryId = cat.categoryId"
+                    :title="cat.categoryName"
+                  >
+                    {{ cat.categoryName }}
+                  </div>
+                </div>
+              </div>
+
+              <!-- Price Limit Filter Slider -->
+              <div class="mb-4">
+                <label class="form-label text-muted small font-weight-bold d-flex justify-content-between uppercase">
+                  <span>Max Price Limit</span>
+                  <span class="text-primary font-weight-bold">LKR {{ priceRange.toLocaleString() }}</span>
+                </label>
+                <input 
+                  type="range" 
+                  class="form-range" 
+                  min="0" 
+                  max="1000000" 
+                  step="5000"
+                  v-model.number="priceRange"
+                />
+                <div class="d-flex justify-content-between text-muted small mt-1">
+                  <span>LKR 0</span>
+                  <span>LKR 1,000,000</span>
+                </div>
+              </div>
+
+              <!-- Brand Filter Options -->
+              <div class="mb-4">
+                <label class="form-label text-muted small font-weight-bold uppercase">Manufacturers / Brand</label>
+                <select class="bf-input py-2 text-white bg-dark border-light" v-model="selectedBrand">
+                  <option value="all">All Manufacturers</option>
+                  <option v-for="b in brandList" :key="b" :value="b">{{ b }}</option>
+                </select>
+              </div>
+
+              <!-- Availability Checkbox -->
+              <div class="mb-4">
+                <div class="form-check form-switch">
+                  <input 
+                    class="form-check-input" 
+                    type="checkbox" 
+                    id="stockCheck" 
+                    v-model="inStockOnly"
+                  />
+                  <label class="form-check-label text-white small" for="stockCheck">
+                    In Stock Only
+                  </label>
+                </div>
+              </div>
+
+              <!-- Clear Filters Button -->
+              <button class="bf-btn bf-btn-outline w-100" @click="resetFilters">
+                Reset Filters
+              </button>
+            </div>
+          </div>
+
+          <!-- Right Products Catalog Grid -->
+          <div class="col-lg-9 text-start">
+            <!-- Grid sorting options / Results summary -->
+            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+              <span class="text-muted small">
+                Showing <strong>{{ paginatedProducts.length }}</strong> of <strong>{{ filteredProducts.length }}</strong> modules
+              </span>
+              <div class="d-flex align-items-center gap-2">
+                <span class="text-muted small">Sort:</span>
+                <select class="bf-input py-1 px-2 bg-dark text-white border-light text-sm" v-model="sortOrder">
+                  <option value="default">Relevance</option>
+                  <option value="name-asc">Name (A-Z)</option>
+                  <option value="price-asc">Price (Low → High)</option>
+                  <option value="price-desc">Price (High → Low)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Loading skeletons -->
+            <div v-if="loading" class="row g-4">
+              <div v-for="n in 6" :key="n" class="col-xl-4 col-md-6">
+                <LoadingSkeleton type="card" />
+              </div>
+            </div>
+
+            <!-- Error State -->
+            <div v-else-if="error" class="bf-empty-state">
+              <div class="bf-empty-icon text-danger">⚠</div>
+              <h5 class="text-white font-weight-bold">Catalogue Sync Interrupted</h5>
+              <p>{{ error }}</p>
+              <button class="bf-btn bf-btn-primary" @click="fetchProducts">Retry Load</button>
+            </div>
+
+            <!-- Empty filter state -->
+            <div v-else-if="filteredProducts.length === 0" class="bf-empty-state text-center py-5">
+              <div class="bf-empty-icon text-muted">🔍</div>
+              <h5 class="text-white font-weight-bold">No Rig Components Found</h5>
+              <p>Try modifying your sidebar filter categories or raising the price slider limits.</p>
+              <button class="bf-btn bf-btn-primary" @click="resetFilters">Clear All Filters</button>
+            </div>
+
+            <!-- Products catalog list -->
+            <div v-else>
+              <div v-if="viewMode === 'grid'" class="row g-4">
+                <div 
+                  v-for="(product, idx) in paginatedProducts" 
+                  :key="product.productId" 
+                  class="col-xl-4 col-md-6 d-flex bf-fade-in"
+                  :style="{'animation-delay': (idx * 0.05) + 's'}"
+                >
+                  <ProductBox :product="product" />
+                </div>
+              </div>
+              
+              <!-- List View Option -->
+              <div v-else class="d-flex flex-column gap-3">
+                <div 
+                  v-for="product in paginatedProducts" 
+                  :key="product.productId"
+                  class="bf-card bf-glass p-3 list-card d-flex align-items-center gap-4 flex-wrap flex-md-nowrap"
+                >
+                  <img :src="product.imageUrl" class="list-card-img rounded-3" alt="Item Image" />
+                  <div class="flex-grow-1 text-start">
+                    <span class="bf-badge bf-badge-primary text-uppercase mb-1 small" v-if="product.category">
+                      {{ product.category.categoryName }}
+                    </span>
+                    <h5 class="text-white font-weight-bold mb-2">{{ product.productName }}</h5>
+                    <p class="text-secondary small mb-0 text-truncate-2">{{ product.description }}</p>
+                  </div>
+                  <div class="text-md-end d-flex flex-column gap-2 flex-shrink-0 align-items-end justify-content-between min-width-card">
+                    <span class="text-primary font-weight-bold fs-4">LKR {{ Number(product.price).toLocaleString() }}</span>
+                    <router-link :to="'/product/detail/' + product.productId" class="bf-btn bf-btn-primary bf-btn-sm w-100">
+                      Configure
+                    </router-link>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Pagination widgets -->
+              <div class="d-flex justify-content-center mt-5" v-if="totalPages > 1">
+                <nav>
+                  <ul class="pagination pagination-cyber gap-2">
+                    <li class="page-item" :class="{ disabled: currentPage === 1 }">
+                      <button class="page-link" @click="changePage(currentPage - 1)">Previous</button>
+                    </li>
+                    <li 
+                      v-for="p in totalPages" 
+                      :key="p" 
+                      class="page-item" 
+                      :class="{ active: currentPage === p }"
+                    >
+                      <button class="page-link" @click="changePage(p)">{{ p }}</button>
+                    </li>
+                    <li class="page-item" :class="{ disabled: currentPage === totalPages }">
+                      <button class="page-link" @click="changePage(currentPage + 1)">Next</button>
+                    </li>
+                  </ul>
+                </nav>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
   </div>
 </template>
 
@@ -183,7 +377,7 @@
 import api, { extractErrorMessage } from '../../utils/api';
 import ProductBox from '../../components/Product/ProductBox.vue';
 import LoadingSkeleton from '../../components/Common/LoadingSkeleton.vue';
-import { getCurrentUser } from '../../utils/auth';
+import { showToast } from '../../components/Common/ToastNotification.vue';
 
 export default {
   name: 'ProductView',
@@ -197,87 +391,157 @@ export default {
       sortOrder: 'default',
       loading: true,
       error: null,
+      
+      // Catalog layouts
+      viewMode: 'grid',
+      priceRange: 1000000,
+      selectedBrand: 'all',
+      inStockOnly: false,
+      currentPage: 1,
+      pageSize: 9,
 
-      // Dynamic Slider Configuration
+      // Homepage widgets
       activeSlide: 0,
       slidesInterval: null,
       slides: [
         {
-          badge: 'Next-Gen Computing',
-          title: 'Unleash Peak Performance',
-          subtitle: 'Build your dream custom rig with newly restocked Ryzen 7 7800X3D processors and DDR5 modules.'
+          badge: 'Exclusive Tech Drop',
+          title: 'Uncompromising FPS Engine',
+          subtitle: 'Build custom overclocked gaming systems using newly configured Ryzen 7 7800X3D chips & custom water cooling setups.'
         },
         {
-          badge: 'Exclusive Tech Sale',
-          title: 'Level Up Your Setup',
-          subtitle: 'Save up to 40% on mechanical gaming keyboards, high-precision optical mice, and headsets.'
+          badge: 'Next-Gen Liquid Rigs',
+          title: 'Flagship RTX Graphics Systems',
+          subtitle: 'Experience path-tracing rendering and DLSS 3 frame generation inside high-fps benchmarked gaming PCs.'
         },
         {
-          badge: 'Apex Graphics Power',
-          title: 'RTX 4090 Flagship GPUs',
-          subtitle: 'Experience ray-tracing and AI-driven frame rendering with Nvidia RTX and Radeon graphics.'
+          badge: 'Tactical Peripherals Drop',
+          title: 'Precision Forge Accessories',
+          subtitle: 'Elevate peripheral input response rates with hot-swappable custom keyboards and laser optical gaming sensors.'
         }
+      ],
+      homeStats: [
+        { label: 'Rigs Built & Tested', value: '4,280+', icon: '⚙️' },
+        { label: 'Avg User Benchmarks', value: '98.6%', icon: '📈' },
+        { label: 'Verified Sellers', value: '18', icon: '🛡️' },
+        { label: 'Active Components', value: '250+', icon: '🔌' }
+      ],
+      brandList: ['ASUS', 'MSI', 'Corsair', 'NZXT', 'Razer', 'AMD', 'Intel', 'Gigabyte', 'NVIDIA'],
+      testimonials: [
+        { quote: 'The performance tuning of their prebuilts is absolute art. Temps stay under 65C during heavy path-tracing renders.', author: 'Avantha L.', role: 'Computer Scientist' },
+        { quote: 'Ordered my RTX 4080 configuration on Friday, delivered securely in custom padding by Sunday noon.', author: 'Ruwan K.', role: 'Visual Motion Artist' },
+        { quote: 'Genuine parts, verified seller credentials, and instant technical resolution. My absolute first-choice hardware store.', author: 'Pasan M.', role: 'Forge Competitive Player' }
       ]
     };
   },
   computed: {
-    isAdmin() {
-      const user = getCurrentUser();
-      return user && user.role === 'ADMIN';
+    isHomeRoute() {
+      return this.$route.path === '/';
     },
-    heroStyle() {
-      return {
-        background: `var(--bf-gradient-hero), url('https://images.unsplash.com/photo-1587202372775-e229f172b9d7?q=80&w=1200&auto=format&fit=crop') no-repeat center/cover`
-      };
+    isLoggedIn() {
+      return !!localStorage.getItem('bf-token');
     },
-    processedProducts() {
-      let result = [...this.products];
+    homeFeaturedProducts() {
+      return this.products.slice(0, 4);
+    },
+    filteredProducts() {
+      let results = [...this.products];
 
-      // 1. Filter by Search Query
+      // 1. Filter by category
+      if (this.selectedCategoryId !== 'all') {
+        results = results.filter(p => p.categoryId === this.selectedCategoryId);
+      }
+
+      // 2. Filter by search query
       const query = this.searchQuery.trim().toLowerCase();
       if (query) {
-        result = result.filter(p =>
+        results = results.filter(p => 
           p.productName.toLowerCase().includes(query) ||
           p.description.toLowerCase().includes(query)
         );
       }
 
-      // 2. Sort results
-      if (this.sortOrder === 'name-asc') {
-        result.sort((a, b) => a.productName.localeCompare(b.productName));
-      } else if (this.sortOrder === 'price-asc') {
-        result.sort((a, b) => Number(a.price) - Number(b.price));
-      } else if (this.sortOrder === 'price-desc') {
-        result.sort((a, b) => Number(b.price) - Number(a.price));
+      // 3. Filter by price range
+      results = results.filter(p => Number(p.price) <= this.priceRange);
+
+      // 4. Filter by brand
+      if (this.selectedBrand !== 'all') {
+        results = results.filter(p => p.productName.toLowerCase().includes(this.selectedBrand.toLowerCase()));
       }
 
-      return result;
+      // 5. Filter by availability
+      if (this.inStockOnly) {
+        results = results.filter(p => p.stock && p.stock > 0);
+      }
+
+      // Sort
+      if (this.sortOrder === 'name-asc') {
+        results.sort((a, b) => a.productName.localeCompare(b.productName));
+      } else if (this.sortOrder === 'price-asc') {
+        results.sort((a, b) => Number(a.price) - Number(b.price));
+      } else if (this.sortOrder === 'price-desc') {
+        results.sort((a, b) => Number(b.price) - Number(a.price));
+      }
+
+      return results;
+    },
+    totalPages() {
+      return Math.ceil(this.filteredProducts.length / this.pageSize);
+    },
+    paginatedProducts() {
+      const start = (this.currentPage - 1) * this.pageSize;
+      return this.filteredProducts.slice(start, start + this.pageSize);
+    }
+  },
+  watch: {
+    selectedCategoryId() {
+      this.currentPage = 1;
+    },
+    searchQuery() {
+      this.currentPage = 1;
+    },
+    priceRange() {
+      this.currentPage = 1;
+    },
+    selectedBrand() {
+      this.currentPage = 1;
+    },
+    inStockOnly() {
+      this.currentPage = 1;
+    },
+    isHomeRoute(val) {
+      if (val) {
+        this.$nextTick(() => {
+          this.initParticles();
+        });
+      }
     }
   },
   methods: {
-    scrollToProducts() {
-      const el = document.getElementById('products-section');
+    scrollToFeatured() {
+      const el = document.getElementById('featured-section');
       if (el) {
         el.scrollIntoView({ behavior: 'smooth' });
       }
     },
-    selectCategory(id) {
-      this.selectedCategoryId = id;
-      this.fetchProducts();
-      this.scrollToProducts();
+    resetFilters() {
+      this.selectedCategoryId = 'all';
+      this.searchQuery = '';
+      this.priceRange = 1000000;
+      this.selectedBrand = 'all';
+      this.inStockOnly = false;
+      this.currentPage = 1;
     },
-    selectCategoryByName(name) {
-      const category = this.categories.find(c => c.categoryName.toLowerCase().includes(name.toLowerCase()));
-      if (category) {
-        this.selectCategory(category.categoryId);
-      } else {
-        this.scrollToProducts();
+    changePage(p) {
+      if (p >= 1 && p <= this.totalPages) {
+        this.currentPage = p;
+        window.scrollTo({ top: 120, behavior: 'smooth' });
       }
     },
     async fetchCategories() {
       try {
         const response = await api.get('/category');
-        this.categories = response.data.data;
+        this.categories = response.data.data || [];
       } catch (err) {
         console.error('Failed to fetch categories:', extractErrorMessage(err));
       }
@@ -286,366 +550,376 @@ export default {
       this.loading = true;
       this.error = null;
       try {
-        let response;
-        if (this.selectedCategoryId === 'all') {
-          response = await api.get('/product');
-        } else {
-          response = await api.get(`/category/${this.selectedCategoryId}/product`);
-        }
+        const response = await api.get('/product');
         this.products = response.data.data || [];
       } catch (err) {
         this.error = extractErrorMessage(err);
       } finally {
         this.loading = false;
       }
+    },
+    handleSubscribe() {
+      showToast({
+        message: 'Welcome to the Forge. Subscribed successfully!',
+        type: 'success',
+        title: 'Newsletter Verified'
+      });
+    },
+    initParticles() {
+      const canvas = this.$refs.particleCanvas;
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+
+      this.resizeListener = () => {
+        if (canvas) {
+          canvas.width = canvas.parentElement.clientWidth || window.innerWidth;
+          canvas.height = canvas.parentElement.clientHeight || 550;
+        }
+      };
+
+      this.resizeListener();
+      window.addEventListener('resize', this.resizeListener);
+
+      const particles = [];
+      const particleCount = 45;
+
+      for (let i = 0; i < particleCount; i++) {
+        particles.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          vx: (Math.random() - 0.5) * 0.4,
+          vy: (Math.random() - 0.5) * 0.4,
+          radius: Math.random() * 2 + 1
+        });
+      }
+
+      const animate = () => {
+        if (!canvas) return;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = 'rgba(59, 130, 246, 0.15)';
+        ctx.strokeStyle = 'rgba(124, 58, 237, 0.04)';
+
+        particles.forEach((p, idx) => {
+          p.x += p.vx;
+          p.y += p.vy;
+
+          if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+          if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Connect points
+          for (let j = idx + 1; j < particles.length; j++) {
+            const p2 = particles[j];
+            const dist = Math.hypot(p2.x - p.x, p2.y - p.y);
+            if (dist < 100) {
+              ctx.beginPath();
+              ctx.moveTo(p.x, p.y);
+              ctx.lineTo(p2.x, p2.y);
+              ctx.stroke();
+            }
+          }
+        });
+
+        this.animationFrameId = requestAnimationFrame(animate);
+      };
+
+      animate();
     }
   },
   mounted() {
     this.fetchCategories();
     this.fetchProducts();
 
-    // Cycle promotional slides
+    // Slides rotation interval
     this.slidesInterval = setInterval(() => {
       this.activeSlide = (this.activeSlide + 1) % this.slides.length;
-    }, 5000);
+    }, 6000);
+
+    if (this.isHomeRoute) {
+      this.$nextTick(() => {
+        this.initParticles();
+      });
+    }
   },
   beforeUnmount() {
     if (this.slidesInterval) {
       clearInterval(this.slidesInterval);
+    }
+    if (this.resizeListener) {
+      window.removeEventListener('resize', this.resizeListener);
+    }
+    if (this.animationFrameId) {
+      cancelAnimationFrame(this.animationFrameId);
     }
   }
 };
 </script>
 
 <style scoped>
-/* ─── Hero Section ─────────────────────────────────────────── */
-.bf-hero-main {
-  border-radius: var(--bf-radius-xl);
-  padding: 48px 40px;
-  min-height: 400px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  position: relative;
-  overflow: hidden;
-  color: white;
-}
-
-.bf-hero-content {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  height: 100%;
-  gap: 24px;
-}
-
-.bf-hero-badge {
+/* ─── Shared Theme ─── */
+.pulse-dot {
   display: inline-block;
-  background: rgba(245, 158, 11, 0.9);
-  color: #0f172a;
-  padding: 6px 16px;
-  border-radius: var(--bf-radius-full);
-  font-size: 0.7rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  margin-bottom: 16px;
-}
-
-.bf-hero-title {
-  font-size: clamp(1.75rem, 4vw, 3rem);
-  font-weight: 900;
-  line-height: 1.1;
-  margin: 0 0 12px 0;
-  color: #ffffff;
-  letter-spacing: -0.02em;
-}
-
-.bf-hero-subtitle {
-  font-size: var(--bf-font-size-lg);
-  opacity: 0.7;
-  max-width: 500px;
-  line-height: 1.5;
-  margin: 0;
-}
-
-.bf-hero-dots {
-  position: absolute;
-  bottom: 24px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 8px;
-  z-index: 2;
-}
-
-.bf-hero-dot {
-  width: 10px;
-  height: 10px;
+  width: 6px;
+  height: 6px;
+  background: var(--bf-success);
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.4);
-  cursor: pointer;
-  transition: all 0.3s ease;
+  margin-right: 6px;
+  box-shadow: 0 0 8px var(--bf-success);
+  animation: bf-pulse 1.5s infinite;
 }
 
-.bf-hero-dot.active {
-  width: 28px;
-  border-radius: 5px;
-  background: var(--bf-accent);
-}
-
-.bf-hero-pattern {
+/* ─── Layout A: Homepage styles ─── */
+.bf-particle-canvas {
   position: absolute;
-  inset: 0;
-  background-image: radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px);
-  background-size: 24px 24px;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 550px;
+  pointer-events: none;
   z-index: 1;
 }
 
-/* ─── Promo Cards ──────────────────────────────────────────── */
-.bf-promo-card {
-  flex: 1;
-  padding: 28px 24px;
-  border-radius: var(--bf-radius-xl);
-  color: white;
+.hero-row {
+  min-height: 480px;
+}
+
+.bf-hero-badge-tag {
+  background: rgba(59, 130, 246, 0.15) !important;
+  color: var(--bf-primary) !important;
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  padding: 6px 14px;
+}
+
+.bf-hero-title-main {
+  font-size: clamp(2.25rem, 5vw, 3.75rem);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.bf-hero-subtitle-main {
+  max-width: 580px;
+  line-height: 1.6;
+}
+
+.bf-slides-dots {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-  cursor: pointer;
-  transition: all var(--bf-transition-base);
-  position: relative;
-  overflow: hidden;
-}
-
-.bf-promo-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--bf-shadow-xl);
-}
-
-.bf-promo-dark {
-  background: linear-gradient(135deg, rgba(9, 9, 11, 0.9) 0%, rgba(39, 39, 42, 0.95) 100%),
-    url('https://images.unsplash.com/photo-1593642632823-8f785ba67e45?q=80&w=600&auto=format&fit=crop') no-repeat center/cover;
-}
-
-.bf-promo-blue {
-  background: linear-gradient(135deg, rgba(12, 74, 110, 0.9) 0%, rgba(3, 105, 161, 0.95) 100%),
-    url('https://images.unsplash.com/photo-1582994274092-23f4931bc151?q=80&w=600&auto=format&fit=crop') no-repeat center/cover;
-}
-
-.bf-promo-badge { margin-bottom: 10px; align-self: flex-start; }
-.bf-promo-title { font-weight: 800; margin: 0 0 6px 0; font-size: var(--bf-font-size-lg); }
-.bf-promo-desc { font-size: var(--bf-font-size-xs); opacity: 0.6; margin: 0 0 12px 0; }
-.bf-promo-link {
-  font-size: var(--bf-font-size-sm);
-  font-weight: 600;
-  color: rgba(255,255,255,0.8);
-  transition: color 0.2s;
-}
-.bf-promo-card:hover .bf-promo-link { color: #fff; }
-
-/* ─── Section Styling ──────────────────────────────────────── */
-.bf-section {
-  background: var(--bf-bg-card);
-  border: 1px solid var(--bf-border);
-  border-radius: var(--bf-radius-xl);
-  padding: 28px;
-  margin-bottom: 32px;
-}
-
-.bf-section-header { margin-bottom: 20px; }
-.bf-section-title { font-weight: 800; margin: 0 0 4px 0; color: var(--bf-text-primary); }
-.bf-section-desc { margin: 0; font-size: var(--bf-font-size-sm); color: var(--bf-text-muted); }
-
-/* ─── Category Chips ───────────────────────────────────────── */
-.bf-category-scroll {
-  display: flex;
-  gap: 16px;
-  overflow-x: auto;
-  padding-bottom: 8px;
-}
-
-.bf-category-chip {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   gap: 8px;
-  cursor: pointer;
-  flex-shrink: 0;
-  transition: all var(--bf-transition-base);
 }
 
-.bf-category-chip span {
-  font-size: var(--bf-font-size-xs);
-  font-weight: 600;
-  color: var(--bf-text-secondary);
-  max-width: 80px;
-  text-align: center;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.bf-category-chip.active span { color: var(--bf-primary); }
-
-.bf-category-icon,
-.bf-category-img {
-  width: 72px;
-  height: 72px;
+.bf-slide-dot {
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  border: 2.5px solid var(--bf-border);
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--bf-bg-tertiary);
-  transition: all var(--bf-transition-base);
+  background: rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  transition: all var(--bf-transition-fast);
 }
 
-.bf-category-chip.active .bf-category-icon,
-.bf-category-chip.active .bf-category-img {
-  border-color: var(--bf-primary);
-  box-shadow: 0 0 0 3px var(--bf-primary-light);
+.bf-slide-dot.active {
+  width: 24px;
+  border-radius: 4px;
+  background: var(--bf-primary);
+  box-shadow: 0 0 10px var(--bf-primary-glow);
 }
 
-.bf-category-chip:hover .bf-category-icon,
-.bf-category-chip:hover .bf-category-img {
-  transform: scale(1.08);
-  box-shadow: var(--bf-shadow-md);
+.hero-tech-img {
+  position: relative;
+  z-index: 2;
+  border: 1.5px solid rgba(255, 255, 255, 0.08);
+  max-height: 380px;
+  object-fit: cover;
 }
 
-.bf-category-icon { color: var(--bf-primary); }
-.bf-category-img img { width: 100%; height: 100%; object-fit: cover; }
+.hero-graphic-glow {
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(124, 58, 237, 0.15) 0%, transparent 70%);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  pointer-events: none;
+}
 
-/* ─── Feature Cards ────────────────────────────────────────── */
-.bf-feature-card {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 20px;
-  background: var(--bf-bg-card);
-  border: 1px solid var(--bf-border);
+.stat-card {
   border-radius: var(--bf-radius-lg);
-  transition: all var(--bf-transition-base);
+  border: 1px solid rgba(255, 255, 255, 0.04);
 }
 
-.bf-feature-card:hover {
-  box-shadow: var(--bf-shadow-md);
-  transform: translateY(-2px);
-}
-
-.bf-feature-icon {
-  width: 48px;
-  height: 48px;
+.stat-icon-badge {
+  background: rgba(255, 255, 255, 0.03);
+  width: 50px;
+  height: 50px;
   border-radius: var(--bf-radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.brand-grid .col {
+  transition: transform var(--bf-transition-fast);
+}
+
+.brand-grid .col:hover {
+  transform: translateY(-4px);
+}
+
+.brand-item-card {
+  font-family: var(--bf-font-mono);
+  font-weight: 700;
+  font-size: 0.875rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  transition: all var(--bf-transition-fast);
+}
+
+.brand-item-card:hover {
+  color: white !important;
+  border-color: var(--bf-primary) !important;
+  background: rgba(59, 130, 246, 0.08);
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.15);
+}
+
+.testimonial-card {
+  border: 1px solid rgba(255, 255, 255, 0.04) !important;
+  transition: all var(--bf-transition-base);
+}
+
+.testimonial-card:hover {
+  border-color: rgba(124, 58, 237, 0.25) !important;
+  box-shadow: 0 4px 20px rgba(124, 58, 237, 0.08);
+}
+
+.testimonial-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--bf-gradient-accent);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.bf-newsletter-banner {
+  background: var(--bf-gradient-card);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.newsletter-glow {
+  position: absolute;
+  width: 250px;
+  height: 250px;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 75%);
+  bottom: -100px;
+  right: -50px;
+  pointer-events: none;
+}
+
+/* ─── Layout B: Catalog Explorer styles ─── */
+.sticky-sidebar {
+  position: sticky;
+  top: 100px;
+  z-index: 10;
+}
+
+.max-height-chips {
+  max-height: 250px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.filter-chip {
+  padding: 8px 12px;
+  font-size: 0.8125rem;
+  border-radius: var(--bf-radius-md);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  color: var(--bf-text-secondary);
+  cursor: pointer;
+  transition: all var(--bf-transition-fast);
+}
+
+.filter-chip:hover {
+  color: white;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.filter-chip.active {
+  background: var(--bf-primary-light);
+  border-color: var(--bf-primary);
+  color: white;
+  font-weight: 600;
+}
+
+.pagination-cyber .page-link {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: var(--bf-text-secondary);
+  border-radius: var(--bf-radius-md);
+  padding: 8px 16px;
+  transition: all var(--bf-transition-fast);
+}
+
+.pagination-cyber .page-item.active .page-link {
+  background: var(--bf-primary);
+  border-color: var(--bf-primary);
+  color: white;
+  box-shadow: 0 0 10px var(--bf-primary-glow);
+}
+
+.pagination-cyber .page-link:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+}
+
+.pagination-cyber .page-item.disabled .page-link {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.02);
+  color: var(--bf-text-muted);
+  opacity: 0.5;
+}
+
+/* List card styles */
+.list-card {
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  transition: all var(--bf-transition-base);
+}
+
+.list-card:hover {
+  border-color: var(--bf-primary) !important;
+  transform: scale(1.01);
+  box-shadow: var(--bf-shadow-lg);
+}
+
+.list-card-img {
+  width: 90px;
+  height: 90px;
+  object-fit: cover;
+  background: var(--bf-bg-tertiary);
   flex-shrink: 0;
 }
 
-.bf-feature-title {
-  font-weight: 700;
-  margin: 0 0 2px 0;
-  font-size: var(--bf-font-size-sm);
-  color: var(--bf-text-primary);
+.text-truncate-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-.bf-feature-desc {
-  margin: 0;
-  font-size: var(--bf-font-size-xs);
-  color: var(--bf-text-muted);
-}
-
-/* ─── Toolbar ──────────────────────────────────────────────── */
-.bf-toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 16px 20px;
-  background: var(--bf-bg-card);
-  border: 1px solid var(--bf-border);
-  border-radius: var(--bf-radius-lg);
-  margin-bottom: 8px;
-  flex-wrap: wrap;
-}
-
-.bf-toolbar-search {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex: 1;
-  max-width: 400px;
-  color: var(--bf-text-muted);
-}
-
-.bf-toolbar-search .bf-input {
-  border: none;
-  background: var(--bf-bg-tertiary);
-  padding: 10px 14px;
-}
-
-.bf-toolbar-sort {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.bf-toolbar-label {
-  font-size: var(--bf-font-size-xs);
-  color: var(--bf-text-muted);
-  white-space: nowrap;
-}
-
-.bf-toolbar-select {
-  max-width: 180px;
-  padding: 8px 12px !important;
-  background: var(--bf-bg-tertiary) !important;
-  border: 1px solid var(--bf-border) !important;
-}
-
-/* ─── Empty State ──────────────────────────────────────────── */
-.bf-empty-state {
-  text-align: center;
-  padding: 64px 24px;
-  background: var(--bf-bg-card);
-  border: 1px solid var(--bf-border);
-  border-radius: var(--bf-radius-xl);
-  margin-top: 16px;
-}
-
-.bf-empty-icon {
-  font-size: 3rem;
-  margin-bottom: 16px;
-}
-
-.bf-empty-state h5 {
-  font-weight: 700;
-  color: var(--bf-text-primary);
-  margin-bottom: 8px;
-}
-
-.bf-empty-state p {
-  color: var(--bf-text-muted);
-  font-size: var(--bf-font-size-sm);
-  margin-bottom: 20px;
-}
-
-/* ─── Responsive ───────────────────────────────────────────── */
-@media (max-width: 768px) {
-  .bf-hero-main {
-    padding: 32px 24px;
-    min-height: 300px;
-  }
-
-  .bf-toolbar {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .bf-toolbar-search { max-width: none; }
-  .bf-toolbar-sort { justify-content: space-between; }
+.min-width-card {
+  min-width: 140px;
 }
 </style>

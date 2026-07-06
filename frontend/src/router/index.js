@@ -33,13 +33,13 @@ const routes = [
     path: '/admin/product/add',
     name: 'AddProduct',
     component: AddProduct,
-    meta: { requiresAdmin: true }
+    meta: { requiresSeller: true }
   },
   {
     path: '/admin/product/edit/:id',
     name: 'EditProduct',
     component: EditProduct,
-    meta: { requiresAdmin: true }
+    meta: { requiresSeller: true }
   },
   {
     path: '/admin/category',

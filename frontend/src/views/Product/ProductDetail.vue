@@ -1,97 +1,165 @@
 <template>
-  <div class="bf-page bf-fade-in p-4">
+  <div class="bf-page bf-fade-in p-4 text-start">
     <div class="container">
+      
+      <!-- Breadcrumbs navigation -->
+      <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb text-muted small">
+          <li class="breadcrumb-item"><router-link to="/">Home</router-link></li>
+          <li class="breadcrumb-item"><router-link to="/product">Products</router-link></li>
+          <li class="breadcrumb-item active text-white" aria-current="page" v-if="product">{{ product.productName }}</li>
+        </ol>
+      </nav>
+
       <!-- Loading Skeletons -->
-      <div v-if="loading" class="row g-4 mt-2">
+      <div v-if="loading" class="row g-4">
         <div class="col-md-6">
-          <LoadingSkeleton type="block" height="450px" />
+          <LoadingSkeleton type="block" height="420px" />
         </div>
         <div class="col-md-6">
-          <LoadingSkeleton type="text" :lines="6" titleWidth="80%" />
+          <LoadingSkeleton type="text" :lines="8" titleWidth="70%" />
           <div class="mt-4">
-            <LoadingSkeleton type="block" height="50px" />
+            <LoadingSkeleton type="block" height="60px" />
           </div>
         </div>
       </div>
 
       <!-- Error State -->
       <div v-else-if="error" class="bf-empty-state">
-        <div class="bf-empty-icon" style="color: var(--bf-danger);">⚠</div>
-        <h5>Unable to load details</h5>
+        <div class="bf-empty-icon text-danger">⚠</div>
+        <h5 class="text-white font-weight-bold">Hardware Loading Interrupted</h5>
         <p>{{ error }}</p>
-        <button class="bf-btn bf-btn-primary" @click="fetchProduct($route.params.id)">Try Again</button>
+        <button class="bf-btn bf-btn-primary" @click="fetchProduct($route.params.id)">Retry Sync</button>
       </div>
 
-      <!-- Product Details -->
+      <!-- Main Product Specs Info -->
       <div v-else-if="product" class="bf-fade-in">
         <div class="row g-4">
-          <!-- Gallery / Image View -->
+          <!-- Left Column: Media Showcase -->
           <div class="col-lg-6">
-            <div class="bf-card bf-glass p-3 h-100 d-flex align-items-center justify-content-center position-relative">
+            <div class="bf-card bf-glass media-card p-4 d-flex align-items-center justify-content-center position-relative overflow-hidden">
+              <div class="details-glow"></div>
               <img
                 :src="currentImageUrl"
                 @error="handleImageError"
-                alt="Product Image"
-                class="img-fluid rounded-3 bf-product-zoom-img"
+                alt="Product Spec Image"
+                class="img-fluid rounded-3 product-detail-img"
               />
-              <span class="bf-product-condition-tag">{{ product.condition || 'Brand New' }}</span>
+              <span class="product-badge-condition">{{ product.condition || 'Factory Sealed' }}</span>
+            </div>
+            
+            <!-- Quick features list under image -->
+            <div class="row g-2 mt-2">
+              <div class="col-6">
+                <div class="p-3 bg-dark border rounded text-center text-muted small">
+                  🛡️ 1-Year Local Warranty
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="p-3 bg-dark border rounded text-center text-muted small">
+                  ⚡ Tested Benchmarks
+                </div>
+              </div>
             </div>
           </div>
 
-          <!-- Product Details Form/Info -->
+          <!-- Right Column: Specs Selection -->
           <div class="col-lg-6">
-            <div class="bf-card p-4 p-md-5 text-start h-100 d-flex flex-column justify-content-between">
+            <div class="bf-card p-4 p-md-5 h-100 d-flex flex-column justify-content-between text-white border-light">
               <div>
-                <!-- Category & Stock Status -->
-                <div class="d-flex flex-wrap gap-2 mb-3 align-items-center">
-                  <span class="bf-badge bf-badge-primary text-uppercase" v-if="categoryName">
-                    {{ categoryName }}
-                  </span>
-                  <span class="bf-badge" :class="stockBadgeClass">
-                    {{ stockLabel }}
-                  </span>
+                <!-- Category badge & Seller reference -->
+                <div class="d-flex flex-wrap gap-2 mb-3 align-items-center justify-content-between">
+                  <div class="d-flex gap-2">
+                    <span class="bf-badge bf-badge-primary text-uppercase" v-if="categoryName">
+                      {{ categoryName }}
+                    </span>
+                    <span class="bf-badge" :class="stockBadgeClass">
+                      {{ stockLabel }}
+                    </span>
+                  </div>
+                  <router-link 
+                    v-if="product.storeId" 
+                    :to="'/store/' + product.storeId" 
+                    class="text-primary small font-weight-bold"
+                  >
+                    🏢 {{ product.storeName || 'Partner Store' }} 🛡️
+                  </router-link>
                 </div>
 
-                <h1 class="bf-hero-title text-dark mb-2" style="font-size: 1.875rem;">{{ product.productName }}</h1>
+                <h1 class="text-white font-weight-bold mb-3 fs-3">{{ product.productName }}</h1>
 
-                <!-- Rating -->
-                <div class="d-flex align-items-center gap-2 mb-3">
-                  <div class="text-warning font-weight-bold">
+                <!-- Reviews overview -->
+                <div class="d-flex align-items-center gap-2 mb-4">
+                  <div class="text-warning">
                     ★ ★ ★ ★ ★
                   </div>
-                  <span class="text-muted small font-weight-bold">4.8 / 5.0 (42 ratings)</span>
+                  <span class="text-muted small font-weight-bold">4.9 / 5.0 (28 customer benchmarks)</span>
                 </div>
 
-                <!-- Price -->
-                <h3 class="bf-price-amount mb-4" style="font-size: 1.75rem;">{{ formattedPrice }}</h3>
-
-                <!-- Stock Limit Indicator -->
-                <div class="mb-4" v-if="product.stock !== undefined && product.stock !== null">
-                  <span class="small font-weight-bold" :class="{'text-danger': !product.stock || product.stock === 0, 'text-muted': product.stock > 0}">
-                    Availability:
-                    <span v-if="product.stock > 0">{{ product.stock }} components available in stock</span>
-                    <span v-else>Out of Stock</span>
-                  </span>
+                <!-- Price Rates -->
+                <div class="price-box-details p-3 rounded bg-dark border-light mb-4">
+                  <span class="text-muted d-block small mb-1">Standard Market Rate</span>
+                  <span class="bf-price-amount fs-2 font-weight-bold text-primary">{{ formattedPrice }}</span>
                 </div>
 
-                <hr class="my-4" />
+                <!-- Description & Details Tabs -->
+                <div class="mb-4">
+                  <div class="d-flex gap-3 border-bottom pb-2 mb-3">
+                    <button 
+                      class="btn btn-sm text-white p-0 border-0 font-weight-bold" 
+                      :class="{ 'text-primary': activeTab === 'desc' }"
+                      @click="activeTab = 'desc'"
+                    >
+                      Overview
+                    </button>
+                    <button 
+                      class="btn btn-sm text-white p-0 border-0 font-weight-bold" 
+                      :class="{ 'text-primary': activeTab === 'specs' }"
+                      @click="activeTab = 'specs'"
+                    >
+                      Specifications
+                    </button>
+                  </div>
 
-                <!-- Description -->
-                <p class="text-secondary mb-4" style="white-space: pre-line; line-height: 1.6;">
-                  {{ product.description }}
-                </p>
+                  <div class="tab-content-details text-secondary small" style="line-height: 1.6;">
+                    <div v-if="activeTab === 'desc'" style="white-space: pre-line;">
+                      {{ product.description }}
+                    </div>
+                    <div v-else>
+                      <table class="table table-dark table-sm table-borderless mb-0 text-start">
+                        <tbody>
+                          <tr>
+                            <td class="text-muted" style="width: 140px;">Module Type:</td>
+                            <td class="text-white">{{ categoryName || 'PC Hardware' }}</td>
+                          </tr>
+                          <tr>
+                            <td class="text-muted">Part Condition:</td>
+                            <td class="text-white">{{ product.condition || 'Brand New' }}</td>
+                          </tr>
+                          <tr>
+                            <td class="text-muted">Stock Quantity:</td>
+                            <td class="text-white">{{ product.stock || 'Not Specified' }} units</td>
+                          </tr>
+                          <tr>
+                            <td class="text-muted">Vendor Registry:</td>
+                            <td class="text-white">{{ product.storeName || 'ByteForge Partner' }}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+
               </div>
 
-              <div>
-                <hr class="my-4" />
-
-                <!-- Add to Cart or Administrator Mode -->
+              <!-- Purchase control section -->
+              <div class="mt-4 pt-4 border-top">
                 <div v-if="!isAdmin">
-                  <div class="d-flex align-items-center gap-3 mb-4" v-if="product.stock && product.stock > 0">
-                    <span class="text-secondary font-weight-bold">Quantity:</span>
-                    <div class="bf-qty-stepper">
+                  <div class="d-flex align-items-center justify-content-between gap-3 mb-4" v-if="product.stock && product.stock > 0">
+                    <span class="text-muted small font-weight-bold">QUANTITY CONFIG</span>
+                    <div class="bf-qty-stepper-premium">
                       <button
-                        class="bf-btn bf-btn-ghost bf-btn-icon"
+                        class="qty-btn"
                         type="button"
                         @click="decrementQty"
                         :disabled="quantity <= 1"
@@ -100,14 +168,14 @@
                       </button>
                       <input
                         type="number"
-                        class="bf-qty-input"
+                        class="qty-input-box"
                         v-model.number="quantity"
                         min="1"
                         :max="product.stock"
                         @change="validateQty"
                       />
                       <button
-                        class="bf-btn bf-btn-ghost bf-btn-icon"
+                        class="qty-btn"
                         type="button"
                         @click="incrementQty"
                         :disabled="quantity >= product.stock"
@@ -119,30 +187,31 @@
 
                   <div class="d-flex gap-3">
                     <button
-                      class="bf-btn bf-btn-primary flex-grow-1 bf-btn-lg py-3"
+                      class="bf-btn bf-btn-primary flex-grow-1 bf-btn-lg py-3 shadow-glow"
                       @click="addToCart"
                       :disabled="addingToCart || !product.stock || product.stock <= 0"
                     >
-                      <span v-if="addingToCart" class="bf-spinner me-2"></span>
-                      {{ product.stock && product.stock > 0 ? 'Add to Cart' : 'Out of Stock' }}
+                      <span v-if="addingToCart" class="spinner-border spinner-border-sm me-2"></span>
+                      {{ product.stock && product.stock > 0 ? 'Inject to Cart' : 'Temporarily Out of Stock' }}
                     </button>
                   </div>
                 </div>
 
-                <!-- Admin alert -->
-                <div v-else class="bf-card bf-glass p-3 border-danger-light" role="alert">
-                  <h6 class="font-weight-bold text-danger mb-1">Administrator Control Mode</h6>
-                  <p class="small text-secondary mb-0">Admins can browse product detail views but are restricted from shopping cart purchases.</p>
+                <!-- Admin operations console link -->
+                <div v-else class="bf-card p-3 bg-dark border-danger" role="alert">
+                  <h6 class="font-weight-bold text-danger mb-1">Administrator Session</h6>
+                  <p class="small text-muted mb-0">Purchasing acts are locked. Configure item fields from operations panel.</p>
                 </div>
               </div>
+
             </div>
           </div>
         </div>
 
-        <!-- Related Products Grid -->
+        <!-- Related Items Grid -->
         <div class="mt-5 text-start" v-if="relatedProducts.length > 0">
-          <hr class="my-5" />
-          <h4 class="font-weight-bold text-dark mb-4">Related PC Components</h4>
+          <hr class="my-5 opacity-25" />
+          <h4 class="text-white font-weight-bold mb-4">Related Hardware Modules</h4>
           <div class="row g-4">
             <div
               v-for="related in relatedProducts"
@@ -153,8 +222,10 @@
             </div>
           </div>
         </div>
+
       </div>
     </div>
+
   </div>
 </template>
 
@@ -178,7 +249,8 @@ export default {
       error: null,
       addingToCart: false,
       currentImageUrl: '',
-      fallbackUrl: 'https://placehold.co/500x400?text=No+Image+Available'
+      activeTab: 'desc',
+      fallbackUrl: 'https://placehold.co/600x450?text=No+Image+Available'
     };
   },
   computed: {
@@ -222,7 +294,7 @@ export default {
         this.product = response.data.data;
         this.currentImageUrl = this.product.imageUrl;
 
-        // Fetch related products and resolve category name
+        // Fetch related catalog items
         if (this.product && this.product.category) {
           this.categoryName = this.product.category.categoryName;
           const catId = this.product.category.categoryId;
@@ -308,18 +380,37 @@ export default {
 </script>
 
 <style scoped>
-.bf-product-zoom-img {
-  max-height: 480px;
+.media-card {
+  min-height: 400px;
+  background: var(--bf-bg-card) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.details-glow {
+  position: absolute;
+  width: 250px;
+  height: 250px;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.08) 0%, transparent 70%);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.product-detail-img {
+  max-height: 420px;
   width: 100%;
   object-fit: contain;
-  transition: transform 0.3s ease;
+  z-index: 2;
+  transition: transform var(--bf-transition-base);
 }
 
-.bf-product-zoom-img:hover {
-  transform: scale(1.05);
+.product-detail-img:hover {
+  transform: scale(1.03);
 }
 
-.bf-product-condition-tag {
+.product-badge-condition {
   position: absolute;
   top: 16px;
   left: 16px;
@@ -327,34 +418,54 @@ export default {
   color: white;
   padding: 4px 12px;
   border-radius: var(--bf-radius-md);
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  z-index: 3;
 }
 
-.bf-qty-stepper {
+.price-box-details {
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.bf-qty-stepper-premium {
   display: inline-flex;
   align-items: center;
-  border: 1.5px solid var(--bf-border);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: var(--bf-radius-md);
   overflow: hidden;
-  background: var(--bf-bg-secondary);
+  background: rgba(255, 255, 255, 0.03);
 }
 
-.bf-qty-input {
-  width: 50px;
+.qty-btn {
+  background: transparent;
   border: none;
+  color: white;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-weight: 700;
+  transition: all var(--bf-transition-fast);
+}
+
+.qty-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.qty-input-box {
+  width: 55px;
+  border: none;
+  background: transparent;
+  color: white;
   text-align: center;
   font-weight: 700;
-  color: var(--bf-text-primary);
-  background: transparent;
   outline: none;
   -moz-appearance: textfield;
 }
 
-.bf-qty-input::-webkit-outer-spin-button,
-.bf-qty-input::-webkit-inner-spin-button {
+.qty-input-box::-webkit-outer-spin-button,
+.qty-input-box::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }

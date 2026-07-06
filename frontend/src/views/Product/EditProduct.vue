@@ -1,203 +1,201 @@
 <template>
-  <div class="container my-5">
-    <div class="row justify-content-center">
-      <div class="col-md-10">
-        <div class="card shadow-sm border-0">
-          <div class="card-body p-4 p-md-5">
-            <h3 class="mb-4 text-center font-weight-bold">Edit Product</h3>
+  <div class="bf-page bf-fade-in p-4 text-start">
+    <div class="container">
+      <div class="row mb-4">
+        <div class="col-12 text-start">
+          <span class="bf-badge bf-badge-primary mb-2">Catalogue Maintenance</span>
+          <h2 class="text-white font-weight-bold mb-1">Modify Hardware</h2>
+          <p class="text-muted small">Update pricing, description, stock bounds, or image profiles of listed components.</p>
+        </div>
+      </div>
 
-            <!-- Loading Spinner -->
-            <div v-if="loading" class="text-center my-4">
-              <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Loading product details...</span>
-              </div>
+      <!-- Loading Spinner -->
+      <div v-if="loading" class="text-center py-5">
+        <span class="spinner-border spinner-border-sm text-primary mb-2"></span>
+        <p class="text-muted small">Synchronizing item configurations...</p>
+      </div>
+
+      <div v-else class="row text-white g-4">
+        <div class="col-lg-8">
+          <div class="bf-card bg-dark border-light p-4 text-start">
+            <div v-if="error" class="alert alert-danger" role="alert">
+              {{ error }}
             </div>
 
-            <template v-else>
-              <div v-if="error" class="alert alert-danger" role="alert">
-                {{ error }}
-              </div>
-
-              <form @submit.prevent="handleSubmit">
-                <div class="row">
-                  <!-- Form Inputs Column -->
-                  <div class="col-md-7 text-start">
-                    <div class="form-group mb-3">
-                      <label for="productName" class="form-label">Product Name</label>
-                      <input 
-                        type="text" 
-                        id="productName" 
-                        class="form-control" 
-                        v-model="productName"
-                        @blur="touched.productName = true"
-                        required
-                      />
-                      <div v-if="touched.productName && !productName" class="text-danger mt-1 small">
-                        Product Name is required.
-                      </div>
-                    </div>
-
-                    <div class="form-group mb-3">
-                      <label for="description" class="form-label">Description</label>
-                      <textarea 
-                        id="description" 
-                        class="form-control" 
-                        rows="3"
-                        v-model="description"
-                        @blur="touched.description = true"
-                        required
-                      ></textarea>
-                      <div v-if="touched.description && !description" class="text-danger mt-1 small">
-                        Description is required.
-                      </div>
-                    </div>
-
-                    <div class="form-group mb-3">
-                      <label class="form-label d-block">Image Source</label>
-                      <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" id="srcUrlEdit" value="url" v-model="imageSource">
-                        <label class="form-check-label" for="srcUrlEdit">URL</label>
-                      </div>
-                      <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" id="srcUploadEdit" value="upload" v-model="imageSource">
-                        <label class="form-check-label" for="srcUploadEdit">Upload File</label>
-                      </div>
-                    </div>
-
-                    <div v-if="imageSource === 'url'" class="form-group mb-3">
-                      <label for="imageUrl" class="form-label">Image URL</label>
-                      <input 
-                        type="text" 
-                        id="imageUrl" 
-                        class="form-control" 
-                        v-model="imageUrl"
-                        @blur="touched.imageUrl = true"
-                        required
-                      />
-                      <div v-if="touched.imageUrl && !imageUrl" class="text-danger mt-1 small">
-                        Image URL is required.
-                      </div>
-                    </div>
-                    <div v-else class="form-group mb-3">
-                      <label for="imageFile" class="form-label">Upload Image</label>
-                      <input 
-                        type="file" 
-                        id="imageFile" 
-                        class="form-control" 
-                        @change="onFileChange"
-                        accept="image/*"
-                      />
-                      <div v-if="uploading" class="text-muted small mt-1">
-                        <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
-                        Uploading image...
-                      </div>
-                      <div v-if="touched.imageUrl && !imageUrl && !uploading" class="text-danger mt-1 small">
-                        Please upload an image file.
-                      </div>
-                    </div>
-
-                    <div class="form-group mb-3">
-                      <label for="price" class="form-label">Price (LKR)</label>
-                      <input 
-                        type="number" 
-                        id="price" 
-                        class="form-control" 
-                        v-model.number="price"
-                        step="0.01"
-                        min="0.01"
-                        @blur="touched.price = true"
-                        required
-                      />
-                      <div v-if="touched.price && (price === null || price === undefined || price <= 0)" class="text-danger mt-1 small">
-                        Price is required and must be greater than 0.
-                      </div>
-                    </div>
-
-                    <div class="form-group mb-3">
-                      <label for="stock" class="form-label">Stock Count</label>
-                      <input 
-                        type="number" 
-                        id="stock" 
-                        class="form-control" 
-                        v-model.number="stock"
-                        min="0"
-                        @blur="touched.stock = true"
-                        required
-                      />
-                      <div v-if="touched.stock && (stock === null || stock === undefined || stock < 0)" class="text-danger mt-1 small">
-                        Stock Count is required and must be non-negative.
-                      </div>
-                    </div>
-
-                    <div class="form-group mb-4">
-                      <label for="categoryId" class="form-label">Category</label>
-                      <select 
-                        id="categoryId" 
-                        class="form-select" 
-                        v-model="categoryId"
-                        @blur="touched.categoryId = true"
-                        required
-                      >
-                        <option value="" disabled>Select a Category</option>
-                        <option 
-                          v-for="cat in categories" 
-                          :key="cat.categoryId" 
-                          :value="cat.categoryId"
-                        >
-                          {{ cat.categoryName }}
-                        </option>
-                      </select>
-                      <div v-if="touched.categoryId && !categoryId" class="text-danger mt-1 small">
-                        Category selection is required.
-                      </div>
-                    </div>
-
-                    <div class="d-flex gap-3">
-                      <button 
-                        type="submit" 
-                        class="btn btn-primary flex-grow-1 py-2" 
-                        :disabled="!isValid || submitting"
-                      >
-                        <span v-if="submitting" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                        Save Changes
-                      </button>
-                      <button 
-                        type="button" 
-                        class="btn btn-danger py-2" 
-                        @click="handleDelete"
-                        :disabled="deleting"
-                      >
-                        <span v-if="deleting" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                        Delete
-                      </button>
-                    </div>
-                  </div>
-
-                  <!-- Image Preview Column -->
-                  <div class="col-md-5 d-flex flex-column align-items-center justify-content-center border-start ps-md-4 mt-4 mt-md-0">
-                    <span class="text-secondary small font-weight-bold mb-2">Live Image Preview</span>
-                    <div class="preview-container d-flex align-items-center justify-content-center bg-light border rounded" style="width: 100%; height: 250px; overflow: hidden;">
-                      <img 
-                        v-if="imageUrl" 
-                        :src="imageUrl" 
-                        @error="previewError = true" 
-                        @load="previewError = false" 
-                        v-show="!previewError"
-                        alt="Product Preview" 
-                        class="img-fluid"
-                        style="max-height: 100%; object-fit: contain;"
-                      />
-                      <div v-if="!imageUrl" class="text-muted small text-center p-3">
-                        Enter an Image URL to see preview here.
-                      </div>
-                      <div v-else-if="previewError" class="text-danger small text-center p-3">
-                        Unable to load preview image.<br/>Please check the URL.
-                      </div>
-                    </div>
+            <form @submit.prevent="handleSubmit">
+              <div class="row g-3">
+                <div class="col-12">
+                  <label class="form-label small text-muted font-weight-bold">Product Name</label>
+                  <input 
+                    type="text" 
+                    class="bf-input text-white bg-dark border-light" 
+                    v-model="productName"
+                    @blur="touched.productName = true"
+                    required
+                  />
+                  <div v-if="touched.productName && !productName" class="text-danger mt-1 small">
+                    Product Name is required.
                   </div>
                 </div>
-              </form>
-            </template>
+
+                <div class="col-12">
+                  <label class="form-label small text-muted font-weight-bold">Description</label>
+                  <textarea 
+                    class="bf-input text-white bg-dark border-light" 
+                    rows="4"
+                    v-model="description"
+                    @blur="touched.description = true"
+                    required
+                  ></textarea>
+                  <div v-if="touched.description && !description" class="text-danger mt-1 small">
+                    Description is required.
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label small text-muted font-weight-bold d-block">Image Source</label>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" id="srcUrlEdit" value="url" v-model="imageSource">
+                    <label class="form-check-label text-white small" for="srcUrlEdit">URL Link</label>
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" id="srcUploadEdit" value="upload" v-model="imageSource">
+                    <label class="form-check-label text-white small" for="srcUploadEdit">Upload Local File</label>
+                  </div>
+                </div>
+
+                <div class="col-md-6" v-if="imageSource === 'url'">
+                  <label class="form-label small text-muted font-weight-bold">Image URL</label>
+                  <input 
+                    type="text" 
+                    class="bf-input text-white bg-dark border-light" 
+                    v-model="imageUrl"
+                    @blur="touched.imageUrl = true"
+                    required
+                  />
+                  <div v-if="touched.imageUrl && !imageUrl" class="text-danger mt-1 small">
+                    Image URL is required.
+                  </div>
+                </div>
+                <div class="col-md-6" v-else>
+                  <label class="form-label small text-muted font-weight-bold">Upload Image File</label>
+                  <input 
+                    type="file" 
+                    class="bf-input text-white bg-dark border-light py-1" 
+                    @change="onFileChange"
+                    accept="image/*"
+                  />
+                  <div v-if="uploading" class="text-muted small mt-1">
+                    <span class="spinner-border spinner-border-sm text-primary me-1"></span>
+                    Uploading image...
+                  </div>
+                  <div v-if="touched.imageUrl && !imageUrl && !uploading" class="text-danger mt-1 small">
+                    Please upload an image file.
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label small text-muted font-weight-bold">Price Rate (LKR)</label>
+                  <input 
+                    type="number" 
+                    class="bf-input text-white bg-dark border-light" 
+                    v-model.number="price"
+                    step="0.01"
+                    min="0.01"
+                    @blur="touched.price = true"
+                    required
+                  />
+                  <div v-if="touched.price && (price === null || price === undefined || price <= 0)" class="text-danger mt-1 small">
+                    Price is required and must be greater than 0.
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label small text-muted font-weight-bold">Stock Quantity</label>
+                  <input 
+                    type="number" 
+                    class="bf-input text-white bg-dark border-light" 
+                    v-model.number="stock"
+                    min="0"
+                    @blur="touched.stock = true"
+                    required
+                  />
+                  <div v-if="touched.stock && (stock === null || stock === undefined || stock < 0)" class="text-danger mt-1 small">
+                    Stock count is required and must be non-negative.
+                  </div>
+                </div>
+
+                <div class="col-12">
+                  <label class="form-label small text-muted font-weight-bold">Category Grouping</label>
+                  <select 
+                    class="bf-input text-white bg-dark border-light" 
+                    v-model="categoryId"
+                    @blur="touched.categoryId = true"
+                    required
+                  >
+                    <option value="" disabled>Select hardware category...</option>
+                    <option 
+                      v-for="cat in categories" 
+                      :key="cat.categoryId" 
+                      :value="cat.categoryId"
+                    >
+                      {{ cat.categoryName }}
+                    </option>
+                  </select>
+                  <div v-if="touched.categoryId && !categoryId" class="text-danger mt-1 small">
+                    Category selection is required.
+                  </div>
+                </div>
+
+                <div class="col-12 mt-4">
+                  <div class="d-flex gap-3">
+                    <button 
+                      type="submit" 
+                      class="bf-btn bf-btn-primary flex-grow-1 py-3 shadow-glow" 
+                      :disabled="!isValid || submitting"
+                    >
+                      <span v-if="submitting" class="spinner-border spinner-border-sm me-2"></span>
+                      Save Changes
+                    </button>
+                    <button 
+                      type="button" 
+                      class="bf-btn bf-btn-danger px-4" 
+                      @click="handleDelete"
+                      :disabled="deleting"
+                    >
+                      <span v-if="deleting" class="spinner-border spinner-border-sm me-2"></span>
+                      Delete Item
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Left Column: Hologram Preview -->
+        <div class="col-lg-4">
+          <div class="bf-card bg-dark border-light p-4 text-center h-100 d-flex flex-column align-items-center justify-content-center">
+            <span class="text-muted small font-weight-bold mb-3 uppercase tracking-wider">Hologram Image Deck</span>
+            <div class="preview-deck border rounded d-flex align-items-center justify-content-center bg-secondary-dark" style="width: 100%; height: 260px; overflow: hidden; position: relative;">
+              <div class="deck-glow"></div>
+              <img 
+                v-if="imageUrl" 
+                :src="imageUrl" 
+                @error="previewError = true" 
+                @load="previewError = false" 
+                v-show="!previewError"
+                alt="Product Preview" 
+                class="img-fluid position-relative"
+                style="max-height: 100%; object-fit: contain; z-index: 2;"
+              />
+              <div v-if="!imageUrl" class="text-muted small text-center p-3 z-index-top">
+                Enter an Image URL or upload a file to preview it here.
+              </div>
+              <div v-else-if="previewError" class="text-danger small text-center p-3 z-index-top">
+                Unable to load preview image.<br/>Please check the URL.
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -207,6 +205,8 @@
 
 <script>
 import api, { extractErrorMessage } from '../../utils/api';
+import { getCurrentUser } from '../../utils/auth';
+import { showToast } from '../../components/Common/ToastNotification.vue';
 
 export default {
   name: 'EditProduct',
@@ -221,6 +221,7 @@ export default {
       price: null,
       stock: 0,
       categoryId: '',
+      storeId: null,
       categories: [],
       error: null,
       loading: true,
@@ -262,7 +263,7 @@ export default {
     async fetchCategories() {
       try {
         const response = await api.get('/category');
-        this.categories = response.data.data;
+        this.categories = response.data.data || [];
       } catch (err) {
         console.error('Failed to load categories:', extractErrorMessage(err));
       }
@@ -309,6 +310,7 @@ export default {
         this.price = p.price;
         this.stock = p.stock || 0;
         this.categoryId = p.categoryId;
+        this.storeId = p.storeId;
       } catch (err) {
         this.error = extractErrorMessage(err);
       } finally {
@@ -327,11 +329,21 @@ export default {
           imageUrl: this.imageUrl,
           price: this.price,
           stock: this.stock,
-          categoryId: this.categoryId
+          categoryId: this.categoryId,
+          storeId: this.storeId
         };
         const response = await api.put('/product', payload);
-        alert(response.data.message || 'Product updated successfully!');
-        this.$router.push({ name: 'ProductView' });
+        showToast({
+          message: response.data.message || 'Product updated successfully!',
+          type: 'success',
+          title: 'Component Updated'
+        });
+        const user = getCurrentUser();
+        if (user && user.role === 'SELLER') {
+          this.$router.push('/seller/products');
+        } else {
+          this.$router.push('/admin/dashboard');
+        }
       } catch (err) {
         this.error = extractErrorMessage(err);
       } finally {
@@ -345,9 +357,18 @@ export default {
       this.deleting = true;
       this.error = null;
       try {
-        const response = await api.delete(`/product/${this.productId}`);
-        alert(response.data || 'Product deleted successfully!');
-        this.$router.push({ name: 'ProductView' });
+        await api.delete(`/product/${this.productId}`);
+        showToast({
+          message: 'Product deleted successfully!',
+          type: 'success',
+          title: 'Component Deleted'
+        });
+        const user = getCurrentUser();
+        if (user && user.role === 'SELLER') {
+          this.$router.push('/seller/products');
+        } else {
+          this.$router.push('/admin/dashboard');
+        }
       } catch (err) {
         this.error = extractErrorMessage(err);
       } finally {
@@ -363,7 +384,27 @@ export default {
 </script>
 
 <style scoped>
-.card {
-  border-radius: 12px;
+.bg-secondary-dark {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.preview-deck {
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.deck-glow {
+  position: absolute;
+  width: 150px;
+  height: 150px;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.12) 0%, transparent 70%);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.z-index-top {
+  z-index: 3;
 }
 </style>

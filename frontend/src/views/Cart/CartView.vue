@@ -1,11 +1,11 @@
 <template>
-  <div class="bf-page bf-fade-in p-4">
+  <div class="bf-page bf-fade-in p-4 text-start">
     <div class="container">
       <div class="row mb-4">
         <div class="col-12 text-start">
           <span class="bf-badge bf-badge-primary mb-2">Shopping Experience</span>
-          <h2 class="bf-section-title">Shopping Cart</h2>
-          <p class="bf-section-desc">Review your items, enter shipping information, and place your order securely.</p>
+          <h2 class="text-white font-weight-bold mb-1">Shopping Cart</h2>
+          <p class="text-muted small">Review your items, enter shipping information, and place your order securely.</p>
         </div>
       </div>
 
@@ -41,33 +41,33 @@
 
       <!-- Error State -->
       <div v-else-if="error" class="bf-empty-state">
-        <div class="bf-empty-icon" style="color: var(--bf-danger);">⚠</div>
-        <h5>Unable to Sync Cart</h5>
+        <div class="bf-empty-icon text-danger">⚠</div>
+        <h5 class="text-white font-weight-bold">Unable to Sync Cart</h5>
         <p>{{ error }}</p>
         <button class="bf-btn bf-btn-primary" @click="fetchCartData">Retry Sync</button>
       </div>
 
       <!-- Empty Cart State -->
-      <div v-else-if="items.length === 0" class="bf-empty-state">
+      <div v-else-if="items.length === 0" class="bf-empty-state text-center py-5">
         <div class="bf-empty-icon">🛒</div>
-        <h5>Your Shopping Cart is Empty</h5>
-        <p>Browse our catalogue of premium PC graphics cards, processors, and storage kits to get started.</p>
-        <router-link to="/product" class="bf-btn bf-btn-primary">Browse Products</router-link>
+        <h5 class="text-white font-weight-bold">Your Shopping Cart is Empty</h5>
+        <p class="text-muted small mb-4">Browse our catalogue of premium PC graphics cards, processors, and storage kits to get started.</p>
+        <router-link to="/product" class="bf-btn bf-btn-primary px-4">Browse Products</router-link>
       </div>
 
       <!-- Cart Content Layout -->
-      <div v-else class="row g-4 text-start">
+      <div v-else class="row g-4">
         <!-- STEP 1: CART REVIEW -->
         <div v-if="currentStep === 1" class="col-lg-8">
-          <div class="bf-card bf-glass overflow-hidden">
+          <div class="bf-card bf-glass overflow-hidden border-light">
             <div class="table-responsive">
               <table class="bf-table">
                 <thead>
                   <tr>
-                    <th>Product Details</th>
-                    <th>Quantity</th>
-                    <th>Total Price</th>
-                    <th>Actions</th>
+                    <th class="text-white">Product Details</th>
+                    <th class="text-white">Quantity</th>
+                    <th class="text-white">Total Price</th>
+                    <th class="text-white">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -87,14 +87,14 @@
 
         <!-- STEP 2: DELIVERY INFO -->
         <div v-else-if="currentStep === 2" class="col-lg-8">
-          <div class="bf-card bf-glass p-4">
-            <h5 class="font-weight-bold text-dark mb-4">Delivery Information</h5>
+          <div class="bf-card bf-glass p-4 border-light text-white">
+            <h5 class="font-weight-bold text-white mb-4">Delivery Information</h5>
             <form @submit.prevent="currentStep = 3">
               <div class="mb-3">
-                <label class="form-label font-weight-bold text-secondary">Street Address</label>
+                <label class="form-label small text-muted font-weight-bold">Street Address</label>
                 <input
                   type="text"
-                  class="bf-input"
+                  class="bf-input py-2 text-white bg-dark border-light"
                   v-model="delivery.street"
                   required
                   placeholder="e.g., 123 Galle Road, Colombo 03"
@@ -102,20 +102,20 @@
               </div>
               <div class="row g-3">
                 <div class="col-md-6">
-                  <label class="form-label font-weight-bold text-secondary">City</label>
+                  <label class="form-label small text-muted font-weight-bold">City</label>
                   <input
                     type="text"
-                    class="bf-input"
+                    class="bf-input py-2 text-white bg-dark border-light"
                     v-model="delivery.city"
                     required
                     placeholder="e.g., Colombo"
                   />
                 </div>
                 <div class="col-md-6">
-                  <label class="form-label font-weight-bold text-secondary">Phone Number</label>
+                  <label class="form-label small text-muted font-weight-bold">Phone Number</label>
                   <input
                     type="tel"
-                    class="bf-input"
+                    class="bf-input py-2 text-white bg-dark border-light"
                     v-model="delivery.phone"
                     required
                     placeholder="e.g., 0771234567"
@@ -123,7 +123,7 @@
                 </div>
               </div>
               <div class="d-flex justify-content-between mt-4">
-                <button type="button" class="bf-btn bf-btn-ghost" @click="currentStep = 1">Back</button>
+                <button type="button" class="bf-btn bf-btn-ghost text-muted" @click="currentStep = 1">Back</button>
                 <button type="submit" class="bf-btn bf-btn-primary" :disabled="!isDeliveryValid">Proceed to Payment</button>
               </div>
             </form>
@@ -132,13 +132,13 @@
 
         <!-- STEP 3: SECURE PAYMENT -->
         <div v-else-if="currentStep === 3" class="col-lg-8">
-          <div class="bf-card bf-glass p-4">
-            <h5 class="font-weight-bold text-dark mb-4">Payment Method</h5>
+          <div class="bf-card bf-glass p-4 border-light text-white">
+            <h5 class="font-weight-bold text-white mb-4">Payment Method</h5>
 
             <div class="mb-4 d-flex flex-column gap-3">
               <!-- Cash on Delivery Option -->
               <div
-                class="bf-payment-option"
+                class="bf-payment-option-cyber"
                 :class="{ active: payment.method === 'CASH_ON_DELIVERY' }"
                 @click="payment.method = 'CASH_ON_DELIVERY'"
               >
@@ -152,16 +152,16 @@
                     v-model="payment.method"
                     @click.stop
                   />
-                  <label class="form-check-label w-100 cursor-pointer" for="payCod">
-                    <span class="d-block font-weight-bold text-dark">Cash on Delivery (COD)</span>
-                    <span class="small text-secondary">Pay with cash when your package is delivered to your door.</span>
+                  <label class="form-check-label w-100 cursor-pointer text-white" for="payCod">
+                    <span class="d-block font-weight-bold text-white">Cash on Delivery (COD)</span>
+                    <span class="small text-muted">Pay with cash when your package is delivered to your door.</span>
                   </label>
                 </div>
               </div>
 
               <!-- Online Payment Option -->
               <div
-                class="bf-payment-option d-flex flex-column gap-3"
+                class="bf-payment-option-cyber d-flex flex-column gap-3"
                 :class="{ active: payment.method === 'ONLINE_PAYMENT' }"
                 @click="payment.method = 'ONLINE_PAYMENT'"
               >
@@ -175,31 +175,31 @@
                     v-model="payment.method"
                     @click.stop
                   />
-                  <label class="form-check-label w-100 cursor-pointer" for="payOnline">
-                    <span class="d-block font-weight-bold text-dark">Online Payment (Credit / Debit Card)</span>
-                    <span class="small text-secondary">Pay securely using Visa, MasterCard, or Amex credit/debit cards.</span>
+                  <label class="form-check-label w-100 cursor-pointer text-white" for="payOnline">
+                    <span class="d-block font-weight-bold text-white">Online Payment (Credit / Debit Card)</span>
+                    <span class="small text-muted">Pay securely using Visa, MasterCard, or Amex credit/debit cards.</span>
                   </label>
                 </div>
 
                 <!-- Card Details fields inside the active state -->
                 <transition name="page-fade">
-                  <div v-if="payment.method === 'ONLINE_PAYMENT'" class="border-top pt-3 mt-2" @click.stop>
+                  <div v-if="payment.method === 'ONLINE_PAYMENT'" class="border-top border-light-top pt-3 mt-2" @click.stop>
                     <div class="mb-3">
-                      <label class="form-label small text-secondary font-weight-bold">Cardholder Name</label>
-                      <input type="text" class="bf-input py-2" v-model="payment.cardName" required placeholder="John Doe" />
+                      <label class="form-label small text-muted font-weight-bold">Cardholder Name</label>
+                      <input type="text" class="bf-input py-2 text-white bg-dark border-light" v-model="payment.cardName" required placeholder="John Doe" />
                     </div>
                     <div class="mb-3">
-                      <label class="form-label small text-secondary font-weight-bold">Card Number</label>
-                      <input type="text" class="bf-input py-2" v-model="payment.cardNumber" required placeholder="4111 2222 3333 4444" maxlength="19" />
+                      <label class="form-label small text-muted font-weight-bold">Card Number</label>
+                      <input type="text" class="bf-input py-2 text-white bg-dark border-light" v-model="payment.cardNumber" required placeholder="4111 2222 3333 4444" maxlength="19" />
                     </div>
                     <div class="row g-3">
                       <div class="col-6">
-                        <label class="form-label small text-secondary font-weight-bold">Expiry Date</label>
-                        <input type="text" class="bf-input py-2" v-model="payment.cardExpiry" required placeholder="MM/YY" maxlength="5" />
+                        <label class="form-label small text-muted font-weight-bold">Expiry Date</label>
+                        <input type="text" class="bf-input py-2 text-white bg-dark border-light" v-model="payment.cardExpiry" required placeholder="MM/YY" maxlength="5" />
                       </div>
                       <div class="col-6">
-                        <label class="form-label small text-secondary font-weight-bold">CVV Code</label>
-                        <input type="password" class="bf-input py-2" v-model="payment.cardCvv" required placeholder="123" maxlength="3" />
+                        <label class="form-label small text-muted font-weight-bold">CVV Code</label>
+                        <input type="password" class="bf-input py-2 text-white bg-dark border-light" v-model="payment.cardCvv" required placeholder="123" maxlength="3" />
                       </div>
                     </div>
                   </div>
@@ -208,14 +208,14 @@
             </div>
 
             <div class="d-flex justify-content-between mt-4">
-              <button type="button" class="bf-btn bf-btn-ghost" @click="currentStep = 2" :disabled="actionLoading">Back</button>
+              <button type="button" class="bf-btn bf-btn-ghost text-muted" @click="currentStep = 2" :disabled="actionLoading">Back</button>
               <button
                 type="button"
                 class="bf-btn bf-btn-success font-weight-bold px-4"
                 @click="handlePlaceOrder"
                 :disabled="actionLoading || !isPaymentValid"
               >
-                <span v-if="actionLoading" class="bf-spinner me-2"></span>
+                <span v-if="actionLoading" class="spinner-border spinner-border-sm me-2"></span>
                 Place Order
               </button>
             </div>
@@ -223,31 +223,31 @@
         </div>
 
         <!-- Cost Breakdown Card & Promo Code Card -->
-        <div class="col-lg-4">
-          <div class="bf-card p-4 bg-white mb-4">
-            <h5 class="font-weight-bold text-dark mb-4">Order Summary</h5>
+        <div class="col-lg-4 text-white">
+          <div class="bf-card p-4 bf-glass border-light mb-4">
+            <h5 class="font-weight-bold text-white mb-4">Order Summary</h5>
 
             <div class="d-flex justify-content-between mb-3 text-secondary">
-              <span>Subtotal</span>
-              <span class="font-weight-bold text-dark">{{ formattedSubtotal }}</span>
+              <span class="small">Subtotal</span>
+              <span class="font-weight-bold text-white">{{ formattedSubtotal }}</span>
             </div>
 
             <div class="d-flex justify-content-between mb-3 text-secondary">
-              <span>Discount ({{ appliedDiscountPercent }}%)</span>
+              <span class="small">Discount ({{ appliedDiscountPercent }}%)</span>
               <span class="text-success font-weight-bold">- {{ formattedDiscount }}</span>
             </div>
 
-            <hr />
+            <hr class="opacity-25" />
 
-            <div class="d-flex justify-content-between mb-4">
-              <span class="font-weight-bold text-dark">Grand Total</span>
-              <span class="bf-price-amount mb-0" style="font-size: 1.5rem;">{{ formattedTotal }}</span>
+            <div class="d-flex justify-content-between mb-4 align-items-center">
+              <span class="font-weight-bold text-white">Grand Total</span>
+              <span class="bf-price-amount mb-0 text-primary fs-3 font-weight-bold">{{ formattedTotal }}</span>
             </div>
 
             <!-- Proceed buttons -->
             <button
               v-if="currentStep === 1"
-              class="bf-btn bf-btn-primary w-100 py-3"
+              class="bf-btn bf-btn-primary w-100 py-3 shadow-glow"
               @click="currentStep = 2"
               :disabled="actionLoading"
             >
@@ -255,7 +255,7 @@
             </button>
             <button
               v-else-if="currentStep === 2"
-              class="bf-btn bf-btn-primary w-100 py-3"
+              class="bf-btn bf-btn-primary w-100 py-3 shadow-glow"
               @click="currentStep = 3"
               :disabled="!isDeliveryValid"
             >
@@ -263,27 +263,27 @@
             </button>
             <button
               v-else
-              class="bf-btn bf-btn-success w-100 py-3"
+              class="bf-btn bf-btn-success w-100 py-3 shadow-glow"
               @click="handlePlaceOrder"
               :disabled="actionLoading || !isPaymentValid"
             >
-              <span v-if="actionLoading" class="bf-spinner me-2"></span>
+              <span v-if="actionLoading" class="spinner-border spinner-border-sm me-2"></span>
               Place Order
             </button>
           </div>
 
           <!-- Promo Code Card (Only on Step 1) -->
-          <div class="bf-card p-4 bg-white" v-if="currentStep === 1">
-            <h6 class="font-weight-bold text-dark mb-3">Promo Code</h6>
+          <div class="bf-card p-4 bf-glass border-light" v-if="currentStep === 1">
+            <h6 class="font-weight-bold text-white mb-3">Promo Code</h6>
             <div class="d-flex gap-2">
               <input
                 type="text"
-                class="bf-input"
+                class="bf-input py-2 text-white bg-dark border-light"
                 v-model="promoCode"
-                placeholder="Enter SAVE10 or SAVE50"
+                placeholder="SAVE10 or SAVE50"
                 @keyup.enter="applyPromoCode"
               />
-              <button class="bf-btn bf-btn-outline" type="button" @click="applyPromoCode">
+              <button class="bf-btn bf-btn-outline px-3" type="button" @click="applyPromoCode">
                 Apply
               </button>
             </div>
@@ -571,7 +571,7 @@ export default {
   font-size: var(--bf-font-size-sm);
   background: var(--bf-bg-secondary);
   border: 2px solid var(--bf-border);
-  color: var(--bf-text-secondary);
+  color: var(--bf-text-muted);
   transition: all var(--bf-transition-base);
 }
 
@@ -594,18 +594,22 @@ export default {
   color: var(--bf-primary);
 }
 
-.bf-payment-option {
-  border: 1px solid var(--bf-border);
+.bf-payment-option-cyber {
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: var(--bf-radius-lg);
   padding: 18px;
   cursor: pointer;
-  background: var(--bf-bg-secondary);
+  background: rgba(255, 255, 255, 0.02);
   transition: all var(--bf-transition-base);
 }
 
-.bf-payment-option.active {
+.bf-payment-option-cyber.active {
   border-color: var(--bf-primary);
   background: var(--bf-primary-light);
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.05);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.08);
+}
+
+.border-light-top {
+  border-color: rgba(255, 255, 255, 0.06) !important;
 }
 </style>

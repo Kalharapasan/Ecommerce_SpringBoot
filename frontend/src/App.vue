@@ -124,7 +124,7 @@ export default {
   components: { ToastNotification },
   data() {
     return {
-      theme: localStorage.getItem('bf-theme') || 'light',
+      theme: localStorage.getItem('bf-theme') || 'dark',
       isScrolled: false,
       mobileMenuOpen: false,
       userMenuOpen: false
@@ -156,6 +156,12 @@ export default {
     isLoggedIn(newVal) {
       if (newVal) {
         this.fetchCartCount();
+      }
+    },
+    theme: {
+      immediate: true,
+      handler(newVal) {
+        document.documentElement.setAttribute('data-theme', newVal);
       }
     }
   },
