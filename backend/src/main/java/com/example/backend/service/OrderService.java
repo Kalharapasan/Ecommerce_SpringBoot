@@ -129,7 +129,11 @@ public class OrderService {
 
         List<Order> orders = orderRepo.findAll().stream()
                 .filter(order -> order.getUser().getUserId().equals(jwtData.getUserId()))
-                .sorted((a, b) -> b.getCreatedDate().compareTo(a.getCreatedDate())) // Newest first
+                .sorted((a, b) -> {
+                    java.util.Date da = a.getCreatedDate() != null ? a.getCreatedDate() : new java.util.Date(0);
+                    java.util.Date db = b.getCreatedDate() != null ? b.getCreatedDate() : new java.util.Date(0);
+                    return db.compareTo(da);
+                }) // Newest first
                 .collect(Collectors.toList());
 
         response.setMessage("Orders retrieved successfully");
@@ -140,7 +144,11 @@ public class OrderService {
     public ResponseEntity getAllOrders() {
         ResponseDto response = new ResponseDto();
         List<Order> orders = orderRepo.findAll().stream()
-                .sorted((a, b) -> b.getCreatedDate().compareTo(a.getCreatedDate())) // Newest first
+                .sorted((a, b) -> {
+                    java.util.Date da = a.getCreatedDate() != null ? a.getCreatedDate() : new java.util.Date(0);
+                    java.util.Date db = b.getCreatedDate() != null ? b.getCreatedDate() : new java.util.Date(0);
+                    return db.compareTo(da);
+                }) // Newest first
                 .collect(Collectors.toList());
         response.setMessage("All orders retrieved successfully");
         response.setData(orders);
