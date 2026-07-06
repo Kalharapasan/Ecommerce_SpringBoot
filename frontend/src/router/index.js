@@ -9,6 +9,7 @@ import CartView from '../views/Cart/CartView.vue'
 import SignIn from '../views/Auth/SignIn.vue'
 import SignUp from '../views/Auth/SignUp.vue'
 import ProfileView from '../views/Profile/ProfileView.vue'
+import AdminDashboard from '../views/Admin/AdminDashboard.vue'
 import { getCurrentUser } from '../utils/auth'
 
 const routes = [
@@ -52,6 +53,12 @@ const routes = [
     meta: { requiresAdmin: true }
   },
   {
+    path: '/admin/dashboard',
+    name: 'AdminDashboard',
+    component: AdminDashboard,
+    meta: { requiresAdmin: true }
+  },
+  {
     path: '/cart',
     name: 'CartView',
     component: CartView
@@ -79,16 +86,25 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
+  const user = getCurrentUser();
+
+  // Guard admin routes from non-admins
   if (to.matched.some(record => record.meta.requiresAdmin)) {
-    const user = getCurrentUser();
     if (!user || user.role !== 'ADMIN') {
       next({ name: 'Home' });
-    } else {
-      next();
+      return;
     }
-  } else {
-    next();
   }
+
+  // Guard cart from admin (admins can't shop)
+  if (to.name === 'CartView') {
+    if (user && user.role === 'ADMIN') {
+      next({ name: 'Home' });
+      return;
+    }
+  }
+
+  next();
 })
 
 export default router

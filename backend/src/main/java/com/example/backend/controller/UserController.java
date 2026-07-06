@@ -38,4 +38,9 @@ public class UserController {
         return response;
     }
 
+    @GetMapping("/all")
+    public ResponseEntity<ResponseDto> getAllUsers() {
+        return userService.getAllUsers();
+    }
+
 }

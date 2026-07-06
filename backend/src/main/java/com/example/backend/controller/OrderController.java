@@ -26,4 +26,14 @@ public class OrderController {
     public ResponseEntity<ResponseDto> getOrdersForUser(@PathVariable String token) {
         return orderService.getOrdersForUser(token);
     }
+
+    @GetMapping("/all")
+    public ResponseEntity<ResponseDto> getAllOrders() {
+        return orderService.getAllOrders();
+    }
+
+    @PutMapping("/{orderId}/status")
+    public ResponseEntity<ResponseDto> updateOrderStatus(@PathVariable Integer orderId, @RequestParam String status) {
+        return orderService.updateOrderStatus(orderId, status);
+    }
 }

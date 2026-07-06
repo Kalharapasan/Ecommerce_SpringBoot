@@ -13,11 +13,11 @@
     </div>
 
     <!-- Hero Banner Section -->
-    <div class="hero-section rounded-4 text-white p-5 mb-4 position-relative overflow-hidden shadow-lg border border-dark" style="background: linear-gradient(135deg, #3b3082 0%, #1e1145 100%);">
+    <div class="hero-section rounded-4 text-white p-5 mb-4 position-relative overflow-hidden shadow-lg border border-dark" style="background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%);">
       <div class="position-relative z-index-2 text-start">
-        <span class="badge bg-warning text-dark px-3 py-2 rounded-pill font-weight-bold mb-3">SUMMER SALE UP TO 50% OFF</span>
-        <h1 class="display-4 font-weight-bold mb-2">Discover Premium Collection</h1>
-        <p class="lead mb-4 opacity-75">Explore the finest products handpicked just for you. Use code <strong class="text-warning">SAVE50</strong> for a massive 50% discount at checkout!</p>
+        <span class="badge bg-primary text-white px-3 py-2 rounded-pill font-weight-bold mb-3">GAMING GEAR & CUSTOM PC BUILDER</span>
+        <h1 class="display-4 font-weight-bold mb-2">ByteForge PC Store</h1>
+        <p class="lead mb-4 opacity-75">Build your dream setup with high-end GPUs, desktop hardware, custom cases, and peripherals. Use coupon <strong class="text-warning">SAVE50</strong> at checkout!</p>
         <button class="btn btn-warning btn-lg font-weight-bold px-4 py-2 text-dark shadow-sm" @click="scrollToProducts">Shop Now</button>
       </div>
       <div class="hero-pattern position-absolute top-50 start-50 translate-middle w-100 h-100 opacity-10" style="background-image: radial-gradient(circle, #ffffff 1px, transparent 1px); background-size: 20px 20px;"></div>

@@ -2,7 +2,7 @@
   <div>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
       <div class="container-fluid container">
-        <router-link class="navbar-brand font-weight-bold" to="/">E-Shop</router-link>
+        <router-link class="navbar-brand font-weight-bold" to="/">ByteForge PC Store</router-link>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
@@ -12,7 +12,7 @@
               <router-link class="nav-link" to="/product">Products</router-link>
             </li>
             <li class="nav-item" v-if="isLoggedIn && role === 'ADMIN'">
-              <router-link class="nav-link" to="/admin/category">Categories</router-link>
+              <router-link class="nav-link" to="/admin/dashboard">Admin Dashboard</router-link>
             </li>
           </ul>
           <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
@@ -36,7 +36,7 @@
               <li class="nav-item">
                 <router-link class="nav-link text-decoration-none text-light opacity-75 hover-opacity-100 me-3" to="/profile">Profile</router-link>
               </li>
-              <li class="nav-item">
+              <li class="nav-item" v-if="role !== 'ADMIN'">
                 <router-link class="nav-link text-decoration-none text-light opacity-75 hover-opacity-100 me-3 position-relative d-flex align-items-center" to="/cart">
                   Cart
                   <span v-if="cartCount > 0" class="badge rounded-pill bg-danger ms-2" style="font-size: 0.75rem;">

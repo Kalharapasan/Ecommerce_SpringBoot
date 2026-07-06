@@ -83,6 +83,7 @@ public class OrderService {
         order.setTotalPrice(finalTotal.doubleValue());
         order.setAddress(request.getAddress());
         order.setPaymentMethod(request.getPaymentMethod());
+        order.setStatus("Pending");
 
         Order savedOrder = orderRepo.save(order);
 
@@ -134,5 +135,30 @@ public class OrderService {
         response.setMessage("Orders retrieved successfully");
         response.setData(orders);
         return ResponseEntity.ok().body(response);
+    }
+
+    public ResponseEntity getAllOrders() {
+        ResponseDto response = new ResponseDto();
+        List<Order> orders = orderRepo.findAll().stream()
+                .sorted((a, b) -> b.getCreatedDate().compareTo(a.getCreatedDate())) // Newest first
+                .collect(Collectors.toList());
+        response.setMessage("All orders retrieved successfully");
+        response.setData(orders);
+        return ResponseEntity.ok().body(response);
+    }
+
+    public ResponseEntity updateOrderStatus(Integer orderId, String status) {
+        ResponseDto response = new ResponseDto();
+        Optional<Order> optOrder = orderRepo.findById(orderId);
+        if (optOrder.isPresent()) {
+            Order order = optOrder.get();
+            order.setStatus(status);
+            orderRepo.save(order);
+            response.setMessage("Order status updated successfully");
+            response.setData(order);
+            return ResponseEntity.ok().body(response);
+        } else {
+            return ResponseEntity.badRequest().body("Order not found");
+        }
     }
 }

@@ -111,4 +111,13 @@ public class UserService {
             return ResponseEntity.badRequest().body("USER NOT FOUND");
         }
     }
+
+    public ResponseEntity getAllUsers() {
+        ResponseDto response = new ResponseDto();
+        java.util.List<User> users = userRepo.findAll();
+        users.forEach(u -> u.setPassword(null)); // blank passwords for security
+        response.setMessage("All users retrieved successfully");
+        response.setData(users);
+        return ResponseEntity.ok().body(response);
+    }
 }

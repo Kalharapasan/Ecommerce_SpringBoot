@@ -66,44 +66,50 @@
             <hr />
 
             <!-- Add to Cart / Quantity Stepper Section -->
-            <div class="d-flex align-items-center gap-3 mb-4" v-if="product.stock && product.stock > 0">
-              <span class="text-secondary">Quantity:</span>
-              <div class="input-group quantity-stepper">
-                <button 
-                  class="btn btn-outline-secondary" 
-                  type="button" 
-                  @click="decrementQty"
-                  :disabled="quantity <= 1"
-                >
-                  -
-                </button>
-                <input 
-                  type="number" 
-                  class="form-control text-center" 
-                  v-model.number="quantity" 
-                  min="1"
-                  :max="product.stock"
-                  @change="validateQty"
-                />
-                <button 
-                  class="btn btn-outline-secondary" 
-                  type="button" 
-                  @click="incrementQty"
-                  :disabled="quantity >= product.stock"
-                >
-                  +
-                </button>
+            <div v-if="!isAdmin">
+              <div class="d-flex align-items-center gap-3 mb-4" v-if="product.stock && product.stock > 0">
+                <span class="text-secondary">Quantity:</span>
+                <div class="input-group quantity-stepper">
+                  <button 
+                    class="btn btn-outline-secondary" 
+                    type="button" 
+                    @click="decrementQty"
+                    :disabled="quantity <= 1"
+                  >
+                    -
+                  </button>
+                  <input 
+                    type="number" 
+                    class="form-control text-center" 
+                    v-model.number="quantity" 
+                    min="1"
+                    :max="product.stock"
+                    @change="validateQty"
+                  />
+                  <button 
+                    class="btn btn-outline-secondary" 
+                    type="button" 
+                    @click="incrementQty"
+                    :disabled="quantity >= product.stock"
+                  >
+                    +
+                  </button>
+                </div>
               </div>
-            </div>
 
-            <button 
-              class="btn btn-primary btn-lg w-100 py-3 d-flex align-items-center justify-content-center gap-2"
-              @click="addToCart"
-              :disabled="addingToCart || !product.stock || product.stock <= 0"
-            >
-              <span v-if="addingToCart" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-              {{ product.stock && product.stock > 0 ? 'Add to Cart' : 'Out of Stock' }}
-            </button>
+              <button 
+                class="btn btn-primary btn-lg w-100 py-3 d-flex align-items-center justify-content-center gap-2"
+                @click="addToCart"
+                :disabled="addingToCart || !product.stock || product.stock <= 0"
+              >
+                <span v-if="addingToCart" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                {{ product.stock && product.stock > 0 ? 'Add to Cart' : 'Out of Stock' }}
+              </button>
+            </div>
+            <div v-else class="alert alert-info text-start" role="alert">
+              <h6 class="font-weight-bold mb-1">Administrator Mode</h6>
+              <p class="small mb-0">As an administrator, you cannot purchase items or add them to the cart.</p>
+            </div>
           </div>
         </div>
       </div>
@@ -128,7 +134,7 @@
 
 <script>
 import api, { extractErrorMessage, formatPrice } from '../../utils/api';
-import { isLoggedIn, getToken, authState } from '../../utils/auth';
+import { isLoggedIn, getToken, authState, getCurrentUser } from '../../utils/auth';
 import ProductBox from '../../components/Product/ProductBox.vue';
 
 export default {
@@ -148,6 +154,10 @@ export default {
     };
   },
   computed: {
+    isAdmin() {
+      const user = getCurrentUser();
+      return user && user.role === 'ADMIN';
+    },
     formattedPrice() {
       return this.product ? formatPrice(this.product.price) : '';
     }

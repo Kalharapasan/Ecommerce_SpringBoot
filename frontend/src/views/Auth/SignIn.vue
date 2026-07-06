@@ -5,13 +5,13 @@
         <div class="card shadow-lg border-0 overflow-hidden" style="border-radius: 16px;">
           <div class="row g-0">
             <!-- Left Branding Panel -->
-            <div class="col-md-5 d-none d-md-flex flex-column justify-content-between p-4 p-lg-5 text-white text-start" style="background: linear-gradient(135deg, #3b3082 0%, #1e1145 100%);">
+            <div class="col-md-5 d-none d-md-flex flex-column justify-content-between p-4 p-lg-5 text-white text-start" style="background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%);">
               <div>
-                <h4 class="font-weight-bold text-warning mb-3">E-Shop</h4>
-                <p class="opacity-75">Welcome back! Access your account to manage your shopping cart, view orders, and apply promo code discounts.</p>
+                <h4 class="font-weight-bold text-warning mb-3">ByteForge PC Store</h4>
+                <p class="opacity-75">Welcome back! Log in to build your dream PC setup, check shipping status, or browse the latest graphics cards.</p>
               </div>
               <div class="small opacity-50">
-                © 2026 E-Shop Corp. All rights reserved.
+                © 2026 ByteForge PC Store. All rights reserved.
               </div>
             </div>
 
