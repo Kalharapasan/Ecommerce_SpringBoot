@@ -12,5 +12,6 @@ public class JwtDataDto {
     private String username;
     private Integer userId;
     private String iss;
+    private String role;
 
 }

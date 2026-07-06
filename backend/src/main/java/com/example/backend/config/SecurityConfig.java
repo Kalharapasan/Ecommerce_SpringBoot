@@ -21,13 +21,16 @@ public class SecurityConfig {
 
     private static final String secret = "1234567891011121314151617181920";
 
-    public String generateToken(String userName, Integer userId) {
+    public String generateToken(String userName, Integer userId, String role) {
 
         if (userName == null || userName.equals("")) {
             return "USERNAME NULL";
         }
         if (userId == null) {
             return "USER_ID NULL";
+        }
+        if (role == null) {
+            return "ROLE NULL";
         }
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
@@ -36,6 +39,7 @@ public class SecurityConfig {
                     .withIssuedAt(new Date())
                     .withClaim("username", userName)
                     .withClaim("userId", userId)
+                    .withClaim("role", role)
                     .sign(algorithm);
             return token;
         } catch (Exception e) {
@@ -91,6 +95,9 @@ public class SecurityConfig {
         jwtDataDto.setUsername(data.get("username").toString());
         jwtDataDto.setUserId(Integer.parseInt(data.get("userId").toString()));
         jwtDataDto.setIss(data.get("iss").toString());
+        if (data.has("role")) {
+            jwtDataDto.setRole(data.get("role").toString());
+        }
         return jwtDataDto;
     }
 }

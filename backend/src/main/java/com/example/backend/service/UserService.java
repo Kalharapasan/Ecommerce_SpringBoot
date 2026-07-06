@@ -74,7 +74,7 @@ public class UserService {
             if (flag) {
 
                 LoginResponseDto loginResponse = new LoginResponseDto();
-                String jwtToken = securityConfig.generateToken(user.getUsername(), user.getUserId());
+                String jwtToken = securityConfig.generateToken(user.getUsername(), user.getUserId(), user.getRole());
                 loginResponse.setToken(jwtToken);
 
                 response.setMessage("LOGIN SUCCESSFUL");

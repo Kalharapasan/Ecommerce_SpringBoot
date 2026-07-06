@@ -11,7 +11,7 @@
             <li class="nav-item">
               <router-link class="nav-link" to="/product">Products</router-link>
             </li>
-            <li class="nav-item">
+            <li class="nav-item" v-if="isLoggedIn && role === 'ADMIN'">
               <router-link class="nav-link" to="/admin/category">Categories</router-link>
             </li>
           </ul>

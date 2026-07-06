@@ -9,6 +9,7 @@ import CartView from '../views/Cart/CartView.vue'
 import SignIn from '../views/Auth/SignIn.vue'
 import SignUp from '../views/Auth/SignUp.vue'
 import ProfileView from '../views/Profile/ProfileView.vue'
+import { getCurrentUser } from '../utils/auth'
 
 const routes = [
   {
@@ -29,22 +30,26 @@ const routes = [
   {
     path: '/admin/product/add',
     name: 'AddProduct',
-    component: AddProduct
+    component: AddProduct,
+    meta: { requiresAdmin: true }
   },
   {
     path: '/admin/product/edit/:id',
     name: 'EditProduct',
-    component: EditProduct
+    component: EditProduct,
+    meta: { requiresAdmin: true }
   },
   {
     path: '/admin/category',
     name: 'CategoryView',
-    component: CategoryView
+    component: CategoryView,
+    meta: { requiresAdmin: true }
   },
   {
     path: '/admin/category/add',
     name: 'AddCategory',
-    component: AddCategory
+    component: AddCategory,
+    meta: { requiresAdmin: true }
   },
   {
     path: '/cart',
@@ -71,6 +76,19 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes
+})
+
+router.beforeEach((to, from, next) => {
+  if (to.matched.some(record => record.meta.requiresAdmin)) {
+    const user = getCurrentUser();
+    if (!user || user.role !== 'ADMIN') {
+      next({ name: 'Home' });
+    } else {
+      next();
+    }
+  } else {
+    next();
+  }
 })
 
 export default router
