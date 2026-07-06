@@ -359,7 +359,7 @@ export default {
             'Content-Type': 'multipart/form-data'
           }
         });
-        const localImageUrl = uploadRes.data;
+        const localImageUrl = uploadRes.data.data;
 
         // 2. Instantly persist to user profile database record
         const updateRes = await api.put('/user/update', {

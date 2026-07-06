@@ -121,7 +121,7 @@ export default {
             'Content-Type': 'multipart/form-data'
           }
         });
-        this.imageUrl = response.data; // Save the raw text URL returned from backend
+        this.imageUrl = response.data.data; // Save the raw text URL returned from backend
       } catch (err) {
         this.error = 'Failed to upload image: ' + extractErrorMessage(err);
       } finally {
