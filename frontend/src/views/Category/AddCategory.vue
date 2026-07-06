@@ -85,7 +85,7 @@ export default {
                         'Content-Type': 'multipart/form-data'
                     }
                 });
-                this.imageUrl = response.data.data;
+                this.imageUrl = response.data;
             } catch (err) {
                 this.error = 'Failed to upload image: ' + extractErrorMessage(err);
             } finally {

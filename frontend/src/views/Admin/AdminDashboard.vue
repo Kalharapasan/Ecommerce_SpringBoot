@@ -3,7 +3,7 @@
     <div class="row mb-4">
       <div class="col-12 text-start">
         <h2 class="font-weight-bold text-dark mb-1">Control Center</h2>
-        <p class="text-secondary small">Manage products, categories, users, and deliveries for ByteForge PC Store.</p>
+        <p class="text-secondary small">Manage products, categories, users, deliveries, and support tickets for ByteForge PC Store.</p>
       </div>
     </div>
 
@@ -38,7 +38,7 @@
               @click="activeTab = 'products'"
               type="button"
             >
-              Products Management
+              Products
             </button>
           </li>
           <li class="nav-item" role="presentation">
@@ -48,7 +48,20 @@
               @click="activeTab = 'categories'"
               type="button"
             >
-              Categories Management
+              Categories
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button 
+              class="nav-link py-3 font-weight-bold border-0 text-white rounded-0 position-relative"
+              :class="{'active bg-primary text-white': activeTab === 'messages', 'opacity-75': activeTab !== 'messages'}"
+              @click="activeTab = 'messages'"
+              type="button"
+            >
+              Support Messages
+              <span v-if="openMessagesCount > 0" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.7rem; z-index: 10;">
+                {{ openMessagesCount }}
+              </span>
             </button>
           </li>
         </ul>
@@ -138,6 +151,7 @@
                     <th>Full Name</th>
                     <th>Username</th>
                     <th>Email Address</th>
+                    <th>Phone</th>
                     <th>Role</th>
                   </tr>
                 </thead>
@@ -147,6 +161,7 @@
                     <td class="font-weight-bold">{{ u.fullName || 'N/A' }}</td>
                     <td>{{ u.username }}</td>
                     <td>{{ u.email }}</td>
+                    <td>{{ u.phoneNumber || 'N/A' }}</td>
                     <td>
                       <span class="badge" :class="u.role === 'ADMIN' ? 'bg-danger' : 'bg-secondary'">{{ u.role }}</span>
                     </td>
@@ -160,7 +175,7 @@
           <div v-if="activeTab === 'products'">
             <div class="d-flex justify-content-between align-items-center mb-3">
               <h5 class="font-weight-bold mb-0">Products Catalog</h5>
-              <router-link :to="{ name: 'AddProduct' }" class="btn btn-primary btn-sm">Add Product</router-link>
+              <router-link :to="{ name: 'AddProduct' }" class="btn btn-primary btn-sm font-weight-bold">Add Product</router-link>
             </div>
 
             <div class="table-responsive">
@@ -201,7 +216,7 @@
           <div v-if="activeTab === 'categories'">
             <div class="d-flex justify-content-between align-items-center mb-3">
               <h5 class="font-weight-bold mb-0">Categories</h5>
-              <router-link :to="{ name: 'AddCategory' }" class="btn btn-primary btn-sm">Add Category</router-link>
+              <router-link :to="{ name: 'AddCategory' }" class="btn btn-primary btn-sm font-weight-bold">Add Category</router-link>
             </div>
 
             <div class="table-responsive">
@@ -218,11 +233,65 @@
                     <td class="font-weight-bold">{{ c.categoryName }}</td>
                     <td class="small">{{ c.description }}</td>
                     <td class="text-end">
+                      <router-link :to="{ name: 'EditCategory', params: { id: c.categoryId } }" class="btn btn-outline-secondary btn-sm me-2">Edit</router-link>
                       <button class="btn btn-outline-danger btn-sm" @click="handleDeleteCategory(c.categoryId)">Delete</button>
                     </td>
                   </tr>
                 </tbody>
               </table>
+            </div>
+          </div>
+
+          <!-- TAB 5: SUPPORT MESSAGES -->
+          <div v-if="activeTab === 'messages'">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h5 class="font-weight-bold mb-0">Customer Support Messages</h5>
+              <span class="badge bg-danger" v-if="openMessagesCount > 0">{{ openMessagesCount }} Open Ticket(s)</span>
+            </div>
+
+            <div v-if="messages.length === 0" class="text-center py-5">
+              <p class="text-muted mb-0">No support tickets found.</p>
+            </div>
+
+            <div v-else>
+              <div v-for="msg in messages" :key="msg.messageId" class="card mb-4 border shadow-sm">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center flex-wrap gap-2">
+                  <div class="text-start">
+                    <span class="badge me-2" :class="msg.status === 'OPEN' ? 'bg-warning text-dark' : 'bg-success'">
+                      {{ msg.status }}
+                    </span>
+                    <strong class="h6 text-dark font-weight-bold mb-0 align-middle">{{ msg.subject }}</strong>
+                  </div>
+                  <div class="text-end small text-muted">
+                    Submitted: {{ formatDate(msg.createdDate) }}
+                  </div>
+                </div>
+                <div class="card-body text-start">
+                  <p class="mb-3 text-dark"><strong>Issue description:</strong> {{ msg.content }}</p>
+                  
+                  <div class="bg-light p-3 rounded mb-3">
+                    <p class="small text-muted mb-1"><strong>Submitted By:</strong> {{ msg.user ? msg.user.fullName : 'Guest' }} (@{{ msg.user ? msg.user.username : 'guest' }} | {{ msg.user ? msg.user.email : 'N/A' }})</p>
+                    <p class="small text-muted mb-0"><strong>Phone:</strong> {{ msg.user && msg.user.phoneNumber ? msg.user.phoneNumber : 'Not provided' }}</p>
+                  </div>
+
+                  <!-- If status is OPEN, show reply form -->
+                  <div v-if="msg.status === 'OPEN'" class="mt-3">
+                    <div class="mb-3">
+                      <label class="form-label small font-weight-bold text-secondary">Reply to Customer</label>
+                      <textarea class="form-control" rows="3" v-model="msg.replyInput" placeholder="Type your reply here..."></textarea>
+                    </div>
+                    <button class="btn btn-primary btn-sm font-weight-bold" @click="submitMessageReply(msg)">
+                      Send Response
+                    </button>
+                  </div>
+
+                  <!-- If status is REPLIED, show reply text -->
+                  <div v-else class="mt-3 border-top pt-3">
+                    <h6 class="text-success font-weight-bold mb-1">Admin Response:</h6>
+                    <p class="small text-dark mb-0 bg-light p-3 border rounded">{{ msg.reply }}</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -245,8 +314,14 @@ export default {
       orders: [],
       users: [],
       products: [],
-      categories: []
+      categories: [],
+      messages: []
     };
+  },
+  computed: {
+    openMessagesCount() {
+      return this.messages.filter(m => m.status === 'OPEN').length;
+    }
   },
   methods: {
     formatPrice(val) {
@@ -258,7 +333,9 @@ export default {
       return date.toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'short',
-        day: 'numeric'
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
       });
     },
     getStatusClass(status) {
@@ -272,16 +349,21 @@ export default {
       this.loading = true;
       this.error = null;
       try {
-        const [ordersRes, usersRes, prodRes, catRes] = await Promise.all([
+        const [ordersRes, usersRes, prodRes, catRes, msgRes] = await Promise.all([
           api.get('/order/all'),
           api.get('/user/all'),
           api.get('/product'),
-          api.get('/category')
+          api.get('/category'),
+          api.get('/message/all')
         ]);
         this.orders = ordersRes.data.data || [];
         this.users = usersRes.data.data || [];
         this.products = prodRes.data.data || [];
         this.categories = catRes.data.data || [];
+        this.messages = (msgRes.data.data || []).map(m => ({
+          ...m,
+          replyInput: ''
+        }));
       } catch (err) {
         this.error = extractErrorMessage(err);
       } finally {
@@ -318,6 +400,21 @@ export default {
         this.products = prodRes.data.data || [];
       } catch (err) {
         alert('Failed to delete category: ' + extractErrorMessage(err));
+      }
+    },
+    async submitMessageReply(msg) {
+      if (!msg.replyInput.trim()) {
+        alert('Please enter a response message.');
+        return;
+      }
+      try {
+        await api.post(`/message/${msg.messageId}/reply?reply=${encodeURIComponent(msg.replyInput)}`);
+        alert('Response submitted successfully.');
+        msg.reply = msg.replyInput;
+        msg.status = 'REPLIED';
+        msg.replyInput = '';
+      } catch (err) {
+        alert('Failed to send reply: ' + extractErrorMessage(err));
       }
     }
   },

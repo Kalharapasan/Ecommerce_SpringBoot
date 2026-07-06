@@ -3,7 +3,7 @@
     <div class="row">
       <!-- Profile Details Column -->
       <div class="col-lg-4 mb-4">
-        <div class="card shadow-sm border-0 h-100 position-relative">
+        <div class="card shadow-sm border-0 position-relative h-100">
           <!-- Banner Header -->
           <div class="card-header bg-dark text-white p-4 text-center position-relative">
             <h4 class="mb-0 font-weight-bold">My Account</h4>
@@ -126,16 +126,17 @@
         </div>
       </div>
 
-      <!-- Order History Column -->
+      <!-- Order History & Support messages Column -->
       <div class="col-lg-8 mb-4">
-        <div class="card shadow-sm border-0 h-100">
+        <!-- Order History Card -->
+        <div class="card shadow-sm border-0 mb-4">
           <div class="card-header bg-primary text-white p-4 d-flex justify-content-between align-items-center">
             <h4 class="mb-0">Order History</h4>
             <span class="badge bg-light text-primary font-weight-bold" style="font-size: 0.9rem;" v-if="!ordersLoading && !ordersError">
               {{ orders.length }} Order(s)
             </span>
           </div>
-          <div class="card-body p-4" style="max-height: 700px; overflow-y: auto;">
+          <div class="card-body p-4" style="max-height: 400px; overflow-y: auto;">
             <div v-if="ordersLoading" class="text-center py-5">
               <div class="spinner-border text-primary" role="status">
                 <span class="visually-hidden">Loading orders...</span>
@@ -202,6 +203,75 @@
             </div>
           </div>
         </div>
+
+        <!-- Support Messages & Help Card -->
+        <div class="card shadow-sm border-0">
+          <div class="card-header bg-dark text-white p-4 d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">Support Tickets & Help</h4>
+            <button class="btn btn-warning btn-sm font-weight-bold text-dark" @click="showTicketForm = !showTicketForm">
+              {{ showTicketForm ? 'Close Form' : 'Report a Problem' }}
+            </button>
+          </div>
+          <div class="card-body p-4 text-start">
+            
+            <!-- Send Ticket Form -->
+            <div v-if="showTicketForm" class="border p-3 rounded mb-4 bg-light">
+              <h5 class="font-weight-bold mb-3">Submit Support Ticket</h5>
+              <form @submit.prevent="sendTicket">
+                <div class="mb-3">
+                  <label class="form-label small font-weight-bold text-secondary">Subject</label>
+                  <input type="text" class="form-control" v-model="ticketSubject" placeholder="e.g. Delivery status delay / Defective item" required />
+                </div>
+                <div class="mb-3">
+                  <label class="form-label small font-weight-bold text-secondary">Details</label>
+                  <textarea class="form-control" rows="4" v-model="ticketContent" placeholder="Describe your problem or question in detail..." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary btn-sm font-weight-bold" :disabled="sendingTicket">
+                  <span v-if="sendingTicket" class="spinner-border spinner-border-sm me-1"></span>
+                  Send Message
+                </button>
+              </form>
+            </div>
+
+            <!-- Messages List -->
+            <div v-if="messagesLoading" class="text-center py-5">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading messages...</span>
+              </div>
+            </div>
+
+            <div v-else-if="messagesError" class="alert alert-danger">
+              {{ messagesError }}
+            </div>
+
+            <div v-else-if="messages.length === 0">
+              <p class="text-muted text-center mb-0">No active support tickets found.</p>
+            </div>
+
+            <div v-else style="max-height: 350px; overflow-y: auto;">
+              <div v-for="msg in messages" :key="msg.messageId" class="card mb-3 border shadow-xs">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center py-2 flex-wrap gap-2">
+                  <div>
+                    <span class="badge me-2" :class="msg.status === 'OPEN' ? 'bg-warning text-dark' : 'bg-success'">
+                      {{ msg.status }}
+                    </span>
+                    <strong class="text-dark small">{{ msg.subject }}</strong>
+                  </div>
+                  <small class="text-muted">{{ formatDate(msg.createdDate) }}</small>
+                </div>
+                <div class="card-body py-2">
+                  <p class="small mb-2 text-dark"><strong>My message:</strong> {{ msg.content }}</p>
+                  
+                  <div v-if="msg.status === 'REPLIED'" class="bg-light p-2 rounded border-start border-success border-3 text-start mt-2">
+                    <small class="font-weight-bold text-success d-block mb-1">Admin Response:</small>
+                    <p class="small mb-0 text-dark">{{ msg.reply }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -232,6 +302,15 @@ export default {
       // Avatar Image Upload
       uploading: false,
       defaultAvatar: 'https://placehold.co/150x150?text=Upload+Photo',
+
+      // Support Tickets Configuration
+      messages: [],
+      messagesLoading: true,
+      messagesError: null,
+      showTicketForm: false,
+      ticketSubject: '',
+      ticketContent: '',
+      sendingTicket: false,
 
       // Orders History
       orders: [],
@@ -283,7 +362,7 @@ export default {
         const localImageUrl = uploadRes.data;
 
         // 2. Instantly persist to user profile database record
-        const updateRes = await api.put('/user/profile/update', {
+        const updateRes = await api.put('/user/update', {
           userId: this.user.userId,
           fullName: this.user.fullName,
           email: this.user.email,
@@ -321,7 +400,7 @@ export default {
           address: this.editForm.address,
           profileImageUrl: this.user.profileImageUrl
         };
-        const response = await api.put('/user/profile/update', updatePayload);
+        const response = await api.put('/user/update', updatePayload);
         this.user = response.data.data;
         this.editMode = false;
         alert('Profile saved successfully.');
@@ -329,6 +408,43 @@ export default {
         alert('Failed to save profile: ' + extractErrorMessage(err));
       } finally {
         this.saving = false;
+      }
+    },
+    async fetchUserMessages() {
+      const token = getToken();
+      if (!token) {
+        this.messagesLoading = false;
+        return;
+      }
+      this.messagesLoading = true;
+      try {
+        const response = await api.get(`/message/user/${token}`);
+        this.messages = response.data.data || [];
+      } catch (err) {
+        this.messagesError = extractErrorMessage(err);
+      } finally {
+        this.messagesLoading = false;
+      }
+    },
+    async sendTicket() {
+      const token = getToken();
+      if (!token) return;
+      if (!this.ticketSubject.trim() || !this.ticketContent.trim()) {
+        alert('Please fill in all fields.');
+        return;
+      }
+      this.sendingTicket = true;
+      try {
+        await api.post(`/message/create?subject=${encodeURIComponent(this.ticketSubject)}&content=${encodeURIComponent(this.ticketContent)}&token=${token}`);
+        alert('Support ticket created successfully!');
+        this.ticketSubject = '';
+        this.ticketContent = '';
+        this.showTicketForm = false;
+        await this.fetchUserMessages();
+      } catch (err) {
+        alert('Failed to send message: ' + extractErrorMessage(err));
+      } finally {
+        this.sendingTicket = false;
       }
     },
     async fetchOrderHistory() {
@@ -354,13 +470,17 @@ export default {
       this.error = 'User session not found. Please log in.';
       this.loading = false;
       this.ordersLoading = false;
+      this.messagesLoading = false;
       return;
     }
     
     try {
       const response = await api.get(`/user/profile/${currentUser.userId}`);
       this.user = response.data.data;
-      await this.fetchOrderHistory();
+      await Promise.all([
+        this.fetchOrderHistory(),
+        this.fetchUserMessages()
+      ]);
     } catch (err) {
       this.error = extractErrorMessage(err);
     } finally {
@@ -397,6 +517,7 @@ export default {
   width: 100%;
   height: 100%;
   background: rgba(0, 0, 0, 0.4);
+  border-radius: 50%;
   opacity: 0;
   transition: opacity 0.25s ease;
 }

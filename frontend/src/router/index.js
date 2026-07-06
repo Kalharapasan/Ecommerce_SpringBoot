@@ -5,6 +5,7 @@ import AddProduct from '../views/Product/AddProduct.vue'
 import EditProduct from '../views/Product/EditProduct.vue'
 import CategoryView from '../views/Category/CategoryView.vue'
 import AddCategory from '../views/Category/AddCategory.vue'
+import EditCategory from '../views/Category/EditCategory.vue'
 import CartView from '../views/Cart/CartView.vue'
 import SignIn from '../views/Auth/SignIn.vue'
 import SignUp from '../views/Auth/SignUp.vue'
@@ -50,6 +51,12 @@ const routes = [
     path: '/admin/category/add',
     name: 'AddCategory',
     component: AddCategory,
+    meta: { requiresAdmin: true }
+  },
+  {
+    path: '/admin/category/edit/:id',
+    name: 'EditCategory',
+    component: EditCategory,
     meta: { requiresAdmin: true }
   },
   {
