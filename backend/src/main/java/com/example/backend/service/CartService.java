@@ -50,10 +50,10 @@ public class CartService {
 
     public ResponseEntity addItem(String token, CartDto cartDto) {
         ResponseDto response = new ResponseDto();
-        if (token.isEmpty()) {
-            return ResponseEntity.badRequest().body(MSG_CODE_1);
-        } else if (token == null) {
+        if (token == null) {
             return ResponseEntity.badRequest().body(MSG_CODE_2);
+        } else if (token.isEmpty()) {
+            return ResponseEntity.badRequest().body(MSG_CODE_1);
         }
         JwtDataDto jwtData = securityConfig.getJWTData(token);
         if (jwtData.getUserId() == null) {
@@ -79,17 +79,17 @@ public class CartService {
 
     public ResponseEntity getItemsForUser(String token) {
         ResponseDto response = new ResponseDto();
-        if (token.isEmpty()) {
-            return ResponseEntity.badRequest().body(MSG_CODE_1);
-        } else if (token == null) {
+        if (token == null) {
             return ResponseEntity.badRequest().body(MSG_CODE_2);
+        } else if (token.isEmpty()) {
+            return ResponseEntity.badRequest().body(MSG_CODE_1);
         }
         JwtDataDto jwtData = securityConfig.getJWTData(token);
         if (jwtData.getUserId() == null) {
             return ResponseEntity.badRequest().body(MSG_CODE_3);
         }
 
-        List<Cart> itemList = cartRepo.findAll().stream().filter(cart -> cart.getUser().getUserId() == jwtData.getUserId()).collect(Collectors.toList());
+        List<Cart> itemList = cartRepo.findAll().stream().filter(cart -> cart.getUser().getUserId().equals(jwtData.getUserId())).collect(Collectors.toList());
         response.setMessage(MSG_CODE_7);
         response.setData(itemList);
         return ResponseEntity.ok().body(response);
@@ -139,7 +139,7 @@ public class CartService {
         if (!optUser.isPresent()) {
             return ResponseEntity.badRequest().body(MSG_CODE_13);
         }
-        List<Cart> itemList = cartRepo.findAll().stream().filter(cart -> cart.getUser().getUserId() == userId).collect(Collectors.toList());
+        List<Cart> itemList = cartRepo.findAll().stream().filter(cart -> cart.getUser().getUserId().equals(userId)).collect(Collectors.toList());
         if (itemList.size() == 0) {
             return ResponseEntity.badRequest().body(MSG_CODE_10);
         } else {
@@ -148,7 +148,7 @@ public class CartService {
             }
         }
 
-        if (!discount.equals(0)) {
+        if (discount.compareTo(BigDecimal.ZERO) != 0) {
             discountAmount = total.divide(new BigDecimal(100)).multiply(discount);
         }
         BigDecimal finalTotal = total.subtract(discountAmount);
@@ -159,17 +159,17 @@ public class CartService {
     }
 
     public ResponseEntity clearCart(String token) {
-        if (token.isEmpty()) {
-            return ResponseEntity.badRequest().body(MSG_CODE_1);
-        } else if (token == null) {
+        if (token == null) {
             return ResponseEntity.badRequest().body(MSG_CODE_2);
+        } else if (token.isEmpty()) {
+            return ResponseEntity.badRequest().body(MSG_CODE_1);
         }
         JwtDataDto jwtData = securityConfig.getJWTData(token);
         if (jwtData.getUserId() == null) {
             return ResponseEntity.badRequest().body(MSG_CODE_3);
         }
         List<Cart> itemList = cartRepo.findAll().stream()
-                .filter(cart -> cart.getUser().getUserId() == jwtData.getUserId())
+                .filter(cart -> cart.getUser().getUserId().equals(jwtData.getUserId()))
                 .collect(Collectors.toList());
         for (Cart cart : itemList) {
             Product product = cart.getProduct();
