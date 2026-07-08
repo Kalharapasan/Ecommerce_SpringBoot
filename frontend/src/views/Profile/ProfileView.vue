@@ -1,135 +1,142 @@
 <template>
-  <div class="bf-page bf-fade-in p-4 text-start">
-    <div class="container">
-      <div class="row mb-4">
+  <div class="bf-page bf-fade-in py-5 text-start">
+    <div class="container position-relative">
+      <div class="glow-bg animate-float"></div>
+
+      <!-- Header -->
+      <div class="row mb-5 position-relative z-2">
         <div class="col-12 text-start">
-          <span class="bf-badge bf-badge-primary mb-2">Customer Profile</span>
-          <h2 class="font-weight-bold mb-1">My Account & Overview</h2>
-          <p class="text-muted small">Manage account information, check order statuses, and create support queries.</p>
+          <span class="badge bg-primary bg-opacity-25 text-cyan px-3 py-2 mb-2 rounded-pill text-uppercase">
+            <i class="bi bi-person-fill me-1"></i> Account Command Center
+          </span>
+          <h1 class="text-white font-bold mb-1 fs-2">My Account Overview</h1>
+          <p class="text-muted small">Update profile credentials, inspect your order pipelines, and contact system admin.</p>
         </div>
       </div>
 
-      <div class="row g-4">
-        <!-- Profile Details Column -->
+      <div class="row g-4 position-relative z-2">
+        <!-- Profile Details Column (Left) -->
         <div class="col-lg-4">
-          <div class="bf-card bf-glass position-relative h-100">
-            <!-- Header -->
-            <div class="p-4 text-center border-light-bottom position-relative" style="border-top-left-radius: var(--bf-radius-lg); border-top-right-radius: var(--bf-radius-lg);">
-              <h5 class="mb-0 font-weight-bold">Member Information</h5>
-              <span class="bf-badge bf-badge-primary text-uppercase mt-2">
-                {{ user ? user.role : 'Guest' }}
-              </span>
-            </div>
-
-            <div class="p-4 text-center">
-              <div v-if="loading" class="py-4">
-                <LoadingSkeleton type="avatar" />
+          <div class="bf-glass-card h-100 border-0 p-4 d-flex flex-column justify-content-between">
+            <div>
+              <!-- Header tag -->
+              <div class="text-center mb-4">
+                <span class="badge bg-primary bg-opacity-15 text-cyan text-uppercase px-3 py-2">
+                  🛡️ {{ user ? user.role : 'Guest' }} MEMBER
+                </span>
               </div>
 
-              <div v-else-if="error" class="bf-empty-state py-3">
-                <p class="text-danger small mb-0">{{ error }}</p>
-              </div>
-
-              <div v-else-if="user" class="bf-fade-in">
-                <!-- Avatar Container -->
-                <div class="avatar-container mb-4 position-relative mx-auto border-light rounded-circle">
-                  <img
-                    :src="user.profileImageUrl || defaultAvatar"
-                    class="rounded-circle border border-secondary shadow-sm avatar-image"
-                    alt="Profile Avatar"
-                    @error="handleAvatarError"
-                  />
-                  <!-- Upload overlay -->
-                  <div class="avatar-upload-overlay rounded-circle d-flex align-items-center justify-content-center cursor-pointer" @click="triggerFileInput">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="text-white" viewBox="0 0 16 16">
-                      <path d="M15 12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h1.172a3 3 0 0 0 2.12-.879l.83-.828A1 1 0 0 1 6.827 3h2.344a1 1 0 0 1 .702.292l.83.828A3 3 0 0 0 12.828 5H14a1 1 0 0 1 1 1zM2 4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-1.172a2 2 0 0 1-1.414-.586l-.828-.828A2 2 0 0 0 9.172 2H6.828a2 2 0 0 0-1.414.586l-.828.828A2 2 0 0 1 3.172 4z"/>
-                      <path d="M8 11a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5m0 1a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM3 6.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0"/>
-                    </svg>
-                  </div>
-                  <!-- Hidden file input -->
-                  <input
-                    type="file"
-                    ref="fileInput"
-                    class="d-none"
-                    accept="image/*"
-                    @change="handleAvatarUpload"
-                  />
+              <!-- Avatar & Details -->
+              <div class="p-2 text-center">
+                <div v-if="loading" class="py-4">
+                  <div class="bf-skeleton rounded-circle mx-auto" style="width: 120px; height: 120px;"></div>
                 </div>
 
-                <!-- Upload Progress Indicator -->
-                <div v-if="uploading" class="bf-spinner mb-3 mx-auto"></div>
+                <div v-else-if="error" class="text-center py-3">
+                  <p class="text-danger small mb-0">{{ error }}</p>
+                </div>
 
-                <!-- User Header -->
-                <h5 class="font-weight-bold mb-1">{{ user.fullName || 'Anonymous' }}</h5>
-                <p class="text-muted small mb-4">@{{ user.username }}</p>
-
-                <hr class="my-4 opacity-25" />
-
-                <!-- Details Panel -->
-                <div class="text-start">
-                  <!-- VIEW MODE -->
-                  <div v-if="!editMode">
-                    <div class="mb-3">
-                      <span class="text-muted d-block small">Full Name</span>
-                      <strong>{{ user.fullName || 'N/A' }}</strong>
+                <div v-else-if="user" class="bf-fade-in">
+                  <!-- Avatar with Upload Overlay -->
+                  <div class="avatar-container mb-4 position-relative mx-auto rounded-circle bf-glass p-1">
+                    <img
+                      :src="user.profileImageUrl || defaultAvatar"
+                      class="rounded-circle avatar-image"
+                      alt="Profile Avatar"
+                      @error="handleAvatarError"
+                    />
+                    <!-- Camera Upload Overlay -->
+                    <div class="avatar-upload-overlay rounded-circle d-flex align-items-center justify-content-center cursor-pointer" @click="triggerFileInput">
+                      <i class="bi bi-camera-fill text-white fs-4"></i>
                     </div>
-                    <div class="mb-3">
-                      <span class="text-muted d-block small">Email Address</span>
-                      <strong class="text-break">{{ user.email }}</strong>
-                    </div>
-                    <div class="mb-3">
-                      <span class="text-muted d-block small">Phone Connection</span>
-                      <strong>{{ user.phoneNumber || 'Not provided' }}</strong>
-                    </div>
-                    <div class="mb-3">
-                      <span class="text-muted d-block small">Shipping Address</span>
-                      <strong>{{ user.address || 'No shipping address set' }}</strong>
-                    </div>
-
-                    <button class="bf-btn bf-btn-outline w-100 mt-4" @click="toggleEdit">
-                      Edit Account Info
-                    </button>
-
-                    <!-- Become a Seller Section for regular USERs -->
-                    <div v-if="user && user.role === 'USER'" class="mt-4 p-3 rounded border text-center">
-                      <h6 class="font-weight-bold mb-2">💡 Start Earning</h6>
-                      <p class="small text-muted mb-3">Sell your high-quality PC hardware and components on the ByteForge marketplace.</p>
-                      <router-link to="/seller/store-setup" class="bf-btn bf-btn-primary bf-btn-sm w-100">Become a Seller</router-link>
-                    </div>
+                    <!-- Hidden input -->
+                    <input
+                      type="file"
+                      ref="fileInput"
+                      class="d-none"
+                      accept="image/*"
+                      @change="handleAvatarUpload"
+                    />
                   </div>
 
-                  <div v-else>
-                    <form @submit.prevent="saveProfile">
-                      <div class="mb-3">
-                        <label class="form-label small text-muted font-weight-bold">Full Name</label>
-                        <input type="text" class="bf-input" v-model="editForm.fullName" required />
+                  <!-- Uploading spinner -->
+                  <div v-if="uploading" class="spinner-border spinner-border-sm text-cyan mb-3 d-block mx-auto" role="status"></div>
+
+                  <!-- User headers -->
+                  <h5 class="text-white font-bold mb-1 fs-5">{{ user.fullName || 'Enthusiast Member' }}</h5>
+                  <p class="text-muted small mb-4">@{{ user.username }}</p>
+
+                  <hr class="border-secondary border-opacity-25 my-4" />
+
+                  <!-- Profile Attributes display -->
+                  <div class="text-start">
+                    <!-- Read Mode -->
+                    <div v-if="!editMode" class="d-flex flex-column gap-3">
+                      <div>
+                        <span class="text-muted d-block small mb-1">Full Name</span>
+                        <strong class="text-white">{{ user.fullName || 'N/A' }}</strong>
+                      </div>
+                      <div>
+                        <span class="text-muted d-block small mb-1">Email Address</span>
+                        <strong class="text-white text-break">{{ user.email }}</strong>
+                      </div>
+                      <div>
+                        <span class="text-muted d-block small mb-1">Phone Connection</span>
+                        <strong class="text-white">{{ user.phoneNumber || 'Not provided' }}</strong>
+                      </div>
+                      <div>
+                        <span class="text-muted d-block small mb-1">Shipping Destination</span>
+                        <strong class="text-white">{{ user.address || 'No address registered' }}</strong>
                       </div>
 
-                      <div class="mb-3">
-                        <label class="form-label small text-muted font-weight-bold">Email Address</label>
-                        <input type="email" class="bf-input" v-model="editForm.email" required />
-                      </div>
+                      <button class="bf-btn-ghost w-100 mt-3 border-secondary border-opacity-20" @click="toggleEdit">
+                        <i class="bi bi-pencil-square me-1"></i> Edit Account details
+                      </button>
 
-                      <div class="mb-3">
-                        <label class="form-label small text-muted font-weight-bold">Phone Number</label>
-                        <input type="text" class="bf-input" v-model="editForm.phoneNumber" placeholder="e.g. +94 77 123 4567" />
+                      <!-- Become seller banner -->
+                      <div v-if="user && user.role === 'USER'" class="mt-4 p-3 bf-glass border-0 bg-opacity-25 bg-black">
+                        <h6 class="text-white font-bold mb-2"><i class="bi bi-lightbulb-fill text-warning me-1"></i> Start Earning</h6>
+                        <p class="small text-muted mb-3">Sell high-quality components on the ByteForge tech marketplace.</p>
+                        <router-link to="/seller/store-setup" class="bf-btn-premium w-100 py-2 border-0 text-center text-decoration-none d-block">
+                          Become a Seller
+                        </router-link>
                       </div>
+                    </div>
 
-                      <div class="mb-3">
-                        <label class="form-label small text-muted font-weight-bold">Shipping Address</label>
-                        <textarea class="bf-input" rows="3" v-model="editForm.address" placeholder="Enter your full delivery address..."></textarea>
-                      </div>
+                    <!-- Edit Mode -->
+                    <div v-else>
+                      <form @submit.prevent="saveProfile">
+                        <div class="mb-3">
+                          <label class="form-label small text-muted font-bold mb-2">Full Name</label>
+                          <input type="text" class="bf-search-input py-2.5 px-3 border-secondary border-opacity-25 w-100 text-white" v-model="editForm.fullName" required />
+                        </div>
 
-                      <div class="d-flex gap-2 mt-4">
-                        <button type="submit" class="bf-btn bf-btn-primary flex-grow-1" :disabled="saving">
-                          <span v-if="saving" class="spinner-border spinner-border-sm me-1"></span>
-                          Save Changes
-                        </button>
-                        <button type="button" class="bf-btn bf-btn-ghost text-muted" @click="toggleEdit" :disabled="saving">
-                          Cancel
-                        </button>
-                      </div>
-                    </form>
+                        <div class="mb-3">
+                          <label class="form-label small text-muted font-bold mb-2">Email Address</label>
+                          <input type="email" class="bf-search-input py-2.5 px-3 border-secondary border-opacity-25 w-100 text-white" v-model="editForm.email" required />
+                        </div>
+
+                        <div class="mb-3">
+                          <label class="form-label small text-muted font-bold mb-2">Phone Number</label>
+                          <input type="text" class="bf-search-input py-2.5 px-3 border-secondary border-opacity-25 w-100 text-white" v-model="editForm.phoneNumber" placeholder="e.g. +94 77 123 4567" />
+                        </div>
+
+                        <div class="mb-3">
+                          <label class="form-label small text-muted font-bold mb-2">Shipping Destination</label>
+                          <textarea class="bf-search-input py-2.5 px-3 border-secondary border-opacity-25 w-100 text-white" rows="3" v-model="editForm.address" placeholder="Enter delivery coordinates..."></textarea>
+                        </div>
+
+                        <div class="d-flex gap-2 mt-4">
+                          <button type="submit" class="bf-btn-premium border-0 py-2.5 flex-grow-1" :disabled="saving">
+                            <span v-if="saving" class="spinner-border spinner-border-sm me-1"></span>
+                            Save Profile
+                          </button>
+                          <button type="button" class="bf-btn-ghost border-0 text-muted" @click="toggleEdit" :disabled="saving">
+                            Cancel
+                          </button>
+                        </div>
+                      </form>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -137,72 +144,76 @@
           </div>
         </div>
 
-        <!-- Orders & Support Columns -->
+        <!-- Orders & Support Columns (Right) -->
         <div class="col-lg-8 d-flex flex-column gap-4">
-          <!-- Order History Card -->
-          <div class="bf-card">
-            <div class="p-4 border-light-bottom d-flex justify-content-between align-items-center" style="border-top-left-radius: var(--bf-radius-lg); border-top-right-radius: var(--bf-radius-lg);">
-              <h5 class="mb-0 font-weight-bold">Order History</h5>
-              <span class="bf-badge bf-badge-primary" v-if="!ordersLoading && !ordersError">
+          <!-- Order History Panel -->
+          <div class="bf-glass-card border-0 p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <h5 class="text-white font-bold mb-0">Order Pipeline Logs</h5>
+              <span class="badge bg-primary bg-opacity-25 text-cyan" v-if="!ordersLoading && !ordersError">
                 {{ orders.length }} Order(s)
               </span>
             </div>
 
-            <div class="p-4" style="max-height: 400px; overflow-y: auto;">
+            <!-- Scrollable orders list -->
+            <div style="max-height: 420px; overflow-y: auto; padding-right: 4px;">
               <div v-if="ordersLoading" class="py-5 text-center">
-                <span class="spinner-border spinner-border-sm text-primary"></span>
+                <span class="spinner-border spinner-border-sm text-cyan"></span>
               </div>
 
-              <div v-else-if="ordersError" class="bf-empty-state py-3">
+              <div v-else-if="ordersError" class="text-center py-3">
                 <p class="text-danger small mb-0">{{ ordersError }}</p>
               </div>
 
-              <div v-else-if="orders.length === 0" class="text-center py-4">
-                <p class="text-secondary small mb-3">You haven't placed any marketplace orders yet.</p>
-                <router-link to="/product" class="bf-btn bf-btn-primary bf-btn-sm px-3">Shop Parts Now</router-link>
+              <div v-else-if="orders.length === 0" class="text-center py-5">
+                <p class="text-muted small mb-3">No marketplace orders registered under your profile yet.</p>
+                <router-link to="/product" class="bf-btn-premium border-0 py-2 px-4 text-decoration-none">Configure a Build</router-link>
               </div>
 
+              <!-- Order entries -->
               <div v-else class="d-flex flex-column gap-3">
-                <div v-for="order in orders" :key="order.orderId" class="bf-card overflow-hidden">
-                  <div class="p-3 bg-secondary-dark border-light-bottom d-flex flex-wrap justify-content-between align-items-center gap-3">
+                <div v-for="order in orders" :key="order.orderId" class="bf-glass border-secondary border-opacity-25 overflow-hidden">
+                  <!-- Header details -->
+                  <div class="p-3 bg-black bg-opacity-20 border-bottom border-secondary border-opacity-10 d-flex flex-wrap justify-content-between align-items-center gap-3">
                     <div class="text-start">
-                      <span class="text-muted d-block small">ORDER PLACED</span>
-                      <strong class="small">{{ formatDate(order.createdDate) }}</strong>
+                      <span class="text-muted d-block small mb-1">DATE LAUNCHED</span>
+                      <strong class="text-white small">{{ formatDate(order.createdDate) }}</strong>
                     </div>
                     <div class="text-start">
-                      <span class="text-muted d-block small">SHIP TO</span>
-                      <strong class="small text-truncate d-inline-block" style="max-width: 180px;" :title="order.address">
+                      <span class="text-muted d-block small mb-1">SHIPPING DESTINATION</span>
+                      <strong class="text-white small text-truncate d-inline-block" style="max-width: 180px;" :title="order.address">
                         {{ order.address }}
                       </strong>
                     </div>
                     <div class="text-start">
-                      <span class="text-muted d-block small">PAYMENT METHOD</span>
-                      <span class="bf-badge bf-badge-info text-uppercase">{{ formatPaymentMethod(order.paymentMethod) }}</span>
+                      <span class="text-muted d-block small mb-1">TRANSACTION METHOD</span>
+                      <span class="badge bg-success bg-opacity-25 text-success">{{ formatPaymentMethod(order.paymentMethod) }}</span>
                     </div>
                     <div class="text-end">
-                      <span class="text-muted d-block small">GRAND TOTAL</span>
-                      <strong class="text-primary">{{ formatPrice(order.totalPrice) }}</strong>
+                      <span class="text-muted d-block small mb-1">TOTAL AMOUNT</span>
+                      <strong class="text-gradient-primary font-bold">{{ formatPrice(order.totalPrice) }}</strong>
                     </div>
                   </div>
 
+                  <!-- Inner item listing -->
                   <div class="p-0">
                     <div
                       v-for="item in order.orderItems"
                       :key="item.orderItemId"
-                      class="d-flex align-items-center p-3 border-light-bottom last-border-0"
+                      class="d-flex align-items-center p-3 border-bottom border-secondary border-opacity-10 last-border-0"
                     >
                       <img
                         :src="item.product.imageUrl"
-                        class="img-thumbnail me-3"
-                        style="width: 50px; height: 50px; object-fit: contain;"
+                        class="rounded border border-secondary border-opacity-25 me-3"
+                        style="width: 48px; height: 48px; object-fit: cover;"
                         alt="Product Image"
                       />
                       <div class="text-start flex-grow-1">
-                        <h6 class="mb-1 font-weight-bold small">{{ item.product.productName }}</h6>
+                        <h6 class="text-white mb-1 font-semibold small">{{ item.product.productName }}</h6>
                         <small class="text-muted">Quantity: {{ item.quantity }}</small>
                       </div>
                       <div class="text-end">
-                        <strong class="small">{{ formatPrice(item.price * item.quantity) }}</strong>
+                        <strong class="text-white small">{{ formatPrice(item.price * item.quantity) }}</strong>
                       </div>
                     </div>
                   </div>
@@ -211,67 +222,71 @@
             </div>
           </div>
 
-          <!-- Support Tickets -->
-          <div class="bf-card text-white">
-            <div class="p-4 border-light-bottom d-flex justify-content-between align-items-center" style="border-top-left-radius: var(--bf-radius-lg); border-top-right-radius: var(--bf-radius-lg);">
-              <h5 class="mb-0 font-weight-bold">Support Resolution Desk</h5>
-              <button class="bf-btn bf-btn-accent bf-btn-sm px-3" @click="showTicketForm = !showTicketForm">
-                {{ showTicketForm ? 'Close Window' : 'File Complaint' }}
+          <!-- Support Desk Resolution Center -->
+          <div class="bf-glass-card border-0 p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <h5 class="text-white font-bold mb-0">Support Resolution Desk</h5>
+              <button class="bf-btn-premium border-0 py-2 px-3 small" @click="showTicketForm = !showTicketForm">
+                {{ showTicketForm ? 'Close Console' : 'Open Ticket' }}
               </button>
             </div>
 
-            <div class="p-4 text-start">
-              <!-- Report form -->
-              <transition name="page-fade">
-                <div v-if="showTicketForm" class="bf-card p-3 mb-4">
-                  <h5 class="font-weight-bold mb-3">File Support Request</h5>
-                  <form @submit.prevent="sendTicket">
-                    <div class="mb-3">
-                      <label class="form-label small font-weight-bold text-muted">Subject</label>
-                      <input type="text" class="bf-input" v-model="ticketSubject" placeholder="e.g. Delivery status delay / Defective item" required />
-                    </div>
-                    <div class="mb-3">
-                      <label class="form-label small font-weight-bold text-muted">Details</label>
-                      <textarea class="bf-input" rows="4" v-model="ticketContent" placeholder="Describe your problem or question in detail..." required></textarea>
-                    </div>
-                    <button type="submit" class="bf-btn bf-btn-primary bf-btn-sm" :disabled="sendingTicket">
-                      <span v-if="sendingTicket" class="spinner-border spinner-border-sm me-1"></span>
-                      Submit Ticket
-                    </button>
-                  </form>
-                </div>
-              </transition>
+            <!-- Complaint Filing Console -->
+            <transition name="page-fade">
+              <div v-if="showTicketForm" class="bf-glass p-4 border-secondary border-opacity-25 mb-4 text-start">
+                <h6 class="text-white font-bold mb-3 d-flex align-items-center gap-2">
+                  <i class="bi bi-ticket-perforated-fill text-cyan"></i> File Support Ticket Request
+                </h6>
+                <form @submit.prevent="sendTicket">
+                  <div class="mb-3">
+                    <label class="form-label small text-muted font-bold mb-2">Subject</label>
+                    <input type="text" class="bf-search-input py-2.5 px-3 border-secondary border-opacity-25 w-100 text-white" v-model="ticketSubject" placeholder="e.g., Shipping delays / Hardware anomaly details" required />
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label small text-muted font-bold mb-2">Description Detail</label>
+                    <textarea class="bf-search-input py-2.5 px-3 border-secondary border-opacity-25 w-100 text-white" rows="3" v-model="ticketContent" placeholder="Describe query coordinates in detail..." required></textarea>
+                  </div>
+                  <button type="submit" class="bf-btn-premium border-0 py-2.5 px-4" :disabled="sendingTicket">
+                    <span v-if="sendingTicket" class="spinner-border spinner-border-sm me-1"></span>
+                    Launch Ticket
+                  </button>
+                </form>
+              </div>
+            </transition>
 
-              <!-- Ticket logs -->
+            <!-- Support Ticket Logs -->
+            <div style="max-height: 300px; overflow-y: auto;">
               <div v-if="messagesLoading" class="py-4 text-center">
-                <span class="spinner-border spinner-border-sm text-primary"></span>
+                <span class="spinner-border spinner-border-sm text-cyan"></span>
               </div>
 
               <div v-else-if="messagesError" class="alert alert-danger py-2">
                 {{ messagesError }}
               </div>
 
-              <div v-else-if="messages.length === 0" class="text-center py-3 text-secondary small">
-                No support logs registered under your account.
+              <div v-else-if="messages.length === 0" class="text-center py-4 text-muted small">
+                No support logs registered under your profile coordinates.
               </div>
 
-              <div v-else style="max-height: 350px; overflow-y: auto;" class="d-flex flex-column gap-3">
-                <div v-for="msg in messages" :key="msg.messageId" class="bf-card p-3">
-                  <div class="d-flex justify-content-between align-items-center py-2 flex-wrap gap-2 border-light-bottom mb-2">
+              <!-- Ticket entry listings -->
+              <div v-else class="d-flex flex-column gap-3">
+                <div v-for="msg in messages" :key="msg.messageId" class="bf-glass border-secondary border-opacity-25 p-3 text-start">
+                  <div class="d-flex justify-content-between align-items-center pb-2 border-bottom border-secondary border-opacity-10 mb-2 flex-wrap gap-2">
                     <div class="d-flex align-items-center gap-2">
-                      <span class="bf-badge" :class="msg.status === 'OPEN' ? 'bf-badge-warning' : 'bf-badge-success'">
+                      <span class="badge" :class="msg.status === 'OPEN' ? 'bg-warning bg-opacity-25 text-warning' : 'bg-success bg-opacity-25 text-success'">
                         {{ msg.status }}
                       </span>
-                      <strong class="small">{{ msg.subject }}</strong>
+                      <strong class="text-white small">{{ msg.subject }}</strong>
                     </div>
-                    <small class="text-muted">{{ formatDate(msg.createdDate) }}</small>
+                    <small class="text-muted small" style="font-size: 0.72rem;">{{ formatDate(msg.createdDate) }}</small>
                   </div>
                   
-                  <p class="small text-secondary mb-2"><strong>My Request:</strong> {{ msg.content }}</p>
+                  <p class="small text-muted mb-2"><strong>Issue:</strong> {{ msg.content }}</p>
 
-                  <div v-if="msg.status === 'REPLIED'" class="bg-secondary-dark p-3 rounded border-start border-success border-3 text-start mt-2">
-                    <small class="font-weight-bold text-success d-block mb-1">Response from Support:</small>
-                    <p class="small mb-0">{{ msg.reply }}</p>
+                  <!-- Replied Box -->
+                  <div v-if="msg.status === 'REPLIED'" class="bg-black bg-opacity-30 p-3 border-start border-success border-3 text-start mt-2">
+                    <small class="font-bold text-success d-block mb-1">Response:</small>
+                    <p class="small text-secondary mb-0">{{ msg.reply }}</p>
                   </div>
                 </div>
               </div>
@@ -297,22 +312,11 @@ export default {
       user: null,
       loading: true,
       error: null,
-
-      // Inline Editing Form
       editMode: false,
       saving: false,
-      editForm: {
-        fullName: '',
-        email: '',
-        phoneNumber: '',
-        address: ''
-      },
-
-      // Avatar Image Upload
+      editForm: { fullName: '', email: '', phoneNumber: '', address: '' },
       uploading: false,
-      defaultAvatar: 'https://placehold.co/150x150?text=Upload+Photo',
-
-      // Support Tickets Configuration
+      defaultAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80',
       messages: [],
       messagesLoading: true,
       messagesError: null,
@@ -320,8 +324,6 @@ export default {
       ticketSubject: '',
       ticketContent: '',
       sendingTicket: false,
-
-      // Orders History
       orders: [],
       ordersLoading: true,
       ordersError: null
@@ -344,15 +346,9 @@ export default {
       if (method === 'ONLINE_PAYMENT') return 'Online';
       return method;
     },
-    formatPrice(val) {
-      return formatPrice(val);
-    },
-    handleAvatarError(e) {
-      e.target.src = this.defaultAvatar;
-    },
-    triggerFileInput() {
-      this.$refs.fileInput.click();
-    },
+    formatPrice(val) { return formatPrice(val); },
+    handleAvatarError(e) { e.target.src = this.defaultAvatar; },
+    triggerFileInput() { this.$refs.fileInput.click(); },
     async handleAvatarUpload(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -363,9 +359,7 @@ export default {
       this.uploading = true;
       try {
         const uploadRes = await api.post('/file/upload', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
+          headers: { 'Content-Type': 'multipart/form-data' }
         });
         const localImageUrl = uploadRes.data.data;
 
@@ -521,41 +515,35 @@ export default {
 </script>
 
 <style scoped>
+.glow-bg {
+  position: absolute;
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(6, 182, 212, 0.08) 0%, transparent 75%);
+  bottom: -100px; left: -100px;
+  pointer-events: none;
+  z-index: 1;
+}
+
 .avatar-container {
-  width: 120px;
-  height: 120px;
-  overflow: hidden;
+  width: 128px; height: 128px;
 }
 
 .avatar-image {
-  width: 120px;
-  height: 120px;
+  width: 120px; height: 120px;
   object-fit: cover;
-  background-color: var(--bf-bg-secondary);
+  background: var(--bf-bg-secondary);
 }
 
 .avatar-upload-overlay {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.4);
-  border-radius: 50%;
+  top: 4px; left: 4px; right: 4px; bottom: 4px;
+  background: rgba(0, 0, 0, 0.55);
   opacity: 0;
-  transition: opacity 0.25s ease;
+  transition: opacity 0.3s ease;
 }
 
 .avatar-container:hover .avatar-upload-overlay {
   opacity: 1;
-}
-
-.bg-secondary-dark {
-  background: rgba(255, 255, 255, 0.03);
-}
-
-.border-light-bottom {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .last-border-0:last-child {

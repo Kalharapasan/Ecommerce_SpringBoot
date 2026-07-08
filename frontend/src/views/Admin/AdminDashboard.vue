@@ -1,102 +1,108 @@
 <template>
-  <div class="bf-page bf-fade-in p-4 text-start">
-    <div class="container">
-      <div class="row mb-4">
+  <div class="bf-page bf-fade-in py-5 text-start">
+    <div class="container position-relative">
+      <div class="glow-bg animate-float"></div>
+
+      <!-- Header -->
+      <div class="row mb-5 position-relative z-2">
         <div class="col-12 text-start">
-          <span class="bf-badge bf-badge-danger mb-2">Control Center</span>
-          <h2 class="text-white font-weight-bold mb-1">Admin Operations Console</h2>
-          <p class="text-muted small">Manage products, categories, registered users, deliveries, and support tickets for ByteForge.</p>
+          <span class="badge bg-danger bg-opacity-25 text-danger px-3 py-2 mb-2 rounded-pill text-uppercase">
+            <i class="bi bi-shield-lock-fill me-1"></i> Control Center Console
+          </span>
+          <h1 class="text-white font-bold mb-1 fs-2">Admin Operations Console</h1>
+          <p class="text-muted small">Manage catalog configurations, inspect user directory privileges, approve multi-vendor storefronts, and process ticket resolutions.</p>
         </div>
       </div>
 
       <!-- Dashboard Tabs Grid Navigation -->
-      <div class="bf-card bf-glass overflow-hidden mb-4 border-light">
-        <div class="bf-tabs-nav bg-navbar-custom border-light-bottom">
+      <div class="bf-glass-card overflow-hidden mb-5 border-0 position-relative z-2">
+        <div class="bf-tabs-nav bg-black bg-opacity-30 border-bottom border-secondary border-opacity-10 d-flex overflow-x-auto">
           <button
             v-for="tab in tabItems"
             :key="tab.id"
-            class="bf-tab-btn-cyber"
+            class="bf-tab-btn-cyber text-uppercase"
             :class="{ active: activeTab === tab.id }"
             @click="activeTab = tab.id"
           >
-            <span class="bf-tab-icon">{{ tab.icon }}</span>
+            <span class="bf-tab-icon me-2">{{ tab.icon }}</span>
             <span class="bf-tab-text">{{ tab.label }}</span>
-            <span v-if="tab.badgeCount && tab.badgeCount > 0" class="bf-tab-badge bf-pulse">
+            <span v-if="tab.badgeCount && tab.badgeCount > 0" class="bf-tab-badge badge bg-danger ms-2 animate-pulse-glow">
               {{ tab.badgeCount }}
             </span>
           </button>
         </div>
 
-        <div class="p-4 text-start text-white">
+        <div class="p-4 p-md-5 text-start text-white">
           <!-- Loading skeleton -->
           <div v-if="loading" class="py-5">
-            <LoadingSkeleton type="table" :lines="6" />
+            <div class="bf-skeleton mb-3" style="height: 40px; width: 30%;"></div>
+            <div class="bf-skeleton" style="height: 250px;"></div>
           </div>
 
           <!-- Error Alert -->
-          <div v-else-if="error" class="bf-empty-state text-center">
-            <div class="bf-empty-icon text-danger">⚠</div>
-            <h5 class="text-white font-weight-bold">Operation Failure</h5>
-            <p>{{ error }}</p>
-            <button class="bf-btn bf-btn-primary" @click="fetchData">Retry Sync</button>
+          <div v-else-if="error" class="bf-empty-state p-5 text-center">
+            <div class="bf-empty-icon text-danger fs-1"><i class="bi bi-exclamation-triangle"></i></div>
+            <h5 class="text-white font-bold mt-3">Sync Operation Failure</h5>
+            <p class="text-muted">{{ error }}</p>
+            <button class="bf-btn-premium border-0 mt-3" @click="fetchData">Retry Sync Pipeline</button>
           </div>
 
           <div v-else>
             <!-- ─── TAB 1: DELIVERIES / ORDERS ─── -->
-            <div v-if="activeTab === 'deliveries'">
-              <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+            <div v-if="activeTab === 'deliveries'" class="bf-fade-in">
+              <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
                 <div>
-                  <h4 class="font-weight-bold text-white mb-1">Marketplace Deliveries</h4>
-                  <p class="text-secondary small mb-0">Track and dispatch customer hardware packages</p>
+                  <h4 class="text-white font-bold mb-1">Marketplace Deliveries</h4>
+                  <p class="text-muted small">Track and dispatch customer components packages</p>
                 </div>
-                <span class="bf-badge bf-badge-primary font-weight-bold">{{ orders.length }} Total Order(s)</span>
+                <span class="badge bg-primary bg-opacity-25 text-cyan font-bold px-3 py-2 fs-7">{{ orders.length }} Total Orders</span>
               </div>
 
               <div v-if="orders.length === 0" class="text-center py-5 text-muted">
-                <p class="mb-0">No active customer orders found.</p>
+                <p class="mb-0">No active customer orders registered in pipeline.</p>
               </div>
 
               <div v-else class="table-responsive">
-                <table class="bf-table text-white">
+                <table class="table table-borderless align-middle text-white mb-0">
                   <thead>
-                    <tr>
-                      <th class="text-white">Order ID</th>
-                      <th class="text-white">Customer</th>
-                      <th class="text-white">Date</th>
-                      <th class="text-white">Components</th>
-                      <th class="text-white">Total</th>
-                      <th class="text-white">Address</th>
-                      <th class="text-white">Status</th>
+                    <tr class="border-bottom border-secondary border-opacity-10 text-muted small text-uppercase">
+                      <th class="py-3">Order ID</th>
+                      <th class="py-3">Customer</th>
+                      <th class="py-3">Date</th>
+                      <th class="py-3">Components</th>
+                      <th class="py-3">Total Cost</th>
+                      <th class="py-3">Address</th>
+                      <th class="py-3">Status</th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr v-for="order in orders" :key="order.orderId" class="border-light-bottom">
-                      <td class="font-weight-bold text-white">#{{ order.orderId }}</td>
-                      <td>
-                        <div class="font-weight-bold text-white">{{ order.user ? order.user.fullName : 'Guest' }}</div>
+                    <tr v-for="order in orders" :key="order.orderId" class="border-bottom border-secondary border-opacity-10">
+                      <td class="font-bold text-white py-4">#{{ order.orderId }}</td>
+                      <td class="py-4">
+                        <div class="font-bold text-white">{{ order.user ? order.user.fullName : 'Guest' }}</div>
                         <small class="text-muted">@{{ order.user ? order.user.username : 'guest' }}</small>
                       </td>
-                      <td class="small">{{ formatDate(order.createdDate) }}</td>
-                      <td>
+                      <td class="small py-4 text-muted">{{ formatDate(order.createdDate) }}</td>
+                      <td class="py-4">
                         <ul class="list-unstyled mb-0 small text-secondary">
-                          <li v-for="item in order.orderItems" :key="item.orderItemId">
-                            ⚙️ {{ item.product.productName }} <span class="text-white font-weight-bold">(x{{ item.quantity }})</span>
+                          <li v-for="item in order.orderItems" :key="item.orderItemId" class="mb-1 text-muted">
+                            ⚙️ {{ item.product.productName }} <span class="text-cyan font-bold">(x{{ item.quantity }})</span>
                           </li>
                         </ul>
                       </td>
-                      <td class="font-weight-bold text-primary">{{ formatPrice(order.totalPrice) }}</td>
-                      <td class="small text-secondary">{{ order.address }}</td>
-                      <td>
+                      <td class="font-bold text-gradient-primary py-4">{{ formatPrice(order.totalPrice) }}</td>
+                      <td class="small text-muted py-4">{{ order.address }}</td>
+                      <td class="py-4">
                         <select
-                          class="bf-input py-1 px-2 text-capitalize font-weight-bold bg-dark text-white border-light text-sm"
+                          class="bf-search-input py-1.5 px-3 bg-opacity-25 bg-black border-secondary border-opacity-25 text-white font-bold small"
                           :style="getStatusColorStyle(order.status)"
                           v-model="order.status"
                           @change="handleStatusChange(order.orderId, order.status)"
                         >
-                          <option value="Pending">Pending</option>
-                          <option value="Shipped">Shipped</option>
-                          <option value="Delivered">Delivered</option>
-                          <option value="Cancelled">Cancelled</option>
+                          <option value="Pending" class="text-warning bg-black">Pending</option>
+                          <option value="Shipped" class="text-info bg-black">Shipped</option>
+                          <option value="Delivered" class="text-success bg-black">Delivered</option>
+                          <option value="Cancelled" class="text-danger bg-black">Cancelled</option>
                         </select>
                       </td>
                     </tr>
@@ -106,36 +112,36 @@
             </div>
 
             <!-- ─── TAB 2: REGISTERED USERS ─── -->
-            <div v-if="activeTab === 'users'">
-              <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+            <div v-if="activeTab === 'users'" class="bf-fade-in">
+              <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
                 <div>
-                  <h4 class="font-weight-bold text-white mb-1">User Directory</h4>
-                  <p class="text-secondary small mb-0">Registered admin, seller, and buyer accounts</p>
+                  <h4 class="text-white font-bold mb-1">User Directory</h4>
+                  <p class="text-muted small">Registered privilege roles, client information, and authentication status</p>
                 </div>
-                <span class="bf-badge bf-badge-primary">{{ users.length }} Active Account(s)</span>
+                <span class="badge bg-primary bg-opacity-25 text-cyan font-bold px-3 py-2 fs-7">{{ users.length }} Active accounts</span>
               </div>
 
               <div class="table-responsive">
-                <table class="bf-table text-white">
+                <table class="table table-borderless align-middle text-white mb-0">
                   <thead>
-                    <tr>
-                      <th class="text-white">UID</th>
-                      <th class="text-white">Name</th>
-                      <th class="text-white">Username</th>
-                      <th class="text-white">Email Address</th>
-                      <th class="text-white">Phone Number</th>
-                      <th class="text-white">Role Privilege</th>
+                    <tr class="border-bottom border-secondary border-opacity-10 text-muted small text-uppercase">
+                      <th class="py-3">UID</th>
+                      <th class="py-3">Name</th>
+                      <th class="py-3">Username</th>
+                      <th class="py-3">Email Address</th>
+                      <th class="py-3">Phone Number</th>
+                      <th class="py-3">Privilege status</th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr v-for="u in users" :key="u.userId" class="border-light-bottom">
-                      <td>#{{ u.userId }}</td>
-                      <td class="font-weight-bold text-white">{{ u.fullName || 'No Name' }}</td>
-                      <td>@{{ u.username }}</td>
-                      <td>{{ u.email }}</td>
-                      <td>{{ u.phoneNumber || 'Not Provided' }}</td>
-                      <td>
-                        <span class="bf-badge" :class="getRoleBadgeClass(u.role)">{{ u.role }}</span>
+                    <tr v-for="u in users" :key="u.userId" class="border-bottom border-secondary border-opacity-10">
+                      <td class="py-4 text-muted">#{{ u.userId }}</td>
+                      <td class="font-bold text-white py-4">{{ u.fullName || 'No Name' }}</td>
+                      <td class="py-4 text-muted">@{{ u.username }}</td>
+                      <td class="py-4 text-white">{{ u.email }}</td>
+                      <td class="py-4 text-muted">{{ u.phoneNumber || 'Not Provided' }}</td>
+                      <td class="py-4">
+                        <span class="badge" :class="getRoleBadgeClass(u.role)">{{ u.role }}</span>
                       </td>
                     </tr>
                   </tbody>
@@ -144,52 +150,54 @@
             </div>
 
             <!-- ─── TAB 3: PRODUCTS ─── -->
-            <div v-if="activeTab === 'products'">
-              <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+            <div v-if="activeTab === 'products'" class="bf-fade-in">
+              <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
                 <div>
-                  <h4 class="font-weight-bold text-white mb-1">Marketplace Inventory</h4>
-                  <p class="text-secondary small mb-0">Manage listed graphics cards, processors, storage, and configurations</p>
+                  <h4 class="text-white font-bold mb-1">Marketplace Inventory</h4>
+                  <p class="text-muted small">Manage active hardware listings catalog levels</p>
                 </div>
-                <router-link :to="{ name: 'AddProduct' }" class="bf-btn bf-btn-primary">
-                  List New Component
+                <router-link :to="{ name: 'AddProduct' }" class="text-decoration-none">
+                  <button class="bf-btn-premium border-0 py-2 px-4">
+                    <i class="bi bi-plus-circle me-1"></i> List Component
+                  </button>
                 </router-link>
               </div>
 
               <div class="table-responsive">
-                <table class="bf-table align-middle text-white">
+                <table class="table table-borderless align-middle text-white mb-0">
                   <thead>
-                    <tr>
-                      <th class="text-white">Product Spec</th>
-                      <th class="text-white">Price Rate</th>
-                      <th class="text-white">Stock Level</th>
-                      <th class="text-white text-end">Operations</th>
+                    <tr class="border-bottom border-secondary border-opacity-10 text-muted small text-uppercase">
+                      <th class="py-3">Product Specification</th>
+                      <th class="py-3">Market Rate</th>
+                      <th class="py-3">Stock level</th>
+                      <th class="py-3 text-end">Operations</th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr v-for="p in products" :key="p.productId" class="border-light-bottom">
-                      <td>
+                    <tr v-for="p in products" :key="p.productId" class="border-bottom border-secondary border-opacity-10">
+                      <td class="py-3">
                         <div class="d-flex align-items-center gap-3">
-                          <div class="bf-product-mini-img-wrapper border-light">
-                            <img :src="p.imageUrl" class="bf-product-mini-img" alt="Product Thumbnail" />
+                          <div class="bf-product-mini-img-wrapper bf-glass border-0">
+                            <img :src="p.imageUrl" class="bf-product-mini-img" alt="Thumbnail" @error="handleImageError" />
                           </div>
-                          <div>
-                            <h6 class="mb-0 font-weight-bold text-white">{{ p.productName }}</h6>
+                          <div class="text-start">
+                            <h6 class="mb-1 font-bold text-white">{{ p.productName }}</h6>
                             <small class="text-muted" v-if="p.category">{{ p.category.categoryName }}</small>
                           </div>
                         </div>
                       </td>
-                      <td class="font-weight-bold text-primary">{{ formatPrice(p.price) }}</td>
-                      <td>
-                        <span class="bf-badge" :class="p.stock > 0 ? 'bf-badge-success' : 'bf-badge-danger'">
+                      <td class="font-bold text-gradient-primary py-3">{{ formatPrice(p.price) }}</td>
+                      <td class="py-3">
+                        <span class="badge" :class="p.stock > 0 ? 'bg-success bg-opacity-25 text-success' : 'bg-danger bg-opacity-25 text-danger'">
                           {{ p.stock > 0 ? p.stock + ' in stock' : 'Out of stock' }}
                         </span>
                       </td>
-                      <td class="text-end">
+                      <td class="text-end py-3">
                         <div class="d-inline-flex gap-2">
-                          <router-link :to="{ name: 'EditProduct', params: { id: p.productId } }" class="bf-btn bf-btn-ghost bf-btn-sm text-primary">
-                            Edit
+                          <router-link :to="{ name: 'EditProduct', params: { id: p.productId } }" class="text-decoration-none">
+                            <button class="bf-btn-ghost py-1.5 px-3 border-secondary border-opacity-25 text-cyan small">Edit</button>
                           </router-link>
-                          <button class="bf-btn bf-btn-danger bf-btn-sm" @click="handleDeleteProduct(p.productId)">
+                          <button class="bf-btn-ghost py-1.5 px-3 border-danger border-opacity-25 text-danger small" @click="handleDeleteProduct(p.productId)">
                             Delete
                           </button>
                         </div>
@@ -201,36 +209,38 @@
             </div>
 
             <!-- ─── TAB 4: CATEGORIES ─── -->
-            <div v-if="activeTab === 'categories'">
-              <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+            <div v-if="activeTab === 'categories'" class="bf-fade-in">
+              <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
                 <div>
-                  <h4 class="font-weight-bold text-white mb-1">Catalog Categories</h4>
-                  <p class="text-secondary small mb-0">Organize motherboard types, CPU sockets, memory, and cases</p>
+                  <h4 class="text-white font-bold mb-1">Catalog Categories</h4>
+                  <p class="text-muted small">Configure categorizations structure metrics</p>
                 </div>
-                <router-link :to="{ name: 'AddCategory' }" class="bf-btn bf-btn-primary">
-                  Create Category
+                <router-link :to="{ name: 'AddCategory' }" class="text-decoration-none">
+                  <button class="bf-btn-premium border-0 py-2 px-4">
+                    <i class="bi bi-plus-circle me-1"></i> Create Category
+                  </button>
                 </router-link>
               </div>
 
               <div class="table-responsive">
-                <table class="bf-table align-middle text-white">
+                <table class="table table-borderless align-middle text-white mb-0">
                   <thead>
-                    <tr>
-                      <th class="text-white">Category Name</th>
-                      <th class="text-white">Description</th>
-                      <th class="text-white text-end">Operations</th>
+                    <tr class="border-bottom border-secondary border-opacity-10 text-muted small text-uppercase">
+                      <th class="py-3">Category classification</th>
+                      <th class="py-3">Description coordinates</th>
+                      <th class="py-3 text-end">Operations</th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr v-for="c in categories" :key="c.categoryId" class="border-light-bottom">
-                      <td class="font-weight-bold text-white">{{ c.categoryName }}</td>
-                      <td class="small text-secondary">{{ c.description }}</td>
-                      <td class="text-end">
+                    <tr v-for="c in categories" :key="c.categoryId" class="border-bottom border-secondary border-opacity-10">
+                      <td class="font-bold text-white py-4">{{ c.categoryName }}</td>
+                      <td class="small text-muted py-4">{{ c.description }}</td>
+                      <td class="text-end py-4">
                         <div class="d-inline-flex gap-2">
-                          <router-link :to="{ name: 'EditCategory', params: { id: c.categoryId } }" class="bf-btn bf-btn-ghost bf-btn-sm text-primary">
-                            Edit
+                          <router-link :to="{ name: 'EditCategory', params: { id: c.categoryId } }" class="text-decoration-none">
+                            <button class="bf-btn-ghost py-1.5 px-3 border-secondary border-opacity-25 text-cyan small">Edit</button>
                           </router-link>
-                          <button class="bf-btn bf-btn-danger bf-btn-sm" @click="handleDeleteCategory(c.categoryId)">
+                          <button class="bf-btn-ghost py-1.5 px-3 border-danger border-opacity-25 text-danger small" @click="handleDeleteCategory(c.categoryId)">
                             Delete
                           </button>
                         </div>
@@ -242,37 +252,37 @@
             </div>
 
             <!-- ─── TAB 5: STORES / VENDORS ─── -->
-            <div v-if="activeTab === 'stores'">
-              <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+            <div v-if="activeTab === 'stores'" class="bf-fade-in">
+              <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
                 <div>
-                  <h4 class="font-weight-bold text-white mb-1">Marketplace Stores & Vendors</h4>
-                  <p class="text-secondary small mb-0">Verify and manage multi-vendor storefront credentials</p>
+                  <h4 class="text-white font-bold mb-1">Marketplace storefronts</h4>
+                  <p class="text-muted small">Verify and register multi-vendor merchants configurations</p>
                 </div>
-                <span class="bf-badge bf-badge-primary">{{ stores.length }} Storefronts</span>
+                <span class="badge bg-primary bg-opacity-25 text-cyan font-bold px-3 py-2 fs-7">{{ stores.length }} Storefronts</span>
               </div>
 
               <div class="table-responsive" v-if="stores.length > 0">
-                <table class="bf-table align-middle text-white">
+                <table class="table table-borderless align-middle text-white mb-0">
                   <thead>
-                    <tr>
-                      <th class="text-white">Store Profile</th>
-                      <th class="text-white">Owner Account</th>
-                      <th class="text-white">Rating & Reviews</th>
-                      <th class="text-white">Followers</th>
-                      <th class="text-white">Verification</th>
-                      <th class="text-white text-end">Actions</th>
+                    <tr class="border-bottom border-secondary border-opacity-10 text-muted small text-uppercase">
+                      <th class="py-3">Store profile</th>
+                      <th class="py-3">Owner Account</th>
+                      <th class="py-3">Rating stats</th>
+                      <th class="py-3">Followers count</th>
+                      <th class="py-3">Verification status</th>
+                      <th class="py-3 text-end">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr v-for="store in stores" :key="store.storeId" class="border-light-bottom">
-                      <td>
+                    <tr v-for="store in stores" :key="store.storeId" class="border-bottom border-secondary border-opacity-10">
+                      <td class="py-3">
                         <div class="d-flex align-items-center gap-3">
-                          <div class="bf-product-mini-img-wrapper border-light">
-                            <img :src="store.storeLogoUrl || 'https://placehold.co/100x100?text=Store'" class="bf-product-mini-img" alt="Logo" />
+                          <div class="bf-product-mini-img-wrapper bf-glass border-0">
+                            <img :src="store.storeLogoUrl" class="bf-product-mini-img" alt="Logo" @error="handleImageError" />
                           </div>
-                          <div>
-                            <h6 class="mb-0 font-weight-bold text-white">
-                              <router-link :to="'/store/' + store.storeId" class="text-decoration-none text-white">
+                          <div class="text-start">
+                            <h6 class="mb-1 font-bold text-white">
+                              <router-link :to="'/store/' + store.storeId" class="text-decoration-none text-white hover-glow">
                                 {{ store.storeName }}
                               </router-link>
                             </h6>
@@ -280,24 +290,24 @@
                           </div>
                         </div>
                       </td>
-                      <td>
-                        <div class="font-weight-bold text-white">{{ store.ownerName }}</div>
+                      <td class="py-3">
+                        <div class="font-bold text-white">{{ store.ownerName }}</div>
                         <small class="text-muted">UID #{{ store.ownerId }}</small>
                       </td>
-                      <td>
-                        <div class="text-warning font-weight-bold">{{ store.rating }} ★</div>
+                      <td class="py-3">
+                        <div class="text-warning font-bold"><i class="bi bi-star-fill me-1"></i>{{ store.rating }}</div>
                         <small class="text-muted">{{ store.reviewsCount }} reviews</small>
                       </td>
-                      <td class="font-weight-bold text-white">{{ store.followersCount }}</td>
-                      <td>
-                        <span class="bf-badge" :class="store.isVerified ? 'bf-badge-success' : 'bf-badge-warning'">
+                      <td class="font-bold text-white py-3">{{ store.followersCount }}</td>
+                      <td class="py-3">
+                        <span class="badge" :class="store.isVerified ? 'bg-success bg-opacity-25 text-success' : 'bg-warning bg-opacity-25 text-warning'">
                           {{ store.isVerified ? 'Verified' : 'Pending Review' }}
                         </span>
                       </td>
-                      <td class="text-end">
+                      <td class="text-end py-3">
                         <button
-                          class="bf-btn bf-btn-sm"
-                          :class="store.isVerified ? 'bf-btn-outline' : 'bf-btn-primary'"
+                          class="bf-btn-ghost py-1.5 px-3 small"
+                          :class="store.isVerified ? 'border-danger border-opacity-25 text-danger' : 'border-cyan border-opacity-25 text-cyan'"
                           @click="toggleStoreVerify(store.storeId)"
                         >
                           {{ store.isVerified ? 'Revoke Status' : 'Grant Verified' }}
@@ -308,69 +318,70 @@
                 </table>
               </div>
               <div v-else class="text-center py-5 text-muted small">
-                No stores registered in the marketplace yet.
+                No stores registered in the marketplace system coordinates yet.
               </div>
             </div>
 
             <!-- ─── TAB 6: SUPPORT MESSAGES ─── -->
-            <div v-if="activeTab === 'messages'">
-              <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+            <div v-if="activeTab === 'messages'" class="bf-fade-in">
+              <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
                 <div>
-                  <h4 class="font-weight-bold text-white mb-1">Support Resolution Center</h4>
-                  <p class="text-secondary small mb-0">Reply to customer issues and system messages</p>
+                  <h4 class="text-white font-bold mb-1">Support Desk Tickets</h4>
+                  <p class="text-muted small">Review customer files and dispatch reply responses</p>
                 </div>
-                <span class="bf-badge bf-badge-danger" v-if="openMessagesCount > 0">
+                <span class="badge bg-danger bg-opacity-25 text-danger font-bold px-3 py-2 fs-7" v-if="openMessagesCount > 0">
                   {{ openMessagesCount }} Open Ticket(s)
                 </span>
               </div>
 
               <div v-if="messages.length === 0" class="text-center py-5 text-muted">
-                <p class="mb-0">No support tickets found.</p>
+                <p class="mb-0">No active customer tickets registered.</p>
               </div>
 
               <div v-else>
-                <div v-for="msg in messages" :key="msg.messageId" class="bf-card bg-dark border-light p-4 mb-4 text-white">
-                  <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3 border-light-bottom pb-2">
+                <div v-for="msg in messages" :key="msg.messageId" class="bf-glass p-4 mb-4 border-secondary border-opacity-25">
+                  <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3 pb-2 border-bottom border-secondary border-opacity-10 text-start">
                     <div class="d-flex align-items-center gap-2">
-                      <span class="bf-badge" :class="msg.status === 'OPEN' ? 'bf-badge-warning' : 'bf-badge-success'">
+                      <span class="badge" :class="msg.status === 'OPEN' ? 'bg-warning bg-opacity-25 text-warning' : 'bg-success bg-opacity-25 text-success'">
                         {{ msg.status }}
                       </span>
-                      <strong class="h5 text-white mb-0">{{ msg.subject }}</strong>
+                      <strong class="h6 text-white mb-0">{{ msg.subject }}</strong>
                     </div>
                     <div class="small text-muted">
-                      Created: {{ formatDate(msg.createdDate) }}
+                      Launched: {{ formatDate(msg.createdDate) }}
                     </div>
                   </div>
 
-                  <p class="text-white mb-3"><strong>Description:</strong> {{ msg.content }}</p>
+                  <p class="text-white text-start mb-3"><strong>Issue:</strong> {{ msg.content }}</p>
 
-                  <div class="bg-secondary-dark p-3 rounded mb-3">
+                  <div class="bg-black bg-opacity-20 p-3 rounded mb-3 text-start">
                     <p class="small text-muted mb-1">
-                      <strong>Submitted By:</strong> {{ msg.user ? msg.user.fullName : 'Guest' }} 
+                      <strong>Client Details:</strong> {{ msg.user ? msg.user.fullName : 'Guest' }} 
                       (@{{ msg.user ? msg.user.username : 'guest' }} | {{ msg.user ? msg.user.email : 'N/A' }})
                     </p>
-                    <p class="small text-muted mb-0"><strong>Phone:</strong> {{ msg.user && msg.user.phoneNumber ? msg.user.phoneNumber : 'Not provided' }}</p>
+                    <p class="small text-muted mb-0"><strong>Phone connection:</strong> {{ msg.user && msg.user.phoneNumber ? msg.user.phoneNumber : 'Not provided' }}</p>
                   </div>
 
-                  <!-- Reply Form -->
-                  <div v-if="msg.status === 'OPEN'" class="mt-3">
+                  <!-- Reply Input -->
+                  <div v-if="msg.status === 'OPEN'" class="mt-3 text-start">
                     <div class="mb-3">
-                      <label class="form-label small font-weight-bold text-muted">Reply Response</label>
-                      <textarea class="bf-input bg-dark text-white border-light" rows="3" v-model="msg.replyInput" placeholder="Write your response message here..."></textarea>
+                      <label class="form-label small font-bold text-muted mb-2">Reply response</label>
+                      <textarea class="bf-search-input py-2.5 px-3 border-secondary border-opacity-25 w-100 text-white" rows="3" v-model="msg.replyInput" placeholder="Write response message coordinates here..."></textarea>
                     </div>
-                    <button class="bf-btn bf-btn-primary bf-btn-sm" @click="submitMessageReply(msg)">
+                    <button class="bf-btn-premium border-0 py-2 px-4" @click="submitMessageReply(msg)">
                       Send Response
                     </button>
                   </div>
 
                   <!-- Replied View -->
-                  <div v-else class="mt-3 border-light-top pt-3 text-start">
-                    <h6 class="text-success font-weight-bold mb-1">Admin Response Logged:</h6>
-                    <p class="small text-white mb-0 bg-secondary-dark p-3 rounded border border-secondary">{{ msg.reply }}</p>
+                  <div v-else class="mt-3 border-top border-secondary border-opacity-10 pt-3 text-start">
+                    <h6 class="text-success font-bold mb-2">Response Logged:</h6>
+                    <p class="small text-secondary mb-0 bg-black bg-opacity-30 p-3 rounded border border-secondary border-opacity-10">{{ msg.reply }}</p>
                   </div>
                 </div>
               </div>
             </div>
+
           </div>
         </div>
       </div>
@@ -399,12 +410,12 @@ export default {
       messages: [],
       stores: [],
       tabItems: [
-        { id: 'deliveries', label: 'Deliveries / Orders', icon: '📦', badgeCount: 0 },
-        { id: 'users', label: 'Registered Users', icon: '👥', badgeCount: 0 },
-        { id: 'products', label: 'Products', icon: '🔌', badgeCount: 0 },
+        { id: 'deliveries', label: 'Deliveries', icon: '📦', badgeCount: 0 },
+        { id: 'users', label: 'Users', icon: '👥', badgeCount: 0 },
+        { id: 'products', label: 'Inventory', icon: '🔌', badgeCount: 0 },
         { id: 'categories', label: 'Categories', icon: '📂', badgeCount: 0 },
         { id: 'stores', label: 'Stores', icon: '🏢', badgeCount: 0 },
-        { id: 'messages', label: 'Support Messages', icon: '✉️', badgeCount: 0 }
+        { id: 'messages', label: 'Support Desk', icon: '✉️', badgeCount: 0 }
       ]
     };
   },
@@ -420,9 +431,7 @@ export default {
     }
   },
   methods: {
-    formatPrice(val) {
-      return formatPrice(val);
-    },
+    formatPrice(val) { return formatPrice(val); },
     formatDate(dateStr) {
       if (!dateStr) return '';
       const date = new Date(dateStr);
@@ -435,16 +444,16 @@ export default {
       });
     },
     getStatusColorStyle(status) {
-      if (status === 'Pending') return { borderColor: 'var(--bf-warning)', color: 'var(--bf-warning)' };
-      if (status === 'Shipped') return { borderColor: 'var(--bf-info)', color: 'var(--bf-info)' };
-      if (status === 'Delivered') return { borderColor: 'var(--bf-success)', color: 'var(--bf-success)' };
-      if (status === 'Cancelled') return { borderColor: 'var(--bf-danger)', color: 'var(--bf-danger)' };
+      if (status === 'Pending') return { color: 'var(--bf-warning)', borderColor: 'rgba(245, 158, 11, 0.3)' };
+      if (status === 'Shipped') return { color: 'var(--bf-info)', borderColor: 'rgba(6, 182, 212, 0.3)' };
+      if (status === 'Delivered') return { color: 'var(--bf-success)', borderColor: 'rgba(16, 185, 129, 0.3)' };
+      if (status === 'Cancelled') return { color: 'var(--bf-danger)', borderColor: 'rgba(239, 68, 68, 0.3)' };
       return {};
     },
     getRoleBadgeClass(role) {
-      if (role === 'ADMIN') return 'bf-badge-danger';
-      if (role === 'SELLER') return 'bf-badge-warning';
-      return 'bf-badge-primary';
+      if (role === 'ADMIN') return 'bg-danger bg-opacity-25 text-danger';
+      if (role === 'SELLER') return 'bg-warning bg-opacity-25 text-warning';
+      return 'bg-primary bg-opacity-25 text-primary';
     },
     async fetchData() {
       this.loading = true;
@@ -492,7 +501,7 @@ export default {
           type: 'error',
           title: 'Operation Failed'
         });
-        await this.fetchData(); // reload to reset UI
+        await this.fetchData();
       }
     },
     async handleDeleteProduct(productId) {
@@ -523,7 +532,6 @@ export default {
           title: 'Category Deleted'
         });
         this.categories = this.categories.filter(c => c.categoryId !== categoryId);
-        // Refresh products list
         const prodRes = await api.get('/product');
         this.products = prodRes.data.data || [];
       } catch (err) {
@@ -544,7 +552,6 @@ export default {
           type: 'success',
           title: 'Store Verification Updated'
         });
-        // Update local state
         const updatedStore = response.data.data;
         const index = this.stores.findIndex(s => s.storeId === storeId);
         if (index !== -1) {
@@ -560,11 +567,7 @@ export default {
     },
     async submitMessageReply(msg) {
       if (!msg.replyInput.trim()) {
-        showToast({
-          message: 'Please enter a reply response.',
-          type: 'warning',
-          title: 'Input Required'
-        });
+        showToast({ message: 'Please enter a reply response.', type: 'warning' });
         return;
       }
       try {
@@ -584,6 +587,9 @@ export default {
           title: 'Operation Failed'
         });
       }
+    },
+    handleImageError(event) {
+      event.target.src = 'https://images.unsplash.com/photo-1587831990711-23ca6441447b?auto=format&fit=crop&w=100&q=80';
     }
   },
   mounted() {
@@ -593,13 +599,13 @@ export default {
 </script>
 
 <style scoped>
-.bg-navbar-custom {
-  background: rgba(11, 15, 25, 0.95);
-}
-
-.bf-tabs-nav {
-  display: flex;
-  overflow-x: auto;
+.glow-bg {
+  position: absolute;
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(239, 68, 68, 0.05) 0%, transparent 75%);
+  top: -100px; right: -100px;
+  pointer-events: none;
+  z-index: 1;
 }
 
 .bf-tab-btn-cyber {
@@ -607,77 +613,49 @@ export default {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 18px;
+  padding: 16px;
   border: none;
   background: transparent;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--bf-text-muted);
   cursor: pointer;
-  font-family: var(--bf-font-family);
   font-weight: 700;
-  font-size: var(--bf-font-size-sm);
+  font-size: 0.82rem;
+  letter-spacing: 0.5px;
   transition: all var(--bf-transition-fast);
   white-space: nowrap;
   position: relative;
 }
 
 .bf-tab-btn-cyber:hover {
-  background: rgba(255, 255, 255, 0.05);
-  color: white;
+  background: rgba(255, 255, 255, 0.03);
+  color: #fff;
 }
 
 .bf-tab-btn-cyber.active {
-  background: rgba(26, 34, 56, 0.85);
-  color: var(--bf-primary);
+  background: rgba(26, 34, 56, 0.6);
+  color: var(--bf-cyan);
 }
 
 .bf-tab-btn-cyber.active::after {
   content: '';
   position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: var(--bf-primary);
-  box-shadow: 0 0 8px var(--bf-primary-glow);
-}
-
-.bf-tab-badge {
-  background: var(--bf-danger);
-  color: white;
-  font-size: 0.65rem;
-  padding: 2px 6px;
-  border-radius: var(--bf-radius-full);
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--bf-cyan);
+  box-shadow: 0 0 10px var(--bf-cyan);
 }
 
 .bf-product-mini-img-wrapper {
-  width: 48px;
-  height: 48px;
-  border-radius: var(--bf-radius-md);
+  width: 48px; height: 48px;
+  border-radius: 8px;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: var(--bf-bg-secondary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  background: rgba(255, 255, 255, 0.03);
+  display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
 }
 
 .bf-product-mini-img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-
-.bg-secondary-dark {
-  background: rgba(255, 255, 255, 0.02);
-}
-
-.border-light-bottom {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.border-light-top {
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  width: 100%; height: 100%;
+  object-fit: cover;
 }
 </style>
