@@ -11,20 +11,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import javax.validation.constraints.NotNull;
-import javax.xml.bind.DatatypeConverter;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 import java.util.Date;
 
-/**
- * Security configuration handling JWT token generation/verification
- * and password hashing.
- *
- * UPGRADE: Migrated from MD5 to BCrypt password hashing.
- * Migration-safe: detects old MD5 hashes (32-char hex) and auto-upgrades
- * to BCrypt on next successful login.
- */
+
 @Configuration
 public class SecurityConfig {
 
@@ -134,7 +126,11 @@ public class SecurityConfig {
         MessageDigest md = MessageDigest.getInstance("MD5");
         md.update(password.getBytes());
         byte[] digest = md.digest();
-        return DatatypeConverter.printHexBinary(digest).toUpperCase();
+        StringBuilder sb = new StringBuilder(digest.length * 2);
+        for (byte b : digest) {
+            sb.append(String.format("%02X", b));
+        }
+        return sb.toString();
     }
 
     /**
@@ -169,18 +165,35 @@ public class SecurityConfig {
 
     public JwtDataDto getJWTData(String token) {
         JwtDataDto jwtDataDto = new JwtDataDto();
-        String[] tokenParts = token.split("\\.");
-        String payload = tokenParts[1];
 
-        Base64.Decoder decoder = Base64.getUrlDecoder();
-        String payloadJson = new String(decoder.decode(payload));
-        JSONObject data = new JSONObject(payloadJson);
+        // SECURITY FIX: previously this method decoded the JWT payload directly
+        // without ever checking the signature, so any caller could forge a token
+        // (e.g. base64-encode {"userId":1,"role":"ADMIN"}) and be trusted as a
+        // real, logged-in admin. Every call site already treats a null userId as
+        // "not authenticated", so verifying here and returning an empty DTO on
+        // failure fixes it everywhere without touching each service.
+        if (token == null || token.isEmpty() || !verifyToken(token)) {
+            return jwtDataDto;
+        }
 
-        jwtDataDto.setUsername(data.get("username").toString());
-        jwtDataDto.setUserId(Integer.parseInt(data.get("userId").toString()));
-        jwtDataDto.setIss(data.get("iss").toString());
-        if (data.has("role")) {
-            jwtDataDto.setRole(data.get("role").toString());
+        try {
+            String[] tokenParts = token.split("\\.");
+            String payload = tokenParts[1];
+
+            Base64.Decoder decoder = Base64.getUrlDecoder();
+            String payloadJson = new String(decoder.decode(payload));
+            JSONObject data = new JSONObject(payloadJson);
+
+            jwtDataDto.setUsername(data.get("username").toString());
+            jwtDataDto.setUserId(Integer.parseInt(data.get("userId").toString()));
+            jwtDataDto.setIss(data.get("iss").toString());
+            if (data.has("role")) {
+                jwtDataDto.setRole(data.get("role").toString());
+            }
+        } catch (Exception e) {
+            // Malformed token: return an empty DTO (userId null) rather than throwing,
+            // so callers' existing "userId == null" checks reject it safely.
+            return new JwtDataDto();
         }
         return jwtDataDto;
     }
