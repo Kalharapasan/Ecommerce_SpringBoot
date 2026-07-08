@@ -1,91 +1,185 @@
 <template>
   <div :data-theme="theme">
-    <!-- ═══ Premium Sticky Navbar ═══ -->
-    <nav class="bf-navbar" :class="{ 'bf-navbar-scrolled': isScrolled }">
-      <div class="container">
+    <!-- ═══ Premium Sticky Glass Navbar ═══ -->
+    <nav class="bf-navbar" :class="{ 'bf-navbar-scrolled': isScrolled }" @mouseleave="activeMegaMenu = null">
+      <div class="container-fluid px-4">
         <div class="bf-navbar-inner">
-          <!-- Brand -->
-          <router-link class="bf-navbar-brand" to="/">
-            <span class="bf-brand-icon">⚡</span>
-            <span class="bf-brand-text">ByteForge</span>
-            <span class="bf-brand-tag">PC Store</span>
-          </router-link>
+          
+          <!-- Left: Brand & Mobile Toggle -->
+          <div class="d-flex align-items-center gap-4">
+            <button class="bf-navbar-toggle" @click="mobileMenuOpen = !mobileMenuOpen" :class="{ active: mobileMenuOpen }">
+              <span></span><span></span><span></span>
+            </button>
+            
+            <router-link class="bf-navbar-brand" to="/">
+              <div class="bf-brand-icon-wrapper">
+                <span class="bf-brand-icon">⚡</span>
+              </div>
+              <div class="bf-brand-text-group d-none d-sm-flex">
+                <span class="bf-brand-text">ByteForge</span>
+                <span class="bf-brand-tag">Premium</span>
+              </div>
+            </router-link>
 
-          <!-- Mobile Toggle -->
-          <button class="bf-navbar-toggle" @click="mobileMenuOpen = !mobileMenuOpen" :class="{ active: mobileMenuOpen }">
-            <span></span><span></span><span></span>
-          </button>
-
-          <!-- Nav Links -->
-          <div class="bf-navbar-menu" :class="{ 'bf-navbar-menu-open': mobileMenuOpen }">
-            <div class="bf-navbar-nav">
-              <router-link class="bf-nav-link" to="/product" @click="mobileMenuOpen = false">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5zm8 0A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5zm-8 8A1.5 1.5 0 0 1 2.5 9h3A1.5 1.5 0 0 1 7 10.5v3A1.5 1.5 0 0 1 5.5 15h-3A1.5 1.5 0 0 1 1 13.5zm8 0A1.5 1.5 0 0 1 10.5 9h3a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 13.5z"/></svg>
-                Products
-              </router-link>
-              <router-link v-if="isLoggedIn && role === 'ADMIN'" class="bf-nav-link" to="/admin/dashboard" @click="mobileMenuOpen = false">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M8 4a.5.5 0 0 1 .5.5V6a.5.5 0 0 1-1 0V4.5A.5.5 0 0 1 8 4M3.732 5.732a.5.5 0 0 1 .707 0l.915.914a.5.5 0 1 1-.708.708l-.914-.915a.5.5 0 0 1 0-.707M2 10a.5.5 0 0 1 .5-.5h1.586a.5.5 0 0 1 0 1H2.5A.5.5 0 0 1 2 10m9.5-.5a.5.5 0 0 0 0 1h1.586a.5.5 0 0 0 0-1zm.697-4.768a.5.5 0 0 1 0 .707l-.914.915a.5.5 0 1 1-.708-.708l.915-.914a.5.5 0 0 1 .707 0M8 1a7 7 0 0 0-4.95 11.95l.707.707A7 7 0 1 0 8 1"/></svg>
-                Dashboard
-              </router-link>
-              <router-link v-if="isLoggedIn && role === 'SELLER'" class="bf-nav-link" to="/seller/dashboard" @click="mobileMenuOpen = false">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M2.97 1.35A1 1 0 0 1 3.73 1h8.54a1 1 0 0 1 .76.35l2.609 3.044A1.5 1.5 0 0 1 16 5.37v.255a2.375 2.375 0 0 1-4.25 1.458A2.37 2.37 0 0 1 9.875 8 2.37 2.37 0 0 1 8 7.083 2.37 2.37 0 0 1 6.125 8a2.37 2.37 0 0 1-1.875-.917A2.375 2.375 0 0 1 0 5.625V5.37a1.5 1.5 0 0 1 .361-.976zm1.78 4.275a1.375 1.375 0 0 0 2.75 0 .5.5 0 0 1 1 0 1.375 1.375 0 0 0 2.75 0 .5.5 0 0 1 1 0 1.375 1.375 0 1 0 2.75 0V5.37a.5.5 0 0 0-.12-.325L12.27 2H3.73L1.12 5.045A.5.5 0 0 0 1 5.37v.255a1.375 1.375 0 0 0 2.75 0 .5.5 0 0 1 1 0M1.5 8.5A.5.5 0 0 1 2 9v6h12V9a.5.5 0 0 1 1 0v6h.5a.5.5 0 0 1 0 1H.5a.5.5 0 0 1 0-1H1V9a.5.5 0 0 1 .5-.5m2 .5a.5.5 0 0 1 .5.5V13h8V9.5a.5.5 0 0 1 1 0V13a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5a.5.5 0 0 1 .5-.5"/></svg>
-                Seller Hub
+            <!-- Desktop Navigation (Mega Menu Triggers) -->
+            <div class="bf-desktop-nav d-none d-lg-flex">
+              <div 
+                class="bf-nav-item" 
+                @mouseenter="activeMegaMenu = 'hardware'"
+              >
+                <span>Hardware <i class="bi bi-chevron-down ms-1 small"></i></span>
+              </div>
+              <div 
+                class="bf-nav-item" 
+                @mouseenter="activeMegaMenu = 'peripherals'"
+              >
+                <span>Peripherals <i class="bi bi-chevron-down ms-1 small"></i></span>
+              </div>
+              <router-link class="bf-nav-item" to="/product" @mouseenter="activeMegaMenu = null">
+                Explore All
               </router-link>
             </div>
+          </div>
 
-            <div class="bf-navbar-actions">
-              <!-- Dark Mode Toggle -->
-              <button class="bf-theme-toggle" @click="toggleTheme" :title="theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'">
-                <span v-if="theme === 'dark'" class="bf-theme-icon">☀️</span>
-                <span v-else class="bf-theme-icon">🌙</span>
-              </button>
+          <!-- Center: Animated Smart Search -->
+          <div class="bf-navbar-search d-none d-md-block">
+            <form class="bf-search-form" @submit.prevent="handleSearch">
+              <i class="bi bi-search bf-search-icon"></i>
+              <input 
+                type="text" 
+                v-model="searchQuery" 
+                placeholder="Search for RTX 4090, Ryzen 9, Monitors..." 
+                class="bf-search-input"
+              />
+              <button type="submit" class="bf-search-btn">Search</button>
+            </form>
+          </div>
 
-              <!-- Guest Links -->
-              <template v-if="!isLoggedIn">
-                <router-link class="bf-btn bf-btn-ghost bf-btn-sm" to="/signIn" @click="mobileMenuOpen = false">Sign In</router-link>
-                <router-link class="bf-btn bf-btn-primary bf-btn-sm" to="/signUp" @click="mobileMenuOpen = false">Sign Up</router-link>
-              </template>
+          <!-- Right: Actions & User Profile -->
+          <div class="bf-navbar-actions">
+            <!-- Theme Toggle -->
+            <button class="bf-icon-btn d-none d-sm-flex" @click="toggleTheme" :title="theme === 'dark' ? 'Light Mode' : 'Dark Mode'">
+              <i class="bi" :class="theme === 'dark' ? 'bi-sun-fill text-warning' : 'bi-moon-stars-fill'"></i>
+            </button>
 
-              <!-- Logged In Links -->
-              <template v-else>
-                <!-- Cart (not for admin) -->
-                <router-link v-if="role !== 'ADMIN'" class="bf-nav-icon-btn" to="/cart" title="Cart" @click="mobileMenuOpen = false">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5M3.102 4l1.313 7h8.17l1.313-7zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4m7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4m-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2m7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/></svg>
-                  <span v-if="cartCount > 0" class="bf-nav-badge">{{ cartCount }}</span>
+            <!-- Guest Links -->
+            <template v-if="!isLoggedIn">
+              <router-link class="bf-btn-ghost d-none d-sm-flex" to="/signIn">Sign In</router-link>
+              <router-link class="bf-btn-premium bf-btn-sm" to="/signUp">Create Account</router-link>
+            </template>
+
+            <!-- Logged In Actions -->
+            <template v-else>
+              <!-- Wishlist -->
+              <router-link v-if="role !== 'ADMIN'" class="bf-icon-btn hover-glow" to="/profile" title="Wishlist">
+                <i class="bi bi-heart"></i>
+              </router-link>
+
+              <!-- Cart with Preview -->
+              <div v-if="role !== 'ADMIN'" class="bf-cart-wrapper" @mouseenter="cartPreviewOpen = true" @mouseleave="cartPreviewOpen = false">
+                <router-link class="bf-icon-btn hover-glow bf-cart-btn" to="/cart">
+                  <i class="bi bi-cart3"></i>
+                  <span v-if="cartCount > 0" class="bf-badge-notification animate-pulse-glow">{{ cartCount }}</span>
                 </router-link>
+              </div>
 
-                <!-- User Menu -->
-                <div class="bf-user-menu" @click="userMenuOpen = !userMenuOpen" v-click-away="closeUserMenu">
-                  <div class="bf-user-avatar">
-                    <span>{{ userInitial }}</span>
-                  </div>
-                  <div class="bf-user-info">
-                    <span class="bf-user-name">{{ username }}</span>
-                    <span class="bf-user-role bf-badge" :class="roleBadgeClass">{{ role }}</span>
-                  </div>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16" class="bf-chevron" :class="{ rotated: userMenuOpen }"><path d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708"/></svg>
+              <!-- Admin/Seller Dashboards -->
+              <router-link v-if="role === 'ADMIN'" class="bf-icon-btn text-danger" to="/admin/dashboard" title="Admin Panel">
+                <i class="bi bi-speedometer2"></i>
+              </router-link>
+              <router-link v-if="role === 'SELLER'" class="bf-icon-btn text-warning" to="/seller/dashboard" title="Seller Hub">
+                <i class="bi bi-shop"></i>
+              </router-link>
 
-                  <!-- Dropdown -->
-                  <transition name="dropdown-fade">
-                    <div v-if="userMenuOpen" class="bf-user-dropdown">
-                      <router-link class="bf-dropdown-item" to="/profile" @click="closeUserMenu">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/></svg>
-                        My Profile
-                      </router-link>
-                      <div class="bf-dropdown-divider"></div>
-                      <button class="bf-dropdown-item bf-dropdown-danger" @click="handleLogout">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0z"/><path fill-rule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708z"/></svg>
-                        Sign Out
-                      </button>
-                    </div>
-                  </transition>
+              <!-- User Avatar Dropdown -->
+              <div class="bf-user-menu" @click="userMenuOpen = !userMenuOpen" v-click-away="closeUserMenu">
+                <div class="bf-avatar">
+                  {{ userInitial }}
                 </div>
-              </template>
-            </div>
+                <transition name="dropdown-fade">
+                  <div v-if="userMenuOpen" class="bf-dropdown-menu bf-glass-strong">
+                    <div class="bf-dropdown-header">
+                      <strong>{{ username }}</strong>
+                      <span class="bf-role-badge" :class="roleBadgeClass">{{ role }}</span>
+                    </div>
+                    <div class="bf-divider"></div>
+                    <router-link class="bf-dropdown-item" to="/profile" @click="closeUserMenu">
+                      <i class="bi bi-person"></i> My Profile
+                    </router-link>
+                    <router-link class="bf-dropdown-item" to="/profile" @click="closeUserMenu">
+                      <i class="bi bi-box-seam"></i> My Orders
+                    </router-link>
+                    <div class="bf-divider"></div>
+                    <button class="bf-dropdown-item text-danger" @click="handleLogout">
+                      <i class="bi bi-box-arrow-right"></i> Sign Out
+                    </button>
+                  </div>
+                </transition>
+              </div>
+            </template>
           </div>
         </div>
       </div>
+
+      <!-- Mega Menu Dropdown (Hardware) -->
+      <transition name="mega-menu-fade">
+        <div v-if="activeMegaMenu === 'hardware'" class="bf-mega-menu bf-glass-strong" @mouseleave="activeMegaMenu = null">
+          <div class="container">
+            <div class="row py-4">
+              <div class="col-md-3">
+                <h6 class="mega-menu-title">Processors (CPUs)</h6>
+                <ul class="mega-menu-list">
+                  <li><a href="#">Intel Core i9 / i7</a></li>
+                  <li><a href="#">AMD Ryzen 9 / 7</a></li>
+                  <li><a href="#">Server CPUs</a></li>
+                  <li><a href="#">Cooling Solutions</a></li>
+                </ul>
+              </div>
+              <div class="col-md-3">
+                <h6 class="mega-menu-title">Graphics (GPUs)</h6>
+                <ul class="mega-menu-list">
+                  <li><a href="#">NVIDIA RTX 40 Series</a></li>
+                  <li><a href="#">AMD Radeon RX 7000</a></li>
+                  <li><a href="#">Workstation GPUs</a></li>
+                  <li><a href="#">eGPUs</a></li>
+                </ul>
+              </div>
+              <div class="col-md-3">
+                <h6 class="mega-menu-title">Motherboards & RAM</h6>
+                <ul class="mega-menu-list">
+                  <li><a href="#">DDR5 Memory</a></li>
+                  <li><a href="#">ATX / Micro-ATX</a></li>
+                  <li><a href="#">Z790 / X670 Boards</a></li>
+                  <li><a href="#">RGB Components</a></li>
+                </ul>
+              </div>
+              <div class="col-md-3 mega-menu-promo">
+                <div class="promo-card bf-glass">
+                  <span>RTX 4090 in Stock</span>
+                  <button class="bf-btn-premium bf-btn-sm mt-2">Shop Now</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </transition>
     </nav>
+
+    <!-- Mobile Navigation Sidebar -->
+    <transition name="mobile-menu-slide">
+      <div v-if="mobileMenuOpen" class="bf-mobile-menu bf-glass-strong">
+        <div class="p-4">
+          <form class="bf-search-form mb-4" @submit.prevent="handleSearch">
+            <input type="text" v-model="searchQuery" placeholder="Search..." class="bf-search-input" />
+          </form>
+          <div class="d-flex flex-column gap-3">
+            <router-link to="/" class="bf-mobile-link" @click="mobileMenuOpen = false">Home</router-link>
+            <router-link to="/product" class="bf-mobile-link" @click="mobileMenuOpen = false">All Products</router-link>
+            <router-link v-if="!isLoggedIn" to="/signIn" class="bf-mobile-link" @click="mobileMenuOpen = false">Sign In</router-link>
+          </div>
+        </div>
+      </div>
+    </transition>
 
     <!-- ═══ Main Content ═══ -->
     <main class="bf-main-content">
@@ -96,21 +190,63 @@
       </router-view>
     </main>
 
-    <!-- ═══ Footer ═══ -->
+    <!-- ═══ Premium Footer ═══ -->
     <footer class="bf-footer">
       <div class="container">
-        <div class="bf-footer-inner">
-          <div class="bf-footer-brand">
-            <span class="bf-brand-icon">⚡</span>
-            <span>ByteForge PC Store</span>
+        <div class="row g-4 mb-5">
+          <div class="col-lg-4 col-md-6">
+            <div class="bf-navbar-brand mb-3">
+              <span class="bf-brand-icon">⚡</span>
+              <span class="bf-brand-text">ByteForge</span>
+            </div>
+            <p class="text-muted small">
+              The ultimate destination for premium PC hardware, custom builds, and enthusiast gear. Join the next generation of gamers and creators.
+            </p>
+            <div class="d-flex gap-3 mt-4">
+              <a href="#" class="bf-social-icon"><i class="bi bi-twitter-x"></i></a>
+              <a href="#" class="bf-social-icon"><i class="bi bi-discord"></i></a>
+              <a href="#" class="bf-social-icon"><i class="bi bi-youtube"></i></a>
+              <a href="#" class="bf-social-icon"><i class="bi bi-instagram"></i></a>
+            </div>
           </div>
-          <p class="bf-footer-copy">&copy; {{ new Date().getFullYear() }} ByteForge. All rights reserved.</p>
+          <div class="col-lg-2 col-md-6 col-6">
+            <h6 class="footer-title">Products</h6>
+            <ul class="footer-links">
+              <li><a href="#">Components</a></li>
+              <li><a href="#">Peripherals</a></li>
+              <li><a href="#">Pre-built PCs</a></li>
+              <li><a href="#">Laptops</a></li>
+            </ul>
+          </div>
+          <div class="col-lg-2 col-md-6 col-6">
+            <h6 class="footer-title">Support</h6>
+            <ul class="footer-links">
+              <li><a href="#">Help Center</a></li>
+              <li><a href="#">Returns & Warranty</a></li>
+              <li><a href="#">Track Order</a></li>
+              <li><a href="#">Contact Us</a></li>
+            </ul>
+          </div>
+          <div class="col-lg-4 col-md-6">
+            <h6 class="footer-title">Subscribe to Newsletter</h6>
+            <p class="text-muted small">Get exclusive deals and early access to hardware drops.</p>
+            <form class="footer-newsletter mt-3">
+              <input type="email" placeholder="Enter your email" required />
+              <button type="submit"><i class="bi bi-arrow-right"></i></button>
+            </form>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>&copy; {{ new Date().getFullYear() }} ByteForge. All rights reserved.</p>
+          <div class="footer-bottom-links">
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+          </div>
         </div>
       </div>
     </footer>
 
-    <!-- ═══ Toast Notifications ═══ -->
-    <ToastNotification position="top-right" />
+    <ToastNotification position="bottom-right" />
   </div>
 </template>
 
@@ -124,45 +260,32 @@ export default {
   components: { ToastNotification },
   data() {
     return {
-      theme: localStorage.getItem('bf-theme') || 'dark',
+      theme: 'dark', // Forced dark theme for premium feel
       isScrolled: false,
       mobileMenuOpen: false,
-      userMenuOpen: false
+      userMenuOpen: false,
+      cartPreviewOpen: false,
+      activeMegaMenu: null,
+      searchQuery: ''
     };
   },
   computed: {
-    isLoggedIn() {
-      return !!authState.token;
-    },
-    username() {
-      return authState.user ? authState.user.username : '';
-    },
-    userInitial() {
-      return this.username ? this.username.charAt(0).toUpperCase() : '?';
-    },
-    role() {
-      return authState.user ? authState.user.role : '';
-    },
-    cartCount() {
-      return authState.cartCount;
-    },
+    isLoggedIn() { return !!authState.token; },
+    username() { return authState.user ? authState.user.username : ''; },
+    userInitial() { return this.username ? this.username.charAt(0).toUpperCase() : '?'; },
+    role() { return authState.user ? authState.user.role : ''; },
+    cartCount() { return authState.cartCount; },
     roleBadgeClass() {
-      if (this.role === 'ADMIN') return 'bf-badge-danger';
-      if (this.role === 'SELLER') return 'bf-badge-warning';
-      return 'bf-badge-primary';
+      if (this.role === 'ADMIN') return 'badge bg-danger bg-opacity-25 text-danger';
+      if (this.role === 'SELLER') return 'badge bg-warning bg-opacity-25 text-warning';
+      return 'badge bg-primary bg-opacity-25 text-primary';
     }
   },
   watch: {
-    isLoggedIn(newVal) {
-      if (newVal) {
-        this.fetchCartCount();
-      }
-    },
+    isLoggedIn(newVal) { if (newVal) this.fetchCartCount(); },
     theme: {
       immediate: true,
-      handler(newVal) {
-        document.documentElement.setAttribute('data-theme', newVal);
-      }
+      handler(newVal) { document.documentElement.setAttribute('data-theme', newVal); }
     }
   },
   methods: {
@@ -176,11 +299,13 @@ export default {
       this.theme = this.theme === 'dark' ? 'light' : 'dark';
       localStorage.setItem('bf-theme', this.theme);
     },
-    closeUserMenu() {
-      this.userMenuOpen = false;
-    },
-    handleScroll() {
-      this.isScrolled = window.scrollY > 20;
+    closeUserMenu() { this.userMenuOpen = false; },
+    handleScroll() { this.isScrolled = window.scrollY > 20; },
+    handleSearch() {
+      if (this.searchQuery.trim()) {
+        this.$router.push({ path: '/product', query: { q: this.searchQuery } });
+        this.searchQuery = '';
+      }
     },
     async fetchCartCount() {
       if (!this.isLoggedIn) return;
@@ -199,18 +324,23 @@ export default {
     'click-away': {
       mounted(el, binding) {
         el.__clickAway = (event) => {
-          if (!el.contains(event.target)) {
-            binding.value();
-          }
+          if (!el.contains(event.target)) { binding.value(); }
         };
         document.addEventListener('click', el.__clickAway);
       },
-      unmounted(el) {
-        document.removeEventListener('click', el.__clickAway);
-      }
+      unmounted(el) { document.removeEventListener('click', el.__clickAway); }
     }
   },
   mounted() {
+    // Inject Bootstrap Icons if not present
+    if (!document.getElementById('bootstrap-icons')) {
+      const link = document.createElement('link');
+      link.id = 'bootstrap-icons';
+      link.rel = 'stylesheet';
+      link.href = 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css';
+      document.head.appendChild(link);
+    }
+    
     this.fetchCartCount();
     window.addEventListener('scroll', this.handleScroll);
   },
@@ -221,37 +351,39 @@ export default {
 </script>
 
 <style>
-/* ─── App Global Styles ────────────────────────────────────── */
+/* ─── App Global Layout ────────────────────────────────────── */
 #app {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  overflow-x: hidden;
 }
 
 .bf-main-content {
   flex: 1;
-  padding-top: 80px; /* navbar height */
+  padding-top: 80px; 
 }
 
-/* ─── Premium Navbar ───────────────────────────────────────── */
+/* ─── Premium Glass Navbar ─────────────────────────────────── */
 .bf-navbar {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
+  top: 0; left: 0; right: 0;
   z-index: 1000;
-  height: 72px;
-  background: var(--bf-bg-navbar);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  transition: all var(--bf-transition-base);
+  height: 80px;
+  background: rgba(11, 15, 25, 0.4);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .bf-navbar-scrolled {
   height: 64px;
-  background: rgba(15, 23, 42, 0.98);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.15);
+  background: rgba(11, 15, 25, 0.85);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .bf-navbar-inner {
@@ -259,376 +391,246 @@ export default {
   align-items: center;
   justify-content: space-between;
   height: 100%;
-  gap: 20px;
 }
 
 /* Brand */
 .bf-navbar-brand {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
   text-decoration: none;
-  flex-shrink: 0;
+}
+
+.bf-brand-icon-wrapper {
+  width: 40px; height: 40px;
+  background: var(--bf-gradient-primary);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: var(--bf-shadow-glow-purple);
 }
 
 .bf-brand-icon {
-  font-size: 1.5rem;
-  filter: drop-shadow(0 0 8px rgba(99, 102, 241, 0.5));
+  font-size: 1.2rem;
+  color: white;
+}
+
+.bf-brand-text-group {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
 }
 
 .bf-brand-text {
-  font-size: 1.25rem;
+  font-size: 1.3rem;
   font-weight: 800;
-  color: #ffffff;
-  letter-spacing: -0.02em;
+  color: #fff;
+  letter-spacing: -0.5px;
 }
 
 .bf-brand-tag {
   font-size: 0.65rem;
-  font-weight: 600;
-  color: var(--bf-primary);
-  background: rgba(99, 102, 241, 0.15);
-  padding: 2px 8px;
-  border-radius: var(--bf-radius-full);
+  font-weight: 700;
+  color: var(--bf-cyan);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 1px;
 }
 
-/* Nav Links */
-.bf-navbar-menu {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex: 1;
+/* Desktop Nav Links */
+.bf-desktop-nav {
+  margin-left: 2rem;
+  gap: 24px;
 }
 
-.bf-navbar-nav {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.bf-nav-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 16px;
-  color: rgba(255, 255, 255, 0.7);
-  font-size: var(--bf-font-size-sm);
+.bf-nav-item {
+  color: var(--bf-text-secondary);
   font-weight: 500;
-  text-decoration: none;
-  border-radius: var(--bf-radius-md);
-  transition: all var(--bf-transition-fast);
-}
-
-.bf-nav-link:hover,
-.bf-nav-link.router-link-active {
-  color: #ffffff;
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.bf-nav-link.router-link-exact-active {
-  color: var(--bf-primary);
-  background: rgba(99, 102, 241, 0.12);
-}
-
-/* Navbar Actions */
-.bf-navbar-actions {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-/* Theme Toggle */
-.bf-theme-toggle {
-  width: 38px;
-  height: 38px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  background: rgba(255, 255, 255, 0.06);
-  border-radius: var(--bf-radius-md);
+  font-size: 0.95rem;
   cursor: pointer;
-  transition: all var(--bf-transition-fast);
+  text-decoration: none;
+  transition: color 0.3s ease;
+  padding: 10px 0;
+}
+
+.bf-nav-item:hover {
+  color: var(--bf-cyan);
+}
+
+/* Mega Menu */
+.bf-mega-menu {
+  position: absolute;
+  top: 100%; left: 0; right: 0;
+  background: rgba(17, 24, 39, 0.98);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: var(--bf-shadow-xl);
+  transform-origin: top;
+}
+
+.mega-menu-fade-enter-active, .mega-menu-fade-leave-active {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.mega-menu-fade-enter-from, .mega-menu-fade-leave-to {
+  opacity: 0; transform: translateY(-10px);
+}
+
+.mega-menu-title {
+  color: #fff;
+  font-weight: 700;
+  margin-bottom: 16px;
   font-size: 1.1rem;
 }
 
-.bf-theme-toggle:hover {
-  background: rgba(255, 255, 255, 0.12);
-  transform: scale(1.05);
+.mega-menu-list {
+  list-style: none; padding: 0; margin: 0;
+  display: flex; flex-direction: column; gap: 12px;
 }
 
-.bf-theme-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.3s ease;
-}
-
-/* Icon Button (Cart, Notifications) */
-.bf-nav-icon-btn {
-  position: relative;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--bf-radius-md);
-  color: rgba(255, 255, 255, 0.75);
-  transition: all var(--bf-transition-fast);
+.mega-menu-list a {
+  color: var(--bf-text-muted);
   text-decoration: none;
+  transition: color 0.2s ease;
+  font-size: 0.95rem;
+}
+.mega-menu-list a:hover { color: var(--bf-cyan); }
+
+.mega-menu-promo .promo-card {
+  padding: 24px;
+  border-radius: 16px;
+  display: flex; flex-direction: column; align-items: flex-start; justify-content: center;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(124, 58, 237, 0.1) 100%);
+  border: 1px solid rgba(124, 58, 237, 0.2);
+}
+.promo-card span { font-weight: 700; color: #fff; font-size: 1.2rem; }
+
+/* Animated Search */
+.bf-navbar-search {
+  flex: 0 1 400px;
 }
 
-.bf-nav-icon-btn:hover {
-  color: #ffffff;
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.bf-nav-badge {
-  position: absolute;
-  top: 2px;
-  right: 2px;
-  min-width: 18px;
-  height: 18px;
-  padding: 0 5px;
-  background: var(--bf-danger);
-  color: white;
-  font-size: 0.65rem;
-  font-weight: 700;
-  border-radius: var(--bf-radius-full);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  line-height: 1;
-}
-
-/* User Menu */
-.bf-user-menu {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 6px 12px 6px 6px;
-  border-radius: var(--bf-radius-lg);
-  cursor: pointer;
-  transition: all var(--bf-transition-fast);
+.bf-search-form {
   position: relative;
-  user-select: none;
+  display: flex; align-items: center;
 }
 
-.bf-user-menu:hover {
-  background: rgba(255, 255, 255, 0.06);
-}
-
-.bf-user-avatar {
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: var(--bf-gradient-primary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-weight: 700;
-  font-size: 0.875rem;
-  flex-shrink: 0;
-}
-
-.bf-user-info {
-  display: flex;
-  flex-direction: column;
-  line-height: 1.3;
-}
-
-.bf-user-name {
-  color: #ffffff;
-  font-size: var(--bf-font-size-sm);
-  font-weight: 600;
-}
-
-.bf-user-role {
-  font-size: 0.6rem !important;
-  padding: 1px 6px !important;
-  align-self: flex-start;
-}
-
-.bf-chevron {
-  color: rgba(255, 255, 255, 0.5);
-  transition: transform 0.2s ease;
-}
-
-.bf-chevron.rotated {
-  transform: rotate(180deg);
-}
-
-/* User Dropdown */
-.bf-user-dropdown {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  margin-top: 8px;
-  min-width: 200px;
-  background: var(--bf-bg-card);
-  border: 1px solid var(--bf-border);
-  border-radius: var(--bf-radius-lg);
-  box-shadow: var(--bf-shadow-xl);
-  overflow: hidden;
-  z-index: 1001;
-}
-
-.bf-dropdown-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 16px;
-  font-size: var(--bf-font-size-sm);
-  color: var(--bf-text-secondary);
-  text-decoration: none;
-  transition: all var(--bf-transition-fast);
-  border: none;
-  background: none;
+.bf-search-input {
   width: 100%;
-  cursor: pointer;
-  font-family: var(--bf-font-family);
-}
-
-.bf-dropdown-item:hover {
-  background: var(--bf-primary-light);
-  color: var(--bf-primary);
-}
-
-.bf-dropdown-danger:hover {
-  background: var(--bf-danger-light);
-  color: var(--bf-danger);
-}
-
-.bf-dropdown-divider {
-  height: 1px;
-  background: var(--bf-border);
-  margin: 4px 0;
-}
-
-/* Dropdown transition */
-.dropdown-fade-enter-active {
-  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-.dropdown-fade-leave-active {
-  transition: all 0.15s ease-in;
-}
-.dropdown-fade-enter-from,
-.dropdown-fade-leave-to {
-  opacity: 0;
-  transform: translateY(-8px) scale(0.96);
-}
-
-/* ─── Mobile Toggle ────────────────────────────────────────── */
-.bf-navbar-toggle {
-  display: none;
-  flex-direction: column;
-  gap: 5px;
-  padding: 8px;
-  background: none;
-  border: none;
-  cursor: pointer;
-}
-
-.bf-navbar-toggle span {
-  display: block;
-  width: 22px;
-  height: 2px;
-  background: #fff;
-  border-radius: 2px;
+  padding: 10px 100px 10px 45px;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.3);
+  color: #fff;
+  font-size: 0.9rem;
   transition: all 0.3s ease;
 }
 
-.bf-navbar-toggle.active span:nth-child(1) {
-  transform: rotate(45deg) translate(5px, 5px);
-}
-.bf-navbar-toggle.active span:nth-child(2) {
-  opacity: 0;
-}
-.bf-navbar-toggle.active span:nth-child(3) {
-  transform: rotate(-45deg) translate(5px, -5px);
+.bf-search-input:focus {
+  outline: none;
+  border-color: var(--bf-cyan);
+  background: rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0 15px rgba(6, 182, 212, 0.2);
 }
 
-/* ─── Footer ───────────────────────────────────────────────── */
+.bf-search-icon {
+  position: absolute; left: 16px;
+  color: var(--bf-text-muted);
+}
+
+.bf-search-btn {
+  position: absolute; right: 4px;
+  background: var(--bf-gradient-primary);
+  color: white; border: none;
+  border-radius: 20px;
+  padding: 6px 16px;
+  font-size: 0.85rem; font-weight: 600;
+  transition: opacity 0.2s;
+}
+.bf-search-btn:hover { opacity: 0.9; }
+
+/* Actions */
+.bf-navbar-actions {
+  display: flex; align-items: center; gap: 16px;
+}
+
+.bf-icon-btn {
+  width: 40px; height: 40px;
+  border-radius: 50%; border: none; background: transparent;
+  color: var(--bf-text-secondary);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem;
+  transition: all 0.2s ease; text-decoration: none; cursor: pointer;
+}
+.bf-icon-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+}
+
+.bf-cart-wrapper { position: relative; }
+.bf-cart-btn { position: relative; }
+
+.bf-badge-notification {
+  position: absolute; top: 0px; right: -2px;
+  background: var(--bf-danger); color: #fff;
+  font-size: 0.65rem; font-weight: 800;
+  width: 18px; height: 18px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%; border: 2px solid var(--bf-bg-navbar);
+}
+
+/* Avatar Menu */
+.bf-user-menu { position: relative; cursor: pointer; }
+.bf-avatar {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: var(--bf-gradient-accent); color: white;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 1.1rem;
+  box-shadow: 0 0 10px rgba(124, 58, 237, 0.3);
+}
+
+.bf-dropdown-menu {
+  position: absolute; top: 120%; right: 0;
+  width: 240px; padding: 8px 0;
+}
+.bf-dropdown-header {
+  padding: 12px 20px; display: flex; flex-direction: column; gap: 4px;
+}
+.bf-role-badge { font-size: 0.7rem; align-self: flex-start; }
+.bf-divider { height: 1px; background: rgba(255,255,255,0.1); margin: 8px 0; }
+.bf-dropdown-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 20px; color: var(--bf-text-secondary);
+  text-decoration: none; border: none; background: transparent; width: 100%; text-align: left;
+  transition: all 0.2s ease;
+}
+.bf-dropdown-item:hover { background: rgba(255,255,255,0.05); color: #fff; padding-left: 24px; }
+
+/* Mobile Menu */
+.bf-navbar-toggle { display: none; background: none; border: none; flex-direction: column; gap: 5px; padding: 5px; }
+.bf-navbar-toggle span { width: 24px; height: 2px; background: #fff; transition: 0.3s; }
+.bf-mobile-menu { position: fixed; top: 72px; left: 0; right: 0; bottom: 0; z-index: 999; }
+.bf-mobile-link { display: block; padding: 16px; color: #fff; text-decoration: none; font-size: 1.1rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
+
+/* Footer */
 .bf-footer {
-  background: var(--bf-bg-navbar);
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-  padding: 24px 0;
+  background: var(--bf-bg-secondary);
+  padding: 80px 0 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
   margin-top: auto;
 }
+.footer-title { color: #fff; margin-bottom: 24px; font-weight: 700; }
+.footer-links { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; }
+.footer-links a { color: var(--bf-text-muted); text-decoration: none; transition: 0.2s; }
+.footer-links a:hover { color: var(--bf-cyan); padding-left: 5px; }
+.bf-social-icon { width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; color: #fff; transition: 0.3s; }
+.bf-social-icon:hover { background: var(--bf-primary); transform: translateY(-3px); }
+.footer-newsletter { display: flex; position: relative; }
+.footer-newsletter input { width: 100%; padding: 12px 45px 12px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); color: #fff; }
+.footer-newsletter button { position: absolute; right: 5px; top: 5px; bottom: 5px; width: 35px; border-radius: 6px; border: none; background: var(--bf-primary); color: #fff; }
+.footer-bottom { border-top: 1px solid rgba(255,255,255,0.05); padding-top: 24px; display: flex; justify-content: space-between; align-items: center; color: var(--bf-text-muted); font-size: 0.85rem; }
+.footer-bottom-links { display: flex; gap: 16px; }
+.footer-bottom-links a { color: var(--bf-text-muted); text-decoration: none; }
+.footer-bottom-links a:hover { color: #fff; }
 
-.bf-footer-inner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.bf-footer-brand {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: rgba(255, 255, 255, 0.8);
-  font-weight: 700;
-  font-size: var(--bf-font-size-sm);
-}
-
-.bf-footer-copy {
-  color: rgba(255, 255, 255, 0.4);
-  font-size: var(--bf-font-size-xs);
-  margin: 0;
-}
-
-/* ─── Responsive ───────────────────────────────────────────── */
-@media (max-width: 768px) {
-  .bf-navbar-toggle {
-    display: flex;
-  }
-
-  .bf-navbar-menu {
-    position: fixed;
-    top: 72px;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: var(--bf-bg-navbar);
-    flex-direction: column;
-    padding: 24px;
-    gap: 24px;
-    transform: translateX(100%);
-    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-    overflow-y: auto;
-  }
-
-  .bf-navbar-menu-open {
-    transform: translateX(0);
-  }
-
-  .bf-navbar-nav {
-    flex-direction: column;
-    width: 100%;
-  }
-
-  .bf-nav-link {
-    width: 100%;
-    padding: 14px 16px;
-    font-size: var(--bf-font-size-base);
-  }
-
-  .bf-navbar-actions {
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-
-  .bf-user-info {
-    display: none;
-  }
-
-  .bf-footer-inner {
-    flex-direction: column;
-    gap: 8px;
-    text-align: center;
-  }
+@media (max-width: 992px) {
+  .bf-navbar-toggle { display: flex; }
 }
 </style>

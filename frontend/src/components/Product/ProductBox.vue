@@ -1,7 +1,10 @@
 <template>
-  <div class="ebx-card" @mouseenter="hovered = true" @mouseleave="hovered = false">
-
-    <!-- Image -->
+  <div 
+    class="ebx-card bf-glass-card" 
+    @mouseenter="hovered = true" 
+    @mouseleave="hovered = false"
+  >
+    <!-- Image Wrapper with Zoom & badges -->
     <div class="ebx-image-wrapper">
       <router-link :to="{ name: 'ProductDetail', params: { id: product.productId } }">
         <img
@@ -13,36 +16,38 @@
         />
       </router-link>
 
-      <!-- Watchlist heart -->
+      <!-- Glass overlay on hover -->
+      <div class="ebx-image-overlay"></div>
+
+      <!-- Watchlist heart (Micro-interactive) -->
       <button
         class="ebx-watch-btn"
         :class="{ active: isWatched }"
-        @click="toggleWatch"
+        @click.stop="toggleWatch"
         :title="isWatched ? 'Remove from Watchlist' : 'Add to Watchlist'"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 16 16" :fill="isWatched ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="1.4">
-          <path d="M8 14.25s-6-3.87-6-8.1A3.4 3.4 0 0 1 8 4.1a3.4 3.4 0 0 1 6 2.05c0 4.23-6 8.1-6 8.1z"/>
-        </svg>
+        <i class="bi" :class="isWatched ? 'bi-heart-fill text-danger' : 'bi-heart'"></i>
       </button>
 
-      <!-- Stock / shipping tag -->
-      <div class="ebx-tag" :class="stockClass">{{ stockLabel }}</div>
+      <!-- Dynamic Stock Badge -->
+      <span class="ebx-badge" :class="stockClass">{{ stockLabel }}</span>
 
-      <!-- Quick view (hover) -->
-      <transition name="page-fade">
-        <router-link
-          v-if="hovered"
-          :to="{ name: 'ProductDetail', params: { id: product.productId } }"
-          class="ebx-quickview-btn"
-        >
-          Quick View
-        </router-link>
-      </transition>
+      <!-- Fast Quick View trigger -->
+      <router-link
+        v-if="hovered"
+        :to="{ name: 'ProductDetail', params: { id: product.productId } }"
+        class="ebx-quickview-btn bf-glass-strong bf-scale-up"
+      >
+        <i class="bi bi-eye me-1"></i> Quick View
+      </router-link>
     </div>
 
-    <!-- Body -->
+    <!-- Card Contents -->
     <div class="ebx-body">
-      <span v-if="product.category" class="ebx-category">{{ product.category.categoryName }}</span>
+      <div class="d-flex justify-content-between align-items-center mb-1">
+        <span v-if="product.category" class="ebx-category text-gradient">{{ product.category.categoryName }}</span>
+        <span class="ebx-shipping-badge"><i class="bi bi-truck me-1"></i>Free Shipping</span>
+      </div>
 
       <h3 class="ebx-title">
         <router-link :to="{ name: 'ProductDetail', params: { id: product.productId } }">
@@ -50,50 +55,43 @@
         </router-link>
       </h3>
 
-      <!-- Seller row -->
+      <!-- Seller Details & Rating Stars -->
       <div class="ebx-seller-row">
+        <i class="bi bi-shield-check text-cyan" v-if="isVerifiedSeller"></i>
         <span class="ebx-seller-name">{{ sellerName }}</span>
-        <span v-if="isVerifiedSeller" class="ebx-verified-badge" title="Verified Seller">✓</span>
-        <span v-if="sellerRating" class="ebx-stars">
-          <span class="ebx-stars-fill" :style="{ width: starPercent + '%' }">★★★★★</span>
-          <span class="ebx-stars-base">★★★★★</span>
-        </span>
-        <span v-if="sellerReviewCount" class="ebx-review-count">({{ sellerReviewCount }})</span>
+        <div class="ms-auto d-flex align-items-center gap-1" v-if="sellerRating">
+          <span class="text-warning small"><i class="bi bi-star-fill"></i></span>
+          <span class="ebx-rating-val">{{ sellerRating.toFixed(1) }}</span>
+          <span class="ebx-review-count">({{ sellerReviewCount }})</span>
+        </div>
       </div>
 
       <p class="ebx-desc">{{ product.description }}</p>
 
-      <!-- Price -->
+      <!-- Price Block -->
       <div class="ebx-price-row">
-        <span class="ebx-price">{{ formattedPrice }}</span>
-        <span class="ebx-shipping-note">+ shipping from seller</span>
+        <span class="ebx-price text-gradient-primary">{{ formattedPrice }}</span>
       </div>
 
-      <!-- Actions -->
-      <div class="ebx-actions">
-        <router-link
-          :to="{ name: 'ProductDetail', params: { id: product.productId } }"
-          class="ebx-btn ebx-btn-outline"
-        >
-          View Details
-        </router-link>
+      <!-- Action Buttons -->
+      <div class="ebx-actions mt-3">
         <button
-          class="ebx-btn ebx-btn-primary"
+          class="bf-btn-premium w-100 py-2.5 d-flex align-items-center justify-content-center gap-2"
           :disabled="isOutOfStock || addingToCart"
-          @click="quickAddToCart"
+          @click.stop="quickAddToCart"
         >
-          <span v-if="addingToCart">Adding…</span>
-          <span v-else-if="isOutOfStock">Sold Out</span>
-          <span v-else>Add to Cart</span>
+          <span v-if="addingToCart" class="spinner-border spinner-border-sm" role="status"></span>
+          <i v-else class="bi bi-cart-plus"></i>
+          <span>{{ isOutOfStock ? 'Out of Stock' : (addingToCart ? 'Adding...' : 'Add to Cart') }}</span>
         </button>
       </div>
 
       <router-link
         v-if="isAdmin"
         :to="{ name: 'EditProduct', params: { id: product.productId } }"
-        class="ebx-admin-edit"
+        class="ebx-admin-edit mt-3"
       >
-        Edit Product
+        <i class="bi bi-pencil-square"></i> Admin Edit
       </router-link>
     </div>
   </div>
@@ -126,7 +124,7 @@ export default {
       hovered: false,
       addingToCart: false,
       currentImageUrl: this.product.imageUrl,
-      fallbackUrl: 'https://placehold.co/300x200?text=No+Image+Available',
+      fallbackUrl: 'https://images.unsplash.com/photo-1587831990711-23ca6441447b?auto=format&fit=crop&w=500&q=80', // Premium hardware fallback
       isWatched: readWatchlist().includes(this.product.productId)
     };
   },
@@ -147,14 +145,14 @@ export default {
       return !this.product.stock || this.product.stock <= 0;
     },
     stockLabel() {
-      if (this.isOutOfStock) return 'Out of Stock';
-      if (this.product.stock <= 5) return `Only ${this.product.stock} left`;
+      if (this.isOutOfStock) return 'Sold Out';
+      if (this.product.stock <= 5) return `Only ${this.product.stock} Left`;
       return 'In Stock';
     },
     stockClass() {
-      if (this.isOutOfStock) return 'tag-out';
-      if (this.product.stock <= 5) return 'tag-low';
-      return 'tag-in';
+      if (this.isOutOfStock) return 'bg-danger';
+      if (this.product.stock <= 5) return 'bg-warning text-dark';
+      return 'bg-success';
     },
     sellerName() {
       return this.product.store && this.product.store.storeName
@@ -225,129 +223,128 @@ export default {
 
 <style scoped>
 .ebx-card {
-  background: var(--bf-bg-card);
-  border: 1px solid var(--bf-border);
-  border-radius: var(--bf-radius-lg);
-  overflow: hidden;
-  transition: all var(--bf-transition-base);
+  height: 100%;
   display: flex;
   flex-direction: column;
-  height: 100%;
-  width: 100%;
+  position: relative;
+  overflow: hidden;
 }
 
-.ebx-card:hover {
-  box-shadow: var(--bf-shadow-xl);
-  border-color: var(--bf-primary-glow);
-  transform: translateY(-4px);
-}
-
-/* Image */
 .ebx-image-wrapper {
   position: relative;
   overflow: hidden;
-  aspect-ratio: 4/3;
-  background: var(--bf-bg-tertiary);
+  aspect-ratio: 16/10;
+  background: var(--bf-bg-secondary);
 }
 
 .ebx-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  display: block;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .ebx-card:hover .ebx-image {
-  transform: scale(1.06);
+  transform: scale(1.08);
 }
 
-/* Watchlist heart */
+.ebx-image-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(to top, rgba(11, 15, 25, 0.7) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.ebx-card:hover .ebx-image-overlay {
+  opacity: 1;
+}
+
+/* Glass Watchlist button */
 .ebx-watch-btn {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  width: 34px;
-  height: 34px;
+  top: 12px; right: 12px;
+  width: 36px; height: 36px;
   border-radius: 50%;
-  border: none;
-  background: rgba(255, 255, 255, 0.9);
-  color: #6b7280;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all var(--bf-transition-fast);
-  box-shadow: var(--bf-shadow-sm);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(11, 15, 25, 0.6);
+  color: var(--bf-text-secondary);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  z-index: 5;
 }
-[data-theme="dark"] .ebx-watch-btn {
-  background: rgba(17, 24, 39, 0.85);
-  color: #d1d5db;
-}
+
 .ebx-watch-btn:hover {
   transform: scale(1.1);
+  background: rgba(11, 15, 25, 0.8);
+  border-color: rgba(255, 255, 255, 0.2);
 }
+
 .ebx-watch-btn.active {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
   color: var(--bf-danger);
 }
 
-/* Stock tag */
-.ebx-tag {
+/* Badge overlay */
+.ebx-badge {
   position: absolute;
-  top: 10px;
-  left: 10px;
-  padding: 3px 10px;
-  border-radius: var(--bf-radius-full);
-  font-size: 0.65rem;
+  top: 12px; left: 12px;
+  padding: 4px 10px;
+  font-size: 0.7rem;
   font-weight: 700;
+  border-radius: 6px;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: #ffffff;
+  letter-spacing: 0.5px;
+  z-index: 5;
 }
-.tag-in { background: rgba(16, 185, 129, 0.9); }
-.tag-low { background: rgba(245, 158, 11, 0.92); }
-.tag-out { background: rgba(239, 68, 68, 0.9); }
 
-/* Quick view */
+/* Quickview Hover trigger */
 .ebx-quickview-btn {
   position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 8px;
+  bottom: 12px; left: 12px; right: 12px;
+  padding: 10px;
   text-align: center;
-  background: rgba(17, 24, 39, 0.82);
   color: #fff;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   font-weight: 600;
   text-decoration: none;
-  backdrop-filter: blur(4px);
+  border-radius: var(--bf-radius-md);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  z-index: 10;
+  display: flex; align-items: center; justify-content: center;
 }
 
-/* Body */
 .ebx-body {
-  padding: 14px 16px 16px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
-  flex: 1;
+  flex-grow: 1;
 }
 
 .ebx-category {
-  font-size: var(--bf-font-size-xs);
-  color: var(--bf-primary);
-  font-weight: 600;
+  font-size: 0.75rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 4px;
+  letter-spacing: 1px;
+}
+
+.ebx-shipping-badge {
+  font-size: 0.7rem;
+  color: var(--bf-text-muted);
+  font-weight: 500;
 }
 
 .ebx-title {
-  font-size: var(--bf-font-size-base);
+  font-size: 1.05rem;
   font-weight: 700;
-  margin: 0 0 6px 0;
-  line-height: 1.3;
-  min-height: 2.4em;
+  margin: 8px 0 12px 0;
+  min-height: 2.6em;
+  line-height: 1.35;
 }
+
 .ebx-title a {
   color: var(--bf-text-primary);
   text-decoration: none;
@@ -356,148 +353,68 @@ export default {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
 .ebx-title a:hover {
-  color: var(--bf-primary);
+  color: var(--bf-cyan);
 }
 
-/* Seller row */
 .ebx-seller-row {
   display: flex;
   align-items: center;
-  gap: 5px;
-  flex-wrap: wrap;
-  margin-bottom: 6px;
-  font-size: 0.72rem;
+  gap: 6px;
+  font-size: 0.78rem;
+  color: var(--bf-text-muted);
+  margin-bottom: 12px;
 }
 
 .ebx-seller-name {
-  color: var(--bf-text-secondary);
   font-weight: 600;
+  color: var(--bf-text-secondary);
 }
 
-.ebx-verified-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: var(--bf-primary);
-  color: #fff;
-  font-size: 0.55rem;
-  font-weight: 900;
-}
-
-.ebx-stars {
-  position: relative;
-  display: inline-block;
-  font-size: 0.72rem;
-  line-height: 1;
-  letter-spacing: 1px;
-}
-.ebx-stars-base {
-  color: var(--bf-border);
-}
-.ebx-stars-fill {
-  position: absolute;
-  top: 0;
-  left: 0;
-  overflow: hidden;
-  white-space: nowrap;
-  color: var(--bf-warning);
-}
-
-.ebx-review-count {
-  color: var(--bf-text-muted);
+.ebx-rating-val {
+  font-weight: 700;
+  color: var(--bf-text-primary);
 }
 
 .ebx-desc {
-  font-size: var(--bf-font-size-xs);
+  font-size: 0.85rem;
   color: var(--bf-text-muted);
-  margin: 0 0 auto 0;
+  line-height: 1.5;
+  margin: 0 0 16px 0;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  line-height: 1.5;
 }
 
-/* Price */
 .ebx-price-row {
+  margin-top: auto;
   display: flex;
-  flex-direction: column;
-  margin-top: 14px;
-  padding-top: 12px;
-  border-top: 1px solid var(--bf-border-light);
+  align-items: baseline;
+  justify-content: space-between;
 }
 
 .ebx-price {
-  font-size: var(--bf-font-size-xl);
+  font-size: 1.35rem;
   font-weight: 800;
-  color: var(--bf-text-primary);
-}
-
-.ebx-shipping-note {
-  font-size: 0.7rem;
-  color: var(--bf-text-muted);
-  margin-top: 2px;
-}
-
-/* Actions */
-.ebx-actions {
-  display: flex;
-  gap: 8px;
-  margin-top: 12px;
-}
-
-.ebx-btn {
-  flex: 1;
-  padding: 9px 10px;
-  border-radius: var(--bf-radius-md);
-  font-size: 0.8rem;
-  font-weight: 700;
-  text-align: center;
-  text-decoration: none;
-  cursor: pointer;
-  border: 1.5px solid transparent;
-  transition: all var(--bf-transition-fast);
-}
-
-.ebx-btn-outline {
-  background: transparent;
-  border-color: var(--bf-border);
-  color: var(--bf-text-primary);
-}
-.ebx-btn-outline:hover {
-  border-color: var(--bf-primary);
-  color: var(--bf-primary);
-}
-
-.ebx-btn-primary {
-  background: var(--bf-primary);
-  color: #fff;
-}
-.ebx-btn-primary:hover:not(:disabled) {
-  background: var(--bf-primary-hover);
-}
-.ebx-btn-primary:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
 }
 
 .ebx-admin-edit {
-  margin-top: 8px;
-  text-align: center;
-  font-size: 0.75rem;
-  font-weight: 600;
-  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px;
   border-radius: var(--bf-radius-md);
-  border: 1.5px dashed var(--bf-border);
+  border: 1px dashed rgba(255, 255, 255, 0.15);
+  font-size: 0.8rem;
   color: var(--bf-text-muted);
-  text-decoration: none;
+  transition: all 0.2s ease;
 }
+
 .ebx-admin-edit:hover {
-  color: var(--bf-primary);
-  border-color: var(--bf-primary);
+  border-color: var(--bf-cyan);
+  color: var(--bf-cyan);
 }
 </style>
