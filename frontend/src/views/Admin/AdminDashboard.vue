@@ -391,13 +391,12 @@
 
 <script>
 import api, { extractErrorMessage, formatPrice } from '../../utils/api';
-import LoadingSkeleton from '../../components/Common/LoadingSkeleton.vue';
 import { showToast } from '../../components/Common/ToastNotification.vue';
 import { getToken } from '../../utils/auth';
 
 export default {
   name: 'AdminDashboard',
-  components: { LoadingSkeleton },
+  components: { },
   data() {
     return {
       activeTab: 'deliveries',
