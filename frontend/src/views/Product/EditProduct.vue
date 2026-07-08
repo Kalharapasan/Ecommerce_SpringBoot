@@ -95,7 +95,27 @@
                 </div>
 
                 <div class="col-md-6">
-                  <label class="form-label small text-muted font-weight-bold">Price Rate (LKR)</label>
+                  <label class="form-label small text-muted font-weight-bold">Item Condition</label>
+                  <select class="bf-input text-white bg-dark border-light" v-model="conditionType" required>
+                    <option value="Brand New">Brand New (Sealed)</option>
+                    <option value="Refurbished">Certified Refurbished</option>
+                    <option value="Used - Like New">Used - Like New</option>
+                    <option value="Used - Good">Used - Good (Tested)</option>
+                    <option value="For Parts">For Parts or Not Working</option>
+                  </select>
+                </div>
+
+                <div class="col-md-6 d-flex align-items-center mt-4">
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="isAuctionSwitch" v-model="isAuction" @change="onAuctionToggle">
+                    <label class="form-check-label text-white small" for="isAuctionSwitch">List as Auction (Bidding)</label>
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label small text-muted font-weight-bold">
+                    {{ isAuction ? 'Starting Bid Price (LKR)' : 'Price Rate (LKR)' }}
+                  </label>
                   <input 
                     type="number" 
                     class="bf-input text-white bg-dark border-light" 
@@ -106,11 +126,11 @@
                     required
                   />
                   <div v-if="touched.price && (price === null || price === undefined || price <= 0)" class="text-danger mt-1 small">
-                    Price is required and must be greater than 0.
+                    Price/Bid is required and must be greater than 0.
                   </div>
                 </div>
 
-                <div class="col-md-6">
+                <div class="col-md-6" v-if="!isAuction">
                   <label class="form-label small text-muted font-weight-bold">Stock Quantity</label>
                   <input 
                     type="number" 
@@ -123,6 +143,16 @@
                   <div v-if="touched.stock && (stock === null || stock === undefined || stock < 0)" class="text-danger mt-1 small">
                     Stock count is required and must be non-negative.
                   </div>
+                </div>
+                <div class="col-md-6" v-else>
+                  <label class="form-label small text-muted font-weight-bold">Auction Duration (Days)</label>
+                  <select class="bf-input text-white bg-dark border-light" v-model="auctionDuration">
+                    <option :value="1">1 Day</option>
+                    <option :value="3">3 Days</option>
+                    <option :value="5">5 Days</option>
+                    <option :value="7">7 Days (Default)</option>
+                    <option :value="10">10 Days</option>
+                  </select>
                 </div>
 
                 <div class="col-12">
@@ -220,6 +250,9 @@ export default {
       imageUrl: '',
       price: null,
       stock: 0,
+      conditionType: 'Brand New',
+      isAuction: false,
+      auctionDuration: 7,
       categoryId: '',
       storeId: null,
       categories: [],
@@ -252,9 +285,7 @@ export default {
         this.price !== null &&
         this.price !== undefined &&
         this.price > 0 &&
-        this.stock !== null &&
-        this.stock !== undefined &&
-        this.stock >= 0 &&
+        (this.isAuction || (this.stock !== null && this.stock !== undefined && this.stock >= 0)) &&
         this.categoryId !== ''
       );
     }
@@ -311,10 +342,23 @@ export default {
         this.stock = p.stock || 0;
         this.categoryId = p.categoryId;
         this.storeId = p.storeId;
+        this.isAuction = !!p.isAuction;
+        this.conditionType = p.conditionType || 'Brand New';
+        if (p.auctionEndDate) {
+          // Approximate remaining days or keep default duration
+          const diffTime = new Date(p.auctionEndDate) - new Date();
+          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+          this.auctionDuration = diffDays > 0 ? diffDays : 7;
+        }
       } catch (err) {
         this.error = extractErrorMessage(err);
       } finally {
         this.loading = false;
+      }
+    },
+    onAuctionToggle() {
+      if (this.isAuction) {
+        this.stock = 1;
       }
     },
     async handleSubmit() {
@@ -322,15 +366,24 @@ export default {
       this.submitting = true;
       this.error = null;
       try {
+        let auctionEndDate = null;
+        if (this.isAuction) {
+          const endDate = new Date();
+          endDate.setDate(endDate.getDate() + this.auctionDuration);
+          auctionEndDate = endDate.toISOString();
+        }
         const payload = {
           productId: this.productId,
           productName: this.productName,
           description: this.description,
           imageUrl: this.imageUrl,
           price: this.price,
-          stock: this.stock,
+          stock: this.isAuction ? 1 : this.stock,
           categoryId: this.categoryId,
-          storeId: this.storeId
+          storeId: this.storeId,
+          isAuction: this.isAuction,
+          conditionType: this.conditionType,
+          auctionEndDate: auctionEndDate
         };
         const response = await api.put('/product', payload);
         showToast({

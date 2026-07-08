@@ -82,13 +82,23 @@
                       {{ stockLabel }}
                     </span>
                   </div>
-                  <router-link 
-                    v-if="product.storeId" 
-                    :to="'/store/' + product.storeId" 
-                    class="text-cyan small font-bold text-decoration-none hover-glow"
-                  >
-                    <i class="bi bi-shop me-1"></i> {{ product.storeName || 'Partner Store' }}
-                  </router-link>
+                  <div class="d-flex align-items-center gap-3">
+                    <router-link 
+                      v-if="product.storeId" 
+                      :to="'/store/' + product.storeId" 
+                      class="text-cyan small font-bold text-decoration-none hover-glow"
+                    >
+                      <i class="bi bi-shop me-1"></i> {{ product.storeName || 'Partner Store' }}
+                    </router-link>
+                    <a 
+                      href="#" 
+                      @click.prevent="contactSeller" 
+                      class="text-secondary small font-bold text-decoration-none hover-glow"
+                      v-if="product.storeId"
+                    >
+                      <i class="bi bi-envelope me-1"></i> Contact Seller
+                    </a>
+                  </div>
                 </div>
 
                 <h1 class="text-white font-bold mb-3 fs-2">{{ product.productName }}</h1>
@@ -101,8 +111,20 @@
                   <span class="text-muted small">4.9 / 5.0 (28 customer benchmarks)</span>
                 </div>
 
-                <!-- Price Box -->
-                <div class="price-box-details bf-glass p-3 border-0 mb-4 bg-black bg-opacity-20">
+                <!-- Price Box / Bidding overview -->
+                <div class="price-box-details bf-glass p-3 border-0 mb-4 bg-black bg-opacity-20" v-if="product.isAuction">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                      <span class="text-muted d-block small mb-1">Current Highest Bid</span>
+                      <span class="bf-price-amount fs-2 font-bold text-gradient-primary">LKR {{ (product.currentBid || product.price).toLocaleString() }}</span>
+                    </div>
+                    <div class="text-end">
+                      <span class="badge bg-danger bg-opacity-15 text-danger d-block fs-6 mb-1">🔨 {{ product.bidsCount || 0 }} Bid(s)</span>
+                      <span class="text-muted small d-block" v-if="timeRemaining">{{ timeRemaining }}</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="price-box-details bf-glass p-3 border-0 mb-4 bg-black bg-opacity-20" v-else>
                   <span class="text-muted d-block small mb-1">Standard Market Rate</span>
                   <span class="bf-price-amount fs-2 font-bold text-gradient-primary">{{ formattedPrice }}</span>
                 </div>
@@ -140,7 +162,7 @@
                           </tr>
                           <tr class="border-bottom border-secondary border-opacity-10">
                             <td class="text-muted py-2">Part Condition:</td>
-                            <td class="text-secondary font-semibold py-2">{{ product.condition || 'Brand New' }}</td>
+                            <td class="text-secondary font-semibold py-2">{{ product.conditionType || 'Brand New' }}</td>
                           </tr>
                           <tr class="border-bottom border-secondary border-opacity-10">
                             <td class="text-muted py-2">Stock Quantity:</td>
@@ -161,46 +183,91 @@
               <!-- Purchase Control Section -->
               <div class="mt-4 pt-4 border-top border-secondary border-opacity-25">
                 <div v-if="!isAdmin">
-                  <div class="d-flex align-items-center justify-content-between gap-3 mb-4" v-if="product.stock && product.stock > 0">
-                    <span class="text-muted small font-bold">QUANTITY CONFIG</span>
-                    <div class="bf-qty-stepper-premium bf-glass border-0">
-                      <button
-                        class="qty-btn"
-                        type="button"
-                        @click="decrementQty"
-                        :disabled="quantity <= 1"
-                      >
-                        <i class="bi bi-dash"></i>
-                      </button>
-                      <input
-                        type="number"
-                        class="qty-input-box text-white"
-                        v-model.number="quantity"
-                        min="1"
-                        :max="product.stock"
-                        @change="validateQty"
-                      />
-                      <button
-                        class="qty-btn"
-                        type="button"
-                        @click="incrementQty"
-                        :disabled="quantity >= product.stock"
-                      >
-                        <i class="bi bi-plus"></i>
-                      </button>
+                  <!-- Auction Mode Bidding Box -->
+                  <div v-if="product.isAuction" class="bf-glass p-4 border border-secondary border-opacity-15 rounded-3 bg-black bg-opacity-30">
+                    <h6 class="text-white font-bold mb-3"><i class="bi bi-hammer text-warning me-2"></i>Live Auction Portal</h6>
+                    
+                    <div v-if="isAuctionExpired" class="alert alert-secondary py-3 text-center mb-0">
+                      <i class="bi bi-clock-history me-1"></i> This auction has closed.
                     </div>
+                    
+                    <form v-else @submit.prevent="placeBid">
+                      <div class="mb-3">
+                        <label class="form-label small text-muted font-bold d-block mb-2">
+                          Your Max Bid Amount (LKR)
+                        </label>
+                        <div class="input-group">
+                          <span class="input-group-text bg-dark border-secondary text-muted">LKR</span>
+                          <input 
+                            type="number" 
+                            class="form-control text-white bg-dark border-secondary" 
+                            v-model.number="bidAmount"
+                            :min="minBidAmount"
+                            step="100"
+                            required
+                            placeholder="Enter amount..."
+                          />
+                        </div>
+                        <small class="text-muted mt-1 d-block">
+                          Enter at least **LKR {{ minBidAmount.toLocaleString() }}** (minimum increment LKR 100).
+                        </small>
+                      </div>
+                      
+                      <button 
+                        type="submit" 
+                        class="bf-btn-premium w-100 py-3 text-center border-0 d-flex align-items-center justify-content-center gap-2"
+                        :disabled="biddingSubmitting"
+                      >
+                        <span v-if="biddingSubmitting" class="spinner-border spinner-border-sm" role="status"></span>
+                        <i v-else class="bi bi-hammer"></i>
+                        <span>Place Max Bid</span>
+                      </button>
+                    </form>
                   </div>
 
-                  <div class="d-flex gap-3">
-                    <button
-                      class="bf-btn-premium flex-grow-1 py-3 text-center border-0 d-flex align-items-center justify-content-center gap-2"
-                      @click="addToCart"
-                      :disabled="addingToCart || !product.stock || product.stock <= 0"
-                    >
-                      <span v-if="addingToCart" class="spinner-border spinner-border-sm" role="status"></span>
-                      <i v-else class="bi bi-cart-plus-fill"></i>
-                      <span>{{ product.stock && product.stock > 0 ? 'Inject to Cart' : 'Temporarily Out of Stock' }}</span>
-                    </button>
+                  <!-- Standard Buy It Now Box -->
+                  <div v-else>
+                    <div class="d-flex align-items-center justify-content-between gap-3 mb-4" v-if="product.stock && product.stock > 0">
+                      <span class="text-muted small font-bold">QUANTITY CONFIG</span>
+                      <div class="bf-qty-stepper-premium bf-glass border-0">
+                        <button
+                          class="qty-btn"
+                          type="button"
+                          @click="decrementQty"
+                          :disabled="quantity <= 1"
+                        >
+                          <i class="bi bi-dash"></i>
+                        </button>
+                        <input
+                          type="number"
+                          class="qty-input-box text-white"
+                          v-model.number="quantity"
+                          min="1"
+                          :max="product.stock"
+                          @change="validateQty"
+                        />
+                        <button
+                          class="qty-btn"
+                          type="button"
+                          @click="incrementQty"
+                          :disabled="quantity >= product.stock"
+                        >
+                          <i class="bi bi-plus"></i>
+                        </button>
+                      </div>
+                    </div>
+
+                    <div class="d-flex gap-3">
+                      <button
+                        class="bf-btn-premium flex-grow-1 py-3 text-center border-0 d-flex align-items-center justify-content-center gap-2"
+                        @click="addToCart"
+                        :disabled="addingToCart || !product.stock || product.stock <= 0"
+                      >
+                        <span v-if="addingToCart" class="spinner-border spinner-border-sm" role="status"></span>
+                        <i v-else class="bi bi-cart-plus-fill"></i>
+                        <span>{{ product.stock && product.stock > 0 ? 'Inject to Cart' : 'Temporarily Out of Stock' }}</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
 
@@ -258,7 +325,14 @@ export default {
       addingToCart: false,
       currentImageUrl: '',
       activeTab: 'desc',
-      fallbackUrl: 'https://images.unsplash.com/photo-1587831990711-23ca6441447b?auto=format&fit=crop&w=500&q=80'
+      fallbackUrl: 'https://images.unsplash.com/photo-1587831990711-23ca6441447b?auto=format&fit=crop&w=500&q=80',
+      
+      // Bidding / Inquiries variables
+      bidAmount: 0,
+      biddingSubmitting: false,
+      timeRemaining: '',
+      isAuctionExpired: false,
+      timerInterval: null
     };
   },
   computed: {
@@ -270,14 +344,21 @@ export default {
       return this.product ? formatPrice(this.product.price) : '';
     },
     stockLabel() {
+      if (this.product.isAuction) return 'AUCTION ACTIVE';
       if (!this.product.stock || this.product.stock <= 0) return 'OUT OF STOCK';
       if (this.product.stock <= 5) return 'LOW STOCK';
       return 'IN STOCK';
     },
     stockBadgeClass() {
+      if (this.product.isAuction) return 'bg-danger bg-opacity-25 text-danger';
       if (!this.product.stock || this.product.stock <= 0) return 'bg-danger bg-opacity-25 text-danger';
       if (this.product.stock <= 5) return 'bg-warning bg-opacity-25 text-warning';
       return 'bg-success bg-opacity-25 text-success';
+    },
+    minBidAmount() {
+      if (!this.product) return 0;
+      const current = this.product.currentBid || this.product.price || 0;
+      return current + 100;
     }
   },
   watch: {
@@ -285,6 +366,7 @@ export default {
       async handler(newId) {
         if (newId) {
           this.quantity = 1;
+          this.stopTimer();
           await this.fetchProduct(newId);
         }
       },
@@ -301,6 +383,8 @@ export default {
         const response = await api.get(`/product/${productId}`);
         this.product = response.data.data;
         this.currentImageUrl = this.product.imageUrl;
+        this.bidAmount = this.minBidAmount;
+        this.startTimer();
 
         // Fetch related catalog items
         if (this.product && this.product.categoryId) {
@@ -382,7 +466,121 @@ export default {
       } finally {
         this.addingToCart = false;
       }
+    },
+    startTimer() {
+      this.stopTimer();
+      if (this.product && this.product.isAuction && this.product.auctionEndDate) {
+        this.updateCountdown();
+        this.timerInterval = setInterval(() => {
+          this.updateCountdown();
+        }, 1000);
+      }
+    },
+    stopTimer() {
+      if (this.timerInterval) {
+        clearInterval(this.timerInterval);
+        this.timerInterval = null;
+      }
+    },
+    updateCountdown() {
+      if (!this.product || !this.product.auctionEndDate) return;
+      const end = new Date(this.product.auctionEndDate).getTime();
+      const now = new Date().getTime();
+      const diff = end - now;
+
+      if (diff <= 0) {
+        this.timeRemaining = 'Auction Ended';
+        this.isAuctionExpired = true;
+        this.stopTimer();
+        return;
+      }
+
+      this.isAuctionExpired = false;
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+      let parts = [];
+      if (days > 0) parts.push(`${days}d`);
+      if (hours > 0 || days > 0) parts.push(`${hours}h`);
+      parts.push(`${minutes}m`);
+      parts.push(`${seconds}s`);
+
+      this.timeRemaining = 'Time Left: ' + parts.join(' ');
+    },
+    async placeBid() {
+      if (!isLoggedIn()) {
+        showToast({
+          message: 'Please sign in to place a bid on this item.',
+          type: 'warning',
+          title: 'Authentication Required'
+        });
+        this.$router.push({
+          name: 'SignIn',
+          query: { redirect: this.$route.fullPath }
+        });
+        return;
+      }
+
+      if (this.bidAmount < this.minBidAmount) {
+        showToast({
+          message: `Bid amount must be at least LKR ${this.minBidAmount.toLocaleString()}`,
+          type: 'warning',
+          title: 'Invalid Bid'
+        });
+        return;
+      }
+
+      this.biddingSubmitting = true;
+      try {
+        const token = getToken();
+        const response = await api.post(`/product/${this.product.productId}/bid`, null, {
+          params: {
+            token: token,
+            bidAmount: this.bidAmount
+          }
+        });
+
+        showToast({
+          message: response.data.message || 'Your bid has been successfully placed!',
+          type: 'success',
+          title: 'Bid Placed'
+        });
+        
+        await this.fetchProduct(this.product.productId);
+      } catch (err) {
+        showToast({
+          message: extractErrorMessage(err),
+          type: 'error',
+          title: 'Bidding Failed'
+        });
+      } finally {
+        this.biddingSubmitting = false;
+      }
+    },
+    contactSeller() {
+      if (!isLoggedIn()) {
+        showToast({
+          message: 'Please sign in to contact the seller.',
+          type: 'warning',
+          title: 'Authentication Required'
+        });
+        this.$router.push({
+          name: 'SignIn',
+          query: { redirect: this.$route.fullPath }
+        });
+        return;
+      }
+      localStorage.setItem('bf-prefill-ticket', JSON.stringify({
+        subject: `Inquiry: ${this.product.productName} (Item #${this.product.productId})`,
+        content: `Hi ${this.product.storeName || 'Seller'},\n\nI am contacting you regarding your listed item: ${this.product.productName}.\n\n[Please enter your question here...]`
+      }));
+      this.$router.push('/profile');
     }
+  },
+  beforeUnmount() {
+    this.stopTimer();
   }
 };
 </script>

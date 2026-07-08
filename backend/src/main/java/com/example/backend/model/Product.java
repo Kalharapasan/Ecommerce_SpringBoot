@@ -43,6 +43,21 @@ public class Product {
     @Column(name = "STOCK")
     private Integer stock;
 
+    @Column(name = "IS_AUCTION")
+    private Boolean isAuction;
+
+    @Column(name = "CURRENT_BID")
+    private BigDecimal currentBid;
+
+    @Column(name = "BIDS_COUNT")
+    private Integer bidsCount;
+
+    @Column(name = "AUCTION_END_DATE")
+    private java.util.Date auctionEndDate;
+
+    @Column(name = "CONDITION_TYPE")
+    private String conditionType;
+
 //    @OneToMany(mappedBy = "product")
 //    private List<Cart> cart;
 

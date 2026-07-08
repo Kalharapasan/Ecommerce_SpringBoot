@@ -342,6 +342,11 @@ public class StoreService {
                         dto.setStoreRating(product.getStore().getRating());
                         dto.setStoreReviewsCount(product.getStore().getReviewsCount());
                     }
+                    dto.setIsAuction(product.getIsAuction());
+                    dto.setCurrentBid(product.getCurrentBid());
+                    dto.setBidsCount(product.getBidsCount());
+                    dto.setAuctionEndDate(product.getAuctionEndDate());
+                    dto.setConditionType(product.getConditionType());
                     return dto;
                 })
                 .collect(Collectors.toList());

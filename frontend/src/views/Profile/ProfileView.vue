@@ -503,6 +503,26 @@ export default {
         this.fetchOrderHistory(),
         this.fetchUserMessages()
       ]);
+
+      // Prefill support ticket if requested by redirect (eBay contact seller)
+      const prefill = localStorage.getItem('bf-prefill-ticket');
+      if (prefill) {
+        try {
+          const { subject, content } = JSON.parse(prefill);
+          this.ticketSubject = subject;
+          this.ticketContent = content;
+          this.showTicketForm = true;
+
+          // Scroll to Support Desk section
+          this.$nextTick(() => {
+            const el = document.querySelector('.bf-glass-card:last-child');
+            if (el) el.scrollIntoView({ behavior: 'smooth' });
+          });
+        } catch (e) {
+          console.warn('Failed to parse prefilled ticket details:', e);
+        }
+        localStorage.removeItem('bf-prefill-ticket');
+      }
     } catch (err) {
       this.error = extractErrorMessage(err);
     } finally {

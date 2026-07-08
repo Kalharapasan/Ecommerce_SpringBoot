@@ -247,6 +247,25 @@
                 </select>
               </div>
 
+              <!-- Listing Type -->
+              <div class="ebv-filter-group mb-4">
+                <h6 class="text-muted text-uppercase tracking-wider mb-2 font-bold small">Listing Type</h6>
+                <div class="ebv-filter-list d-flex flex-column gap-2">
+                  <label class="ebv-filter-radio d-flex align-items-center gap-2 text-muted cursor-pointer" :class="{ active: selectedListingType === 'all' }">
+                    <input type="radio" name="listingType" :checked="selectedListingType === 'all'" @change="selectedListingType = 'all'" class="form-check-input" />
+                    All Listings
+                  </label>
+                  <label class="ebv-filter-radio d-flex align-items-center gap-2 text-muted cursor-pointer" :class="{ active: selectedListingType === 'buyitnow' }">
+                    <input type="radio" name="listingType" :checked="selectedListingType === 'buyitnow'" @change="selectedListingType = 'buyitnow'" class="form-check-input" />
+                    Buy It Now (Fixed)
+                  </label>
+                  <label class="ebv-filter-radio d-flex align-items-center gap-2 text-muted cursor-pointer" :class="{ active: selectedListingType === 'auction' }">
+                    <input type="radio" name="listingType" :checked="selectedListingType === 'auction'" @change="selectedListingType = 'auction'" class="form-check-input" />
+                    🔨 Auctions (Bids)
+                  </label>
+                </div>
+              </div>
+
               <!-- Stock Options -->
               <div class="ebv-filter-group">
                 <label class="d-flex align-items-center gap-2 text-muted cursor-pointer">
@@ -373,6 +392,7 @@ export default {
       viewMode: 'grid',
       priceRange: 1000000,
       selectedBrand: 'all',
+      selectedListingType: 'all',
       inStockOnly: false,
       currentPage: 1,
       pageSize: 9,
@@ -423,6 +443,12 @@ export default {
         results = results.filter(p => p.productName.toLowerCase().includes(this.selectedBrand.toLowerCase()));
       }
 
+      if (this.selectedListingType === 'auction') {
+        results = results.filter(p => p.isAuction);
+      } else if (this.selectedListingType === 'buyitnow') {
+        results = results.filter(p => !p.isAuction);
+      }
+
       if (this.inStockOnly) {
         results = results.filter(p => p.stock && p.stock > 0);
       }
@@ -450,6 +476,7 @@ export default {
     searchQuery() { this.currentPage = 1; },
     priceRange() { this.currentPage = 1; },
     selectedBrand() { this.currentPage = 1; },
+    selectedListingType() { this.currentPage = 1; },
     inStockOnly() { this.currentPage = 1; },
     '$route.query.q': {
       immediate: true,
@@ -469,6 +496,7 @@ export default {
       this.searchQuery = '';
       this.priceRange = 1000000;
       this.selectedBrand = 'all';
+      this.selectedListingType = 'all';
       this.inStockOnly = false;
       this.currentPage = 1;
     },

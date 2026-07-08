@@ -30,7 +30,9 @@
       </button>
 
       <!-- Dynamic Stock Badge -->
-      <span class="ebx-badge" :class="stockClass">{{ stockLabel }}</span>
+      <span class="ebx-badge" :class="product.isAuction ? 'bg-danger shadow-glow' : stockClass">
+        {{ product.isAuction ? '🔨 Auction' : stockLabel }}
+      </span>
 
       <!-- Fast Quick View trigger -->
       <router-link
@@ -46,7 +48,7 @@
     <div class="ebx-body">
       <div class="d-flex justify-content-between align-items-center mb-1">
         <span v-if="product.categoryName" class="ebx-category text-gradient">{{ product.categoryName }}</span>
-        <span class="ebx-shipping-badge"><i class="bi bi-truck me-1"></i>Free Shipping</span>
+        <span class="badge bg-secondary bg-opacity-25 text-white small px-2 py-1 rounded">{{ product.conditionType || 'Brand New' }}</span>
       </div>
 
       <h3 class="ebx-title">
@@ -70,12 +72,30 @@
 
       <!-- Price Block -->
       <div class="ebx-price-row">
-        <span class="ebx-price text-gradient-primary">{{ formattedPrice }}</span>
+        <div>
+          <span class="text-muted small d-block" v-if="product.isAuction" style="font-size: 0.68rem; margin-bottom: 2px;">CURRENT BID</span>
+          <span class="ebx-price text-gradient-primary">{{ formattedPrice }}</span>
+        </div>
+        <span class="badge bg-danger bg-opacity-15 text-danger small" v-if="product.isAuction && product.bidsCount">
+          {{ product.bidsCount }} bid{{ product.bidsCount > 1 ? 's' : '' }}
+        </span>
+        <span class="badge bg-secondary bg-opacity-15 text-muted small" v-else-if="product.isAuction">
+          No bids
+        </span>
       </div>
 
       <!-- Action Buttons -->
       <div class="ebx-actions mt-3">
+        <router-link
+          v-if="product.isAuction"
+          :to="{ name: 'ProductDetail', params: { id: product.productId } }"
+          class="bf-btn-premium w-100 py-2.5 d-flex align-items-center justify-content-center gap-2 text-decoration-none"
+        >
+          <i class="bi bi-hammer"></i>
+          <span>Place Bid</span>
+        </router-link>
         <button
+          v-else
           class="bf-btn-premium w-100 py-2.5 d-flex align-items-center justify-content-center gap-2"
           :disabled="isOutOfStock || addingToCart"
           @click.stop="quickAddToCart"
@@ -135,7 +155,8 @@ export default {
   },
   computed: {
     formattedPrice() {
-      return formatPrice(this.product.price);
+      const p = (this.product.isAuction && this.product.currentBid) ? this.product.currentBid : this.product.price;
+      return formatPrice(p);
     },
     isAdmin() {
       const user = getCurrentUser();

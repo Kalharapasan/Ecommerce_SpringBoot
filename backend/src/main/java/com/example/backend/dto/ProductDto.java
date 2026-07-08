@@ -25,4 +25,9 @@ public class ProductDto {
     private Boolean storeVerified;
     private BigDecimal storeRating;
     private Integer storeReviewsCount;
+    private Boolean isAuction;
+    private BigDecimal currentBid;
+    private Integer bidsCount;
+    private java.util.Date auctionEndDate;
+    private String conditionType;
 }

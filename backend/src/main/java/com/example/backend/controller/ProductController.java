@@ -46,4 +46,12 @@ public class ProductController {
         return response;
     }
 
+    @PostMapping("/{productId}/bid")
+    public ResponseEntity<ResponseDto> placeBid(
+            @PathVariable Integer productId,
+            @RequestParam String token,
+            @RequestParam java.math.BigDecimal bidAmount) {
+        return productService.placeBid(productId, token, bidAmount);
+    }
+
 }
