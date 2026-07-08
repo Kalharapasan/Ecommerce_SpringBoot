@@ -1,8 +1,9 @@
 <template>
   <tr class="align-middle border-light-row">
-    <td>
+    <!-- Product details column -->
+    <td class="py-4">
       <div class="d-flex align-items-center gap-3">
-        <div class="bf-cart-thumbnail-wrapper">
+        <div class="bf-cart-thumbnail-wrapper bf-glass border-0">
           <img 
             :src="currentImageUrl" 
             @error="handleImageError" 
@@ -11,24 +12,27 @@
           />
         </div>
         <div class="text-start">
-          <h6 class="mb-0 font-weight-bold text-white">{{ item.product.productName }}</h6>
-          <small class="text-muted">Unit Price: {{ formattedUnitPrice }}</small>
+          <h6 class="mb-1 font-bold text-white fs-6">{{ item.product.productName }}</h6>
+          <small class="text-muted d-block mb-1">Seller: <span class="text-secondary font-semibold">{{ item.product.store ? item.product.store.storeName : 'Marketplace Vendor' }}</span></small>
+          <small class="text-muted">Unit Rate: <span class="text-white">{{ formattedUnitPrice }}</span></small>
         </div>
       </div>
     </td>
-    <td>
-      <div class="bf-qty-stepper-cyber">
+    
+    <!-- Quantity configuration -->
+    <td class="py-4">
+      <div class="bf-qty-stepper-cyber bf-glass border-0">
         <button 
           class="qty-control-btn" 
           type="button" 
           @click="decrement"
           :disabled="item.count <= 1 || loading"
         >
-          -
+          <i class="bi bi-dash"></i>
         </button>
         <input 
           type="number" 
-          class="qty-display-box" 
+          class="qty-display-box text-white" 
           v-model.number="count"
           min="1"
           @change="validateAndEmit"
@@ -40,20 +44,24 @@
           @click="increment"
           :disabled="loading"
         >
-          +
+          <i class="bi bi-plus"></i>
         </button>
       </div>
     </td>
-    <td class="text-start">
-      <span class="font-weight-bold text-primary">{{ formattedSubtotal }}</span>
+    
+    <!-- Total Cost -->
+    <td class="py-4 text-start">
+      <span class="font-bold text-gradient-primary fs-5">{{ formattedSubtotal }}</span>
     </td>
-    <td>
+    
+    <!-- Delete Action -->
+    <td class="py-4">
       <button 
-        class="bf-btn bf-btn-ghost bf-btn-danger bf-btn-sm px-3" 
+        class="bf-btn-ghost text-danger border-danger border-opacity-25 px-3 py-1.5 small" 
         @click="remove"
         :disabled="loading"
       >
-        Remove
+        <i class="bi bi-trash-fill"></i>
       </button>
     </td>
   </tr>
@@ -78,7 +86,7 @@ export default {
     return {
       count: this.item.count,
       currentImageUrl: this.item.product.imageUrl,
-      fallbackUrl: 'https://placehold.co/80x80?text=No+Img'
+      fallbackUrl: 'https://images.unsplash.com/photo-1587831990711-23ca6441447b?auto=format&fit=crop&w=100&q=80'
     };
   },
   watch: {
@@ -135,63 +143,65 @@ export default {
 }
 
 .bf-cart-thumbnail-wrapper {
-  width: 72px;
-  height: 72px;
+  width: 76px;
+  height: 76px;
   border-radius: var(--bf-radius-md);
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: var(--bf-bg-secondary);
+  background: rgba(255, 255, 255, 0.03);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+.bf-cart-thumbnail-wrapper:hover {
+  box-shadow: 0 0 10px rgba(6, 182, 212, 0.2);
 }
 
 .bf-cart-thumbnail {
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
 }
 
 .bf-qty-stepper-cyber {
   display: inline-flex;
   align-items: center;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: var(--bf-radius-md);
-  overflow: hidden;
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 8px;
 }
 
 .qty-control-btn {
   background: transparent;
   border: none;
   color: white;
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  font-weight: 700;
-  transition: all var(--bf-transition-fast);
+  transition: background 0.2s ease;
 }
 
-.qty-control-btn:hover {
-  background: rgba(255, 255, 255, 0.06);
+.qty-control-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.08);
+}
+.qty-control-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
 }
 
 .qty-display-box {
-  width: 40px;
+  width: 44px;
   border: none;
   background: transparent;
-  color: white;
   text-align: center;
   font-weight: 700;
-  font-size: var(--bf-font-size-xs);
+  font-size: 0.85rem;
   outline: none;
-  -moz-appearance: textfield;
 }
-
 .qty-display-box::-webkit-outer-spin-button,
 .qty-display-box::-webkit-inner-spin-button {
   -webkit-appearance: none;
