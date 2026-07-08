@@ -48,7 +48,7 @@
                 alt="Product Spec Image"
                 class="img-fluid rounded-3 product-detail-img animate-float"
               />
-              <span class="product-badge-condition">{{ product.condition || 'Factory Sealed' }}</span>
+              <span class="product-badge-condition">{{ product.conditionType || 'Factory Sealed' }}</span>
             </div>
             
             <!-- Quick Features Banner -->

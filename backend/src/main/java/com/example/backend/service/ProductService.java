@@ -239,7 +239,7 @@ public class ProductService {
     }
 
     @Transactional
-    public ResponseEntity placeBid(Integer productId, String token, java.math.BigDecimal bidAmount) {
+    public ResponseEntity<ResponseDto> placeBid(Integer productId, String token, java.math.BigDecimal bidAmount) {
         ResponseDto response = new ResponseDto();
         JwtDataDto jwtData = securityConfig.getJWTData(token);
         if (jwtData.getUserId() == null) {
