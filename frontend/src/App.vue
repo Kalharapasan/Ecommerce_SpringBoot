@@ -57,11 +57,6 @@
 
           <!-- Right: Actions & User Profile -->
           <div class="bf-navbar-actions">
-            <!-- Theme Toggle -->
-            <button class="bf-icon-btn d-none d-sm-flex" @click="toggleTheme" :title="theme === 'dark' ? 'Light Mode' : 'Dark Mode'">
-              <i class="bi" :class="theme === 'dark' ? 'bi-sun-fill text-warning' : 'bi-moon-stars-fill'"></i>
-            </button>
-
             <!-- Guest Links -->
             <template v-if="!isLoggedIn">
               <router-link class="bf-btn-ghost d-none d-sm-flex" to="/signIn">Sign In</router-link>
@@ -260,7 +255,7 @@ export default {
   components: { ToastNotification },
   data() {
     return {
-      theme: 'dark', // Forced dark theme for premium feel
+      theme: 'light',
       isScrolled: false,
       mobileMenuOpen: false,
       userMenuOpen: false,
@@ -294,10 +289,6 @@ export default {
       this.userMenuOpen = false;
       this.mobileMenuOpen = false;
       this.$router.push({ name: 'SignIn' });
-    },
-    toggleTheme() {
-      this.theme = this.theme === 'dark' ? 'light' : 'dark';
-      localStorage.setItem('bf-theme', this.theme);
     },
     closeUserMenu() { this.userMenuOpen = false; },
     handleScroll() { this.isScrolled = window.scrollY > 20; },
@@ -370,20 +361,20 @@ export default {
   top: 0; left: 0; right: 0;
   z-index: 1000;
   height: 80px;
-  background: rgba(11, 15, 25, 0.4);
+  background: var(--bf-bg-navbar);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid var(--bf-border);
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .bf-navbar-scrolled {
   height: 64px;
-  background: rgba(11, 15, 25, 0.85);
+  background: var(--bf-bg-navbar);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: var(--bf-shadow-sm);
+  border-bottom: 1px solid var(--bf-border);
 }
 
 .bf-navbar-inner {
@@ -459,8 +450,8 @@ export default {
 .bf-mega-menu {
   position: absolute;
   top: 100%; left: 0; right: 0;
-  background: rgba(17, 24, 39, 0.98);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  background: var(--bf-bg-primary);
+  border-bottom: 1px solid var(--bf-border);
   box-shadow: var(--bf-shadow-xl);
   transform-origin: top;
 }
@@ -473,7 +464,7 @@ export default {
 }
 
 .mega-menu-title {
-  color: #fff;
+  color: var(--bf-text-primary);
   font-weight: 700;
   margin-bottom: 16px;
   font-size: 1.1rem;
@@ -500,7 +491,7 @@ export default {
   background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(124, 58, 237, 0.1) 100%);
   border: 1px solid rgba(124, 58, 237, 0.2);
 }
-.promo-card span { font-weight: 700; color: #fff; font-size: 1.2rem; }
+.promo-card span { font-weight: 700; color: var(--bf-text-primary); font-size: 1.2rem; }
 
 /* Animated Search */
 .bf-navbar-search {
@@ -516,9 +507,9 @@ export default {
   width: 100%;
   padding: 10px 100px 10px 45px;
   border-radius: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(0, 0, 0, 0.3);
-  color: #fff;
+  border: 1px solid var(--bf-border);
+  background: var(--bf-bg-secondary);
+  color: var(--bf-text-primary);
   font-size: 0.9rem;
   transition: all 0.3s ease;
 }
@@ -526,7 +517,7 @@ export default {
 .bf-search-input:focus {
   outline: none;
   border-color: var(--bf-cyan);
-  background: rgba(0, 0, 0, 0.5);
+  background: var(--bf-bg-primary);
   box-shadow: 0 0 15px rgba(6, 182, 212, 0.2);
 }
 
@@ -560,8 +551,8 @@ export default {
   transition: all 0.2s ease; text-decoration: none; cursor: pointer;
 }
 .bf-icon-btn:hover {
-  background: rgba(255, 255, 255, 0.05);
-  color: #fff;
+  background: var(--bf-bg-secondary);
+  color: var(--bf-text-primary);
 }
 
 .bf-cart-wrapper { position: relative; }

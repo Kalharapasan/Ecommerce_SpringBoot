@@ -26,7 +26,7 @@
               />
             </div>
             <div>
-              <h2 class="font-weight-bold text-dark mb-1 d-flex align-items-center gap-2">
+              <h2 class="font-weight-bold text-white mb-1 d-flex align-items-center gap-2">
                 {{ store.storeName }}
                 <span v-if="store.isVerified" class="verification-badge" title="Verified Seller">🛡️</span>
               </h2>
@@ -121,9 +121,9 @@
         <div v-if="activeTab === 'reviews'" class="row g-4 bf-fade-in">
           <!-- Policies column -->
           <div class="col-lg-5">
-            <div class="bf-card p-4">
-              <h5 class="font-weight-bold text-dark mb-3">Store Policies</h5>
-              <div class="policies-box p-3 bg-light rounded text-secondary small" style="white-space: pre-line; line-height: 1.6;">
+            <div class="bf-card bf-glass border-secondary border-opacity-10 p-4">
+              <h5 class="font-weight-bold text-white mb-3">Store Policies</h5>
+              <div class="policies-box p-3 bg-black bg-opacity-20 rounded text-muted small" style="white-space: pre-line; line-height: 1.6; border: 1px dashed rgba(255, 255, 255, 0.15);">
                 {{ store.storePolicies || 'Default marketplace return and shipping policies apply.' }}
               </div>
             </div>
@@ -131,12 +131,12 @@
 
           <!-- Reviews column -->
           <div class="col-lg-7">
-            <div class="bf-card p-4">
-              <h5 class="font-weight-bold text-dark mb-4">Store Reviews</h5>
+            <div class="bf-card bf-glass border-secondary border-opacity-10 p-4">
+              <h5 class="font-weight-bold text-white mb-4">Store Reviews</h5>
 
               <!-- Write Review Section -->
-              <div v-if="canReview" class="p-3 bg-light rounded mb-4">
-                <h6 class="font-weight-bold mb-3">Write a Store Review</h6>
+              <div v-if="canReview" class="p-3 bg-black bg-opacity-20 border border-secondary border-opacity-10 rounded mb-4">
+                <h6 class="font-weight-bold text-white mb-3">Write a Store Review</h6>
                 <form @submit.prevent="submitReview">
                   <div class="mb-3">
                     <label class="form-label small text-muted font-weight-bold d-block">Store Rating</label>
@@ -178,7 +178,7 @@
               <div v-else class="d-flex flex-column gap-3">
                 <div v-for="rev in reviews" :key="rev.reviewId" class="review-item border-bottom pb-3">
                   <div class="d-flex justify-content-between align-items-center mb-1">
-                    <strong class="text-dark small">@{{ rev.username }}</strong>
+                    <strong class="text-cyan small">@{{ rev.username }}</strong>
                     <small class="text-muted">{{ formatDate(rev.createdDate) }}</small>
                   </div>
                   <div class="text-warning small mb-2">

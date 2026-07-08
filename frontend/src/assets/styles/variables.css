@@ -4,12 +4,12 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
-:root, [data-theme="dark"] {
+:root, [data-theme="dark"], [data-theme="light"] {
   /* Premium Gaming Color Palette */
   --bf-primary: #3B82F6;
   --bf-primary-hover: #2563EB;
-  --bf-primary-light: rgba(59, 130, 246, 0.15);
-  --bf-primary-glow: rgba(59, 130, 246, 0.5);
+  --bf-primary-light: rgba(59, 130, 246, 0.1);
+  --bf-primary-glow: rgba(59, 130, 246, 0.3);
 
   --bf-purple: #7C3AED;
   --bf-purple-hover: #6D28D9;
@@ -17,7 +17,7 @@
   --bf-cyan-hover: #0891B2;
   
   --bf-success: #10B981;
-  --bf-success-light: rgba(16, 185, 129, 0.15);
+  --bf-success-light: rgba(16, 185, 129, 0.1);
   --bf-warning: #F59E0B;
   --bf-warning-light: rgba(245, 158, 11, 0.15);
   --bf-danger: #EF4444;
@@ -25,45 +25,45 @@
   --bf-info: #06B6D4;
   --bf-info-light: rgba(6, 182, 212, 0.15);
 
-  /* Backgrounds (Space Theme) */
-  --bf-bg-primary: #0B0F19; /* Primary Background */
-  --bf-bg-secondary: #111827; /* Secondary Background */
-  --bf-bg-card: #1A2238; /* Card Background */
-  --bf-bg-tertiary: #1F2937;
-  --bf-bg-elevated: #242F4B;
-  --bf-bg-navbar: rgba(11, 15, 25, 0.75);
-  --bf-bg-sidebar: #0B0F19;
+  /* Backgrounds (White/Light Theme) */
+  --bf-bg-primary: #FFFFFF; /* Primary Background */
+  --bf-bg-secondary: #F3F4F6; /* Secondary Background */
+  --bf-bg-card: #FFFFFF; /* Card Background */
+  --bf-bg-tertiary: #E5E7EB;
+  --bf-bg-elevated: #F9FAFB;
+  --bf-bg-navbar: rgba(255, 255, 255, 0.85);
+  --bf-bg-sidebar: #FFFFFF;
 
   /* Typography Colors */
-  --bf-text-primary: #FFFFFF; /* White Text */
-  --bf-text-secondary: #E5E7EB; /* Light Gray Text */
-  --bf-text-muted: #9CA3AF; /* Muted Gray Text */
-  --bf-text-inverse: #0B0F19;
+  --bf-text-primary: #000000; /* Black Text */
+  --bf-text-secondary: #1F2937; /* Dark Gray Text */
+  --bf-text-muted: #4B5563; /* Muted Gray Text */
+  --bf-text-inverse: #FFFFFF;
 
   /* Borders & Glassmorphism */
-  --bf-border: rgba(255, 255, 255, 0.08);
-  --bf-border-light: rgba(255, 255, 255, 0.04);
+  --bf-border: rgba(0, 0, 0, 0.08);
+  --bf-border-light: rgba(0, 0, 0, 0.04);
   --bf-border-focus: var(--bf-cyan);
 
   /* Cyber Glow & Soft Shadows */
-  --bf-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.5);
-  --bf-shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.4);
-  --bf-shadow-md: 0 8px 24px rgba(0, 0, 0, 0.5);
-  --bf-shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.6);
-  --bf-shadow-xl: 0 24px 60px rgba(0, 0, 0, 0.7);
-  --bf-shadow-glow: 0 0 25px rgba(6, 182, 212, 0.25);
-  --bf-shadow-glow-purple: 0 0 30px rgba(124, 58, 237, 0.25);
+  --bf-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --bf-shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --bf-shadow-md: 0 8px 24px rgba(0, 0, 0, 0.1);
+  --bf-shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.12);
+  --bf-shadow-xl: 0 24px 60px rgba(0, 0, 0, 0.15);
+  --bf-shadow-glow: 0 0 25px rgba(6, 182, 212, 0.15);
+  --bf-shadow-glow-purple: 0 0 30px rgba(124, 58, 237, 0.15);
 
   /* Glass Effects */
-  --bf-glass-bg: rgba(26, 34, 56, 0.65);
-  --bf-glass-border: rgba(255, 255, 255, 0.08);
+  --bf-glass-bg: rgba(255, 255, 255, 0.75);
+  --bf-glass-border: rgba(0, 0, 0, 0.08);
   --bf-glass-blur: blur(16px);
   
   /* Gradients */
   --bf-gradient-primary: linear-gradient(135deg, var(--bf-primary) 0%, var(--bf-purple) 100%);
   --bf-gradient-accent: linear-gradient(135deg, var(--bf-purple) 0%, var(--bf-cyan) 100%);
-  --bf-gradient-card: linear-gradient(145deg, rgba(26, 34, 56, 0.9) 0%, rgba(17, 24, 39, 0.95) 100%);
-  --bf-gradient-hero: linear-gradient(135deg, rgba(11, 15, 25, 0.95) 0%, rgba(26, 34, 56, 0.8) 100%);
+  --bf-gradient-card: linear-gradient(145deg, rgba(255, 255, 255, 0.95) 0%, rgba(249, 250, 251, 0.98) 100%);
+  --bf-gradient-hero: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(243, 244, 246, 0.9) 100%);
   --bf-gradient-success: linear-gradient(135deg, #10B981 0%, #059669 100%);
   --bf-gradient-danger: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
 
@@ -105,14 +105,6 @@
   --bf-transition-spring: 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* Light Theme override is disabled; forced to Dark Mode as per premium requirements */
-[data-theme="light"] {
-  --bf-bg-primary: #0B0F19; 
-  --bf-bg-secondary: #111827; 
-  --bf-bg-card: #1A2238; 
-  --bf-text-primary: #FFFFFF; 
-}
-
 /* Base Styles */
 *, *::before, *::after { box-sizing: border-box; }
 body {
@@ -150,10 +142,10 @@ a:hover { color: var(--bf-cyan-hover); }
 }
 
 .bf-glass-strong {
-  background: rgba(17, 24, 39, 0.85);
+  background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: var(--bf-radius-xl);
 }
 
@@ -169,7 +161,7 @@ a:hover { color: var(--bf-cyan-hover); }
 .bf-glass-card:hover {
   transform: translateY(-4px);
   box-shadow: var(--bf-shadow-lg), var(--bf-shadow-glow);
-  border-color: rgba(255, 255, 255, 0.15);
+  border-color: rgba(0, 0, 0, 0.15);
 }
 
 /* Gradient Texts */

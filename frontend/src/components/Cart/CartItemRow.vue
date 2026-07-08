@@ -13,7 +13,7 @@
         </div>
         <div class="text-start">
           <h6 class="mb-1 font-bold text-white fs-6">{{ item.product.productName }}</h6>
-          <small class="text-muted d-block mb-1">Seller: <span class="text-secondary font-semibold">{{ item.product.store ? item.product.store.storeName : 'Marketplace Vendor' }}</span></small>
+          <small class="text-muted d-block mb-1">Seller: <span class="text-secondary font-semibold">{{ item.product.storeName || 'Marketplace Vendor' }}</span></small>
           <small class="text-muted">Unit Rate: <span class="text-white">{{ formattedUnitPrice }}</span></small>
         </div>
       </div>

@@ -17,7 +17,12 @@ public class ProductDto {
     private @NotNull String imageUrl;
     private @NotNull BigDecimal price;
     private Integer categoryId;
+    private String categoryName;
     private Integer stock;
     private Integer storeId;
     private String storeName;
+    private String storeLogoUrl;
+    private Boolean storeVerified;
+    private BigDecimal storeRating;
+    private Integer storeReviewsCount;
 }

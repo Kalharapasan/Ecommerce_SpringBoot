@@ -163,11 +163,16 @@ public class ProductService {
         dto.setPrice(product.getPrice());
         if (product.getCategory() != null) {
             dto.setCategoryId(product.getCategory().getCategoryId());
+            dto.setCategoryName(product.getCategory().getCategoryName());
         }
         dto.setStock(product.getStock());
         if (product.getStore() != null) {
             dto.setStoreId(product.getStore().getStoreId());
             dto.setStoreName(product.getStore().getStoreName());
+            dto.setStoreLogoUrl(product.getStore().getStoreLogoUrl());
+            dto.setStoreVerified(product.getStore().getIsVerified());
+            dto.setStoreRating(product.getStore().getRating());
+            dto.setStoreReviewsCount(product.getStore().getReviewsCount());
         }
         return dto;
     }

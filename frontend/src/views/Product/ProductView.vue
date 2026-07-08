@@ -76,20 +76,15 @@
             class="ebv-category-tile bf-glass-card"
             @click="goToCategory(cat.categoryId)"
           >
-            <div class="ebv-category-tile-icon text-gradient">
-              <i class="bi bi-cpu" v-if="cat.categoryName.toLowerCase().includes('cpu') || cat.categoryName.toLowerCase().includes('process')"></i>
-              <i class="bi bi-gpu-card" v-else-if="cat.categoryName.toLowerCase().includes('gpu') || cat.categoryName.toLowerCase().includes('graph')"></i>
-              <i class="bi bi-device-ssd" v-else-if="cat.categoryName.toLowerCase().includes('ssd') || cat.categoryName.toLowerCase().includes('stor')"></i>
-              <i class="bi bi-memory" v-else-if="cat.categoryName.toLowerCase().includes('ram') || cat.categoryName.toLowerCase().includes('memo')"></i>
-              <i class="bi bi-pc" v-else-if="cat.categoryName.toLowerCase().includes('case') || cat.categoryName.toLowerCase().includes('chass')"></i>
-              <i class="bi bi-keyboard" v-else-if="cat.categoryName.toLowerCase().includes('key') || cat.categoryName.toLowerCase().includes('mous')"></i>
-              <i class="bi bi-display" v-else-if="cat.categoryName.toLowerCase().includes('screen') || cat.categoryName.toLowerCase().includes('monit')"></i>
-              <i class="bi bi-plug" v-else></i>
+            <div class="ebv-category-tile-image-wrapper mb-2">
+              <img :src="getCategoryImage(cat)" class="ebv-category-tile-img" alt="Category Image" />
             </div>
             <span>{{ cat.categoryName }}</span>
           </div>
           <div class="ebv-category-tile ebv-category-tile-all bf-glass-card" @click="goToCategory('all')">
-            <div class="ebv-category-tile-icon text-cyan"><i class="bi bi-plus-circle"></i></div>
+            <div class="ebv-category-tile-image-wrapper mb-2">
+              <img src="https://images.unsplash.com/photo-1600541519463-ee3745d0485f?auto=format&fit=crop&w=150&q=80" class="ebv-category-tile-img" alt="View All" />
+            </div>
             <span>View All</span>
           </div>
         </div>
@@ -311,12 +306,12 @@
                   <img :src="product.imageUrl" class="ebv-list-row-img img-fluid rounded-3" alt="Hardware Image" @error="handleImageError" />
                   
                   <div class="ebv-list-row-body flex-grow-1 text-start">
-                    <span v-if="product.category" class="ebv-list-row-cat text-gradient-primary text-uppercase font-bold small tracking-wider">{{ product.category.categoryName }}</span>
+                    <span v-if="product.categoryName" class="ebv-list-row-cat text-gradient-primary text-uppercase font-bold small tracking-wider">{{ product.categoryName }}</span>
                     <h5 class="text-white mt-1 mb-2">{{ product.productName }}</h5>
                     <p class="text-muted small mb-3">{{ product.description }}</p>
                     <div class="ebv-list-row-seller text-muted d-flex align-items-center gap-1">
-                      <i class="bi bi-shield-check text-cyan" v-if="product.store && product.store.isVerified"></i>
-                      <span>{{ product.store ? product.store.storeName : 'Enthusiast Seller' }}</span>
+                      <i class="bi bi-shield-check text-cyan" v-if="product.storeVerified"></i>
+                      <span>{{ product.storeName || 'Enthusiast Seller' }}</span>
                     </div>
                   </div>
                   
@@ -343,7 +338,7 @@
                 >
                   {{ p }}
                 </button>
-                <button :disabled="currentPage === totalPages" @click="changePage(p + 1)" class="bf-btn-ghost py-1 px-3">
+                <button :disabled="currentPage === totalPages" @click="changePage(currentPage + 1)" class="bf-btn-ghost py-1 px-3">
                   <i class="bi bi-arrow-right"></i>
                 </button>
               </div>
@@ -526,6 +521,34 @@ export default {
     },
     handleImageError(event) {
       event.target.src = 'https://images.unsplash.com/photo-1587831990711-23ca6441447b?auto=format&fit=crop&w=500&q=80';
+    },
+    getCategoryImage(cat) {
+      if (cat.imageUrl && cat.imageUrl.trim() !== '') {
+        return cat.imageUrl;
+      }
+      const name = cat.categoryName.toLowerCase();
+      if (name.includes('cpu') || name.includes('process')) {
+        return 'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?auto=format&fit=crop&w=150&q=80';
+      }
+      if (name.includes('gpu') || name.includes('graph') || name.includes('card')) {
+        return 'https://images.unsplash.com/photo-1591488320449-011701bb6704?auto=format&fit=crop&w=150&q=80';
+      }
+      if (name.includes('ssd') || name.includes('stor') || name.includes('drive')) {
+        return 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?auto=format&fit=crop&w=150&q=80';
+      }
+      if (name.includes('ram') || name.includes('memo')) {
+        return 'https://images.unsplash.com/photo-1562976540-1502c2145186?auto=format&fit=crop&w=150&q=80';
+      }
+      if (name.includes('case') || name.includes('chass') || name.includes('build') || name.includes('pc')) {
+        return 'https://images.unsplash.com/photo-1587831990711-23ca6441447b?auto=format&fit=crop&w=150&q=80';
+      }
+      if (name.includes('key') || name.includes('mous') || name.includes('board') || name.includes('periph')) {
+        return 'https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?auto=format&fit=crop&w=150&q=80';
+      }
+      if (name.includes('screen') || name.includes('monit') || name.includes('display')) {
+        return 'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?auto=format&fit=crop&w=150&q=80';
+      }
+      return 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=150&q=80';
     }
   },
   mounted() {
@@ -642,14 +665,34 @@ export default {
   font-weight: 600;
   font-size: 0.88rem;
   text-align: center;
+  color: var(--bf-text-primary);
 }
 
-.ebv-category-tile-icon {
-  font-size: 2rem;
+.ebv-category-tile-image-wrapper {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid var(--bf-border);
+  box-shadow: var(--bf-shadow-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ebv-category-tile-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--bf-transition-base);
+}
+
+.ebv-category-tile:hover .ebv-category-tile-img {
+  transform: scale(1.1);
 }
 
 .ebv-category-tile-all {
-  border: 1px dashed rgba(6, 182, 212, 0.3) !important;
+  border: 1px dashed var(--bf-cyan) !important;
 }
 
 /* Stats Strip */

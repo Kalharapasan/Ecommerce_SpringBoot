@@ -303,9 +303,9 @@ export default {
         this.currentImageUrl = this.product.imageUrl;
 
         // Fetch related catalog items
-        if (this.product && this.product.category) {
-          this.categoryName = this.product.category.categoryName;
-          const catId = this.product.category.categoryId;
+        if (this.product && this.product.categoryId) {
+          this.categoryName = this.product.categoryName;
+          const catId = this.product.categoryId;
           try {
             const relResponse = await api.get(`/category/${catId}/product`);
             const allProducts = relResponse.data.data || [];

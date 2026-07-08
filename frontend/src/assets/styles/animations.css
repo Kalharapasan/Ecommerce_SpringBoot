@@ -25,9 +25,9 @@
 .bf-skeleton {
   background: linear-gradient(
     90deg,
-    rgba(255, 255, 255, 0.05) 25%,
-    rgba(255, 255, 255, 0.1) 50%,
-    rgba(255, 255, 255, 0.05) 75%
+    rgba(0, 0, 0, 0.05) 25%,
+    rgba(0, 0, 0, 0.1) 50%,
+    rgba(0, 0, 0, 0.05) 75%
   );
   background-size: 200% 100%;
   animation: bf-shimmer 1.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
@@ -86,7 +86,7 @@
 .bf-spinner {
   width: 24px;
   height: 24px;
-  border: 3px solid rgba(255, 255, 255, 0.1);
+  border: 3px solid rgba(0, 0, 0, 0.1);
   border-top-color: var(--bf-cyan);
   border-radius: 50%;
   animation: bf-spin 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;

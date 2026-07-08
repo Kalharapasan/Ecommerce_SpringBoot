@@ -45,7 +45,7 @@
     <!-- Card Contents -->
     <div class="ebx-body">
       <div class="d-flex justify-content-between align-items-center mb-1">
-        <span v-if="product.category" class="ebx-category text-gradient">{{ product.category.categoryName }}</span>
+        <span v-if="product.categoryName" class="ebx-category text-gradient">{{ product.categoryName }}</span>
         <span class="ebx-shipping-badge"><i class="bi bi-truck me-1"></i>Free Shipping</span>
       </div>
 
@@ -155,18 +155,16 @@ export default {
       return 'bg-success';
     },
     sellerName() {
-      return this.product.store && this.product.store.storeName
-        ? this.product.store.storeName
-        : 'Marketplace Seller';
+      return this.product.storeName || 'Marketplace Seller';
     },
     isVerifiedSeller() {
-      return !!(this.product.store && this.product.store.isVerified);
+      return !!this.product.storeVerified;
     },
     sellerRating() {
-      return this.product.store ? Number(this.product.store.rating) || 0 : 0;
+      return Number(this.product.storeRating) || 0;
     },
     sellerReviewCount() {
-      return this.product.store ? Number(this.product.store.reviewsCount) || 0 : 0;
+      return Number(this.product.storeReviewsCount) || 0;
     },
     starPercent() {
       return Math.max(0, Math.min(100, (this.sellerRating / 5) * 100));
