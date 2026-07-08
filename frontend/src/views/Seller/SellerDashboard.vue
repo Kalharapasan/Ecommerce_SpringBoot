@@ -1,98 +1,111 @@
 <template>
-  <div class="bf-page bf-fade-in p-4 text-start">
-    <div class="container">
-      <div class="row mb-4">
-        <div class="col-12 text-start d-flex justify-content-between align-items-center flex-wrap gap-3">
+  <div class="bf-page bf-fade-in py-5 text-start">
+    <div class="container position-relative">
+      <div class="glow-bg animate-float"></div>
+
+      <!-- Header -->
+      <div class="row mb-5 position-relative z-2">
+        <div class="col-12 text-start d-flex justify-content-between align-items-center flex-wrap gap-4">
           <div>
-            <span class="bf-badge bf-badge-warning mb-2 text-dark">Seller Hub</span>
-            <h2 class="text-white font-weight-bold mb-1">Seller Dashboard</h2>
-            <p class="text-muted small">Manage your store, track sales, and list hardware components.</p>
+            <span class="badge bg-warning bg-opacity-25 text-warning mb-2 px-3 py-2 rounded-pill text-uppercase">
+              <i class="bi bi-shop me-1"></i> Merchant Command Center
+            </span>
+            <h2 class="text-white font-bold mb-1 fs-2">Seller Dashboard</h2>
+            <p class="text-muted small">Configure storefront policies, track sales revenue metrics, and list hardware configurations.</p>
           </div>
           <div class="d-flex gap-2">
-            <router-link to="/seller/store-setup" class="bf-btn bf-btn-outline bf-btn-sm">Store Profile Settings</router-link>
-            <router-link to="/seller/products" class="bf-btn bf-btn-primary bf-btn-sm">Manage Products</router-link>
+            <router-link to="/seller/store-setup" class="text-decoration-none">
+              <button class="bf-btn-ghost py-2 px-3 border-secondary border-opacity-25 text-white">Store Settings</button>
+            </router-link>
+            <router-link to="/seller/products" class="text-decoration-none">
+              <button class="bf-btn-premium border-0 py-2.5 px-3">Manage Inventory</button>
+            </router-link>
           </div>
         </div>
       </div>
 
       <!-- Loading State -->
-      <div v-if="loading" class="row g-4 mb-4">
-        <div class="col-md-4" v-for="i in 3" :key="i">
-          <div class="bf-stat-widget bg-dark border-light">
-            <span class="spinner-border spinner-border-sm text-primary mb-2"></span>
-          </div>
+      <div v-if="loading" class="row g-4 mb-4 position-relative z-2">
+        <div class="col-md-3" v-for="i in 4" :key="i">
+          <div class="bf-skeleton" style="height: 140px;"></div>
         </div>
       </div>
 
-      <!-- No Store Alert -->
-      <div v-else-if="!hasStore" class="bf-card bf-glass p-5 text-center text-white border-light">
-        <span style="font-size: 3rem;">🔌</span>
-        <h4 class="font-weight-bold text-white mt-3 mb-2">No Active Store Found</h4>
-        <p class="text-muted small mb-4">Please set up your storefront first to register your policies, logo, and brand name.</p>
-        <router-link to="/seller/store-setup" class="bf-btn bf-btn-primary px-4 shadow-glow">Setup Store Profile</router-link>
+      <!-- No Store Setup Alert -->
+      <div v-else-if="!hasStore" class="bf-glass-card p-5 text-center text-white border-0 position-relative z-2">
+        <span class="fs-1 text-cyan"><i class="bi bi-shop-window"></i></span>
+        <h4 class="font-bold text-white mt-3 mb-2">No Registered Storefront Found</h4>
+        <p class="text-muted small mb-4">You must configure your vendor policies, brand name, and upload a store logo before listing gear.</p>
+        <router-link to="/seller/store-setup" class="text-decoration-none">
+          <button class="bf-btn-premium border-0 py-2.5 px-4 shadow-glow">Launch Store Profile</button>
+        </router-link>
       </div>
 
-      <!-- Overview Stats -->
-      <div v-else class="bf-fade-in text-white">
-        <div class="row g-4 mb-4">
-          <div class="col-md-3">
-            <div class="bf-stat-widget bg-dark border-light">
+      <!-- Analytics Overview Grid -->
+      <div v-else class="bf-fade-in text-white position-relative z-2">
+        <div class="row g-4 mb-5">
+          <!-- Widget 1: Revenue -->
+          <div class="col-xl-3 col-md-6">
+            <div class="bf-stat-widget bf-glass border-0 p-4">
               <div class="d-flex justify-content-between align-items-center mb-3">
-                <span class="stat-label text-muted">Total Revenue</span>
-                <div class="stat-icon font-weight-bold" style="background: var(--bf-success-light); color: var(--bf-success);">LKR</div>
+                <span class="text-muted small font-bold">TOTAL SALES</span>
+                <span class="stat-icon-glow bg-success text-success"><i class="bi bi-cash-stack"></i></span>
               </div>
-              <div class="stat-value text-white">{{ formatPrice(stats.totalRevenue) }}</div>
-              <small class="text-success font-weight-bold">⚡ Sales volume</small>
+              <h3 class="stat-value font-bold text-white mb-2">{{ formatPrice(stats.totalRevenue) }}</h3>
+              <small class="text-success font-semibold small"><i class="bi bi-graph-up-arrow me-1"></i>Sales volume rate</small>
             </div>
           </div>
-          <div class="col-md-3">
-            <div class="bf-stat-widget bg-dark border-light">
+          <!-- Widget 2: Orders -->
+          <div class="col-xl-3 col-md-6">
+            <div class="bf-stat-widget bf-glass border-0 p-4">
               <div class="d-flex justify-content-between align-items-center mb-3">
-                <span class="stat-label text-muted">Orders Received</span>
-                <div class="stat-icon" style="background: var(--bf-primary-light); color: var(--bf-primary);">📦</div>
+                <span class="text-muted small font-bold">ORDERS RECEIVED</span>
+                <span class="stat-icon-glow bg-primary text-cyan"><i class="bi bi-box-seam"></i></span>
               </div>
-              <div class="stat-value text-white">{{ stats.ordersCount }}</div>
-              <small class="text-muted">Unique purchases</small>
+              <h3 class="stat-value font-bold text-white mb-2">{{ stats.ordersCount }}</h3>
+              <small class="text-muted small">Unique customer purchases</small>
             </div>
           </div>
-          <div class="col-md-3">
-            <div class="bf-stat-widget bg-dark border-light">
+          <!-- Widget 3: Products -->
+          <div class="col-xl-3 col-md-6">
+            <div class="bf-stat-widget bf-glass border-0 p-4">
               <div class="d-flex justify-content-between align-items-center mb-3">
-                <span class="stat-label text-muted">Total Products</span>
-                <div class="stat-icon" style="background: var(--bf-info-light); color: var(--bf-info);">🔌</div>
+                <span class="text-muted small font-bold">ACTIVE PRODUCTS</span>
+                <span class="stat-icon-glow bg-purple text-purple"><i class="bi bi-cpu"></i></span>
               </div>
-              <div class="stat-value text-white">{{ stats.productsCount }}</div>
-              <small class="text-muted">Listed components</small>
+              <h3 class="stat-value font-bold text-white mb-2">{{ stats.productsCount }}</h3>
+              <small class="text-muted small">Listed inventory components</small>
             </div>
           </div>
-          <div class="col-md-3">
-            <div class="bf-stat-widget bg-dark border-light">
+          <!-- Widget 4: Fanbase -->
+          <div class="col-xl-3 col-md-6">
+            <div class="bf-stat-widget bf-glass border-0 p-4">
               <div class="d-flex justify-content-between align-items-center mb-3">
-                <span class="stat-label text-muted">Store Followers</span>
-                <div class="stat-icon" style="background: var(--bf-warning-light); color: var(--bf-warning);">❤️</div>
+                <span class="text-muted small font-bold">STORE FOLLOWERS</span>
+                <span class="stat-icon-glow bg-warning text-warning"><i class="bi bi-heart-fill"></i></span>
               </div>
-              <div class="stat-value text-white">{{ stats.followersCount }}</div>
-              <small class="text-muted">Active fanbase</small>
+              <h3 class="stat-value font-bold text-white mb-2">{{ stats.followersCount }}</h3>
+              <small class="text-muted small">Enthusiast fanbase counts</small>
             </div>
           </div>
         </div>
 
         <div class="row g-4">
-          <!-- Verification & Ratings Card -->
-          <div class="col-md-6">
-            <div class="bf-card bg-dark border-light p-4 h-100">
-              <h5 class="font-weight-bold text-white mb-4">Verification & Ratings</h5>
+          <!-- Verification Status -->
+          <div class="col-lg-6">
+            <div class="bf-glass-card border-0 p-4 h-100 text-start">
+              <h5 class="font-bold text-white mb-4">Verification & Ratings</h5>
               
-              <div class="d-flex align-items-center gap-3 mb-4 p-3 bg-secondary-dark rounded">
-                <span style="font-size: 2rem;">🛡️</span>
+              <div class="d-flex align-items-center gap-3 mb-4 p-3 bg-black bg-opacity-20 rounded border border-secondary border-opacity-10">
+                <span class="fs-2 text-cyan"><i class="bi bi-shield-check"></i></span>
                 <div>
-                  <h6 class="font-weight-bold mb-1 text-white">
-                    Store Verification Status:
-                    <span v-if="stats.isVerified" class="text-success">Verified</span>
-                    <span v-else class="text-warning">Pending Review</span>
+                  <h6 class="font-bold mb-1 text-white">
+                    Privilege Badge Status:
+                    <span v-if="stats.isVerified" class="text-success">Verified Hub</span>
+                    <span v-else class="text-warning">In Review</span>
                   </h6>
                   <p class="text-muted small mb-0">
-                    {{ stats.isVerified ? 'Your store carries the official verified seller trust badge.' : 'ByteForge admins are reviewing your store profile details.' }}
+                    {{ stats.isVerified ? 'Your storefront displays the official ByteForge Verified Seller badge.' : 'ByteForge administrators are evaluating your credentials.' }}
                   </p>
                 </div>
               </div>
@@ -100,7 +113,7 @@
               <div class="d-flex align-items-center justify-content-between">
                 <div>
                   <span class="text-muted d-block small">Average Score</span>
-                  <span class="stat-value text-warning fs-3">{{ stats.rating }} ★</span>
+                  <span class="stat-value text-warning fs-3 font-bold">{{ stats.rating.toFixed(1) }} ★</span>
                 </div>
                 <div class="text-end">
                   <span class="text-muted d-block small">Reviews Submitted</span>
@@ -110,18 +123,22 @@
             </div>
           </div>
 
-          <!-- Shortcuts & Management -->
-          <div class="col-md-6">
-            <div class="bf-card bg-dark border-light p-4 h-100">
-              <h5 class="font-weight-bold text-white mb-3">Quick Actions</h5>
-              <p class="text-muted small mb-4">Easily jump to catalog maintenance or test view your store page.</p>
+          <!-- Shortcuts -->
+          <div class="col-lg-6">
+            <div class="bf-glass-card border-0 p-4 h-100 text-start">
+              <h5 class="font-bold text-white mb-3">Quick Actions Console</h5>
+              <p class="text-muted small mb-4">Maintain inventory or examine how your store displays publicly.</p>
               
-              <div class="d-flex flex-column gap-3">
-                <router-link :to="'/store/' + stats.storeId" class="bf-btn bf-btn-outline w-100 text-center py-2.5">
-                  👁️ View Public Storefront Page
+              <div class="d-flex flex-column gap-3 mt-4">
+                <router-link :to="'/store/' + stats.storeId" class="text-decoration-none">
+                  <button class="bf-btn-ghost w-100 text-center py-2.5 border-secondary border-opacity-25">
+                    <i class="bi bi-eye me-1"></i> Inspect Public Storefront Page
+                  </button>
                 </router-link>
-                <router-link to="/seller/products" class="bf-btn bf-btn-primary w-100 text-center py-2.5 shadow-glow">
-                  ➕ List & Manage Store Products
+                <router-link to="/seller/products" class="text-decoration-none">
+                  <button class="bf-btn-premium border-0 w-100 text-center py-2.5 shadow-glow">
+                    <i class="bi bi-plus-circle me-1"></i> List & Maintain Components
+                  </button>
                 </router-link>
               </div>
             </div>
@@ -156,9 +173,7 @@ export default {
     };
   },
   methods: {
-    formatPrice(val) {
-      return formatPrice(val);
-    },
+    formatPrice(val) { return formatPrice(val); },
     async fetchAnalytics() {
       const token = getToken();
       if (!token) {
@@ -186,20 +201,32 @@ export default {
 </script>
 
 <style scoped>
-.bg-secondary-dark {
-  background: rgba(255, 255, 255, 0.03);
+.glow-bg {
+  position: absolute;
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.05) 0%, transparent 75%);
+  top: -100px; left: -100px;
+  pointer-events: none;
+  z-index: 1;
 }
 
 .bf-stat-widget {
-  background: var(--bf-bg-card);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: var(--bf-radius-lg);
-  padding: 1.5rem;
   transition: all var(--bf-transition-base);
 }
 
 .bf-stat-widget:hover {
-  border-color: var(--bf-primary);
-  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.08);
+  transform: translateY(-4px);
+  box-shadow: var(--bf-shadow-xl), 0 0 15px rgba(255, 255, 255, 0.05);
 }
+
+.stat-icon-glow {
+  width: 38px; height: 38px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.25rem;
+}
+.stat-icon-glow.bg-success { background: rgba(16, 185, 129, 0.15) !important; }
+.stat-icon-glow.bg-primary { background: rgba(6, 182, 212, 0.15) !important; }
+.stat-icon-glow.bg-purple { background: rgba(124, 58, 237, 0.15) !important; }
+.stat-icon-glow.bg-warning { background: rgba(245, 158, 11, 0.15) !important; }
 </style>
