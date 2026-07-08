@@ -316,12 +316,11 @@
 import api, { extractErrorMessage, formatPrice } from '../../utils/api';
 import { getToken, getCurrentUser, updateCartCount } from '../../utils/auth';
 import CartItemRow from '../../components/Cart/CartItemRow.vue';
-import LoadingSkeleton from '../../components/Common/LoadingSkeleton.vue';
 import { showToast } from '../../components/Common/ToastNotification.vue';
 
 export default {
   name: 'CartView',
-  components: { CartItemRow, LoadingSkeleton },
+  components: { CartItemRow },
   data() {
     return {
       currentStep: 1,

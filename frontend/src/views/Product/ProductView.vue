@@ -359,12 +359,11 @@
 <script>
 import api, { formatPrice, extractErrorMessage } from '../../utils/api';
 import ProductBox from '../../components/Product/ProductBox.vue';
-import LoadingSkeleton from '../../components/Common/LoadingSkeleton.vue';
 import { showToast } from '../../components/Common/ToastNotification.vue';
 
 export default {
   name: 'ProductView',
-  components: { ProductBox, LoadingSkeleton },
+  components: { ProductBox },
   data() {
     return {
       products: [],

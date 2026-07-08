@@ -301,12 +301,10 @@
 <script>
 import api, { extractErrorMessage, formatPrice } from '../../utils/api';
 import { getCurrentUser, getToken } from '../../utils/auth';
-import LoadingSkeleton from '../../components/Common/LoadingSkeleton.vue';
 import { showToast } from '../../components/Common/ToastNotification.vue';
 
 export default {
   name: 'ProfileView',
-  components: { LoadingSkeleton },
   data() {
     return {
       user: null,

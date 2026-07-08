@@ -242,12 +242,11 @@
 import api, { extractErrorMessage, formatPrice } from '../../utils/api';
 import { isLoggedIn, getToken, authState, getCurrentUser } from '../../utils/auth';
 import ProductBox from '../../components/Product/ProductBox.vue';
-import LoadingSkeleton from '../../components/Common/LoadingSkeleton.vue';
 import { showToast } from '../../components/Common/ToastNotification.vue';
 
 export default {
   name: 'ProductDetail',
-  components: { ProductBox, LoadingSkeleton },
+  components: { ProductBox },
   data() {
     return {
       product: null,
